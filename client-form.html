@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <title>Hire A Hubby Kapiti New Client Form</title>
+</head>
+
+<body>
+    <div class="container"></div>
+    <form id = "clientForm" action="http://wilder.azurewebsites.net/echo" method="get" accept-charset="utf-8" onsubmit="">
+        <fieldset>
+            <input id="accountName" type="Text" name="accountName" placeholder="Account Name" tabindex="2" required>
+        </fieldset>
+        <fieldset>
+            <input id="mainContactFirstName" type="Text" name="mainContactFirstName" placeholder="Main Contact First Name" tabindex="3" required>
+        </fieldset>
+        <fieldset>
+            <input id="mainContactLastName" type="Text" name="mainContactLastName" placeholder="Main Contact Last Name" tabindex="4" required>
+        </fieldset>
+        <fieldset>
+            <input id="mainContactEmail" type="Email" name="mainContactEmail" placeholder="Main Contact Email" tabindex="5" required>
+        </fieldset>
+        <fieldset>
+            <input id="mainContactLandline" type="tel" name="mainContactLandline" placeholder="Main Contact Landline" tabindex="6">
+        </fieldset>
+        <fieldset>
+            <input id="mainContactMobile" type="tel" name="mainContactMobile" placeholder="Main Contact Mobile" tabindex="7">
+        </fieldset>
+        <fieldset>
+            <input id="businessName" type="Text" name="businessName" placeholder="Business Name" tabindex="8">
+        </fieldset>
+        <fieldset>
+            <input id="billingStreetAddress" type="Text" name="billingStreetAddress" placeholder="Billing Street Address" tabindex="9" required>
+        </fieldset>
+        <fieldset>
+            <input id="billingAddressSuburb" type="datalist" name="billingAddressSuburb" placeholder="Billing Address Suburb" tabindex="10">
+            <datalist id="billingAddressSuburb"></datalist required>
+        </fieldset>
+        <fieldset>
+            <input id="territory" type="datalist" name="territory" placeholder="Territory" tabindex="11">
+            <datalist id="territory"></datalist required>
+        </fieldset>
+        <fieldset>
+            <input id="customerDemographic" type="datalist" name="customerDemographic" placeholder="Customer Demographic" tabindex="12">
+            <datalist id="customerDemographic"></datalist required>
+        </fieldset>
+        <fieldset>
+            <input id="estimatedCustomerIncome" type="datalist" name="estimatedCustomerIncome" placeholder="Estimated Customer Income" tabindex="13">
+            <datalist id="estimatedCustomerIncome"></datalist required>
+        </fieldset>
+        <fieldset>
+            <input id="acquisitionChannel" type="datalist" name="acquisitionChannel" placeholder="How did they come to us?" tabindex="14">
+            <datalist id="acquisitionChannel"></datalist required>
+        </fieldset>
+        <fieldset>
+            <input type="submit" name="submit">
+        </fieldset>
+    </form>
+</body>
+<script src="scripts.js" type="text/javascript" charset="utf-8" async defer></script>
+</html>
