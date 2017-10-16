@@ -18,14 +18,14 @@ body {
     font-size: 12px;
     line-height: 30px;
     /*color: #777;*/
-    color: #59748c;
+    color: #394a58;
     /*background: url(images/background-HAH.png) top left repeat;*/
     /*background: #c60062;*/
     background: #aeb4ab;
 }
 
 .container {
-    max-width: 300px;
+    max-width: 450px;
     width: 100%;
     margin: 0 auto;
     position: relative;
@@ -36,8 +36,10 @@ body {
 #clientForm input[type="tel"],
 #clientForm input[type="url"],
 #clientForm textarea,
-#clientForm button[type="submit"] {
-    font: 400 12px/16px "Roboto", Helvetica, Arial, sans-serif;
+#clientForm button[type="submit"],
+#clientForm input[type="datalist"] {
+    font: 400 14px/18px "Roboto", Helvetica, Arial, sans-serif;
+    color: #394a58;
 }
 
 #clientForm {
@@ -57,7 +59,7 @@ body {
 #clientForm h4 {
     margin: 5px 0 15px;
     display: block;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -73,6 +75,7 @@ fieldset {
 #clientForm input[type="email"],
 #clientForm input[type="tel"],
 #clientForm input[type="url"],
+#clientForm input[type="datalist"],
 #clientForm textarea {
     width: 100%;
     border: 1px solid #ccc;
@@ -85,6 +88,7 @@ fieldset {
 #clientForm input[type="email"]:hover,
 #clientForm input[type="tel"]:hover,
 #clientForm input[type="url"]:hover,
+#clientForm input[type="datalist"]:hover,
 #clientForm textarea:hover {
     -webkit-transition: border-color 0.3s ease-in-out;
     -moz-transition: border-color 0.3s ease-in-out;
@@ -104,7 +108,7 @@ fieldset {
     border: none;
     background: #c60062;
     color: #FFF;
-    margin: 0 0 5px;
+    margin: 10px 0 5px;
     padding: 10px;
     font-size: 15px;
 }
