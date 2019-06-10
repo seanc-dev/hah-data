@@ -40,6 +40,29 @@ legend {
     font-size: 1.25rem;
 }
 
+.form-control:focus{
+    border-color: #cccccc;
+    -webkit-box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
+    -moz-box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
+    box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
+}
+
+/* .form-control:focus{
+    border-color: #cccccc;
+    -webkit-box-shadow: 0px 0px 3px 1px rgba(198,0,98,1);
+-moz-box-shadow: 0px 0px 3px 1px rgba(198,0,98,1);
+box-shadow: 0px 0px 3px 1px rgba(198,0,98,0.75);
+border: var(--hubby-maroon)
+} */
+
+label {
+    font-size: 0.875rem;
+}
+
+label.active {
+    color: var(--hubby-maroon);
+}
+
 .jumbotron {
     padding: 1rem;
     margin-bottom: 20px;

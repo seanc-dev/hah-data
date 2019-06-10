@@ -11,6 +11,44 @@ export default function constructForm(formName) {
         formEle.appendChild(constructFormSection(structureArr[i]));
     }
 
+    // create buttons fieldset
+    let submitFieldset = document.createElement('fieldset');
+    submitFieldset.classList.add('border-0');
+    submitFieldset.classList.add('d-flex');
+    let row = document.createElement('div');
+    addClasses(row, ['row', 'justify-content-end'])
+
+    // append buttons to fieldset
+    row.appendChild(constructButtonCol('Clear', 'button', 'btn-outline-secondary'));
+    row.appendChild(constructButtonCol('Submit', 'submit', 'btn-secondary'));
+
+    // append row to buttons fieldset
+    submitFieldset.appendChild(row);
+
+    // append button fieldset to form
+    formEle.appendChild(submitFieldset);
+
+    function addClasses(ele, classArr){
+        for(let q = 0; q < classArr.length; q++){
+            ele.classList.add(classArr[q]);
+        }
+        return ele
+    }
+
+    function constructButtonCol(btnText, btnType, btnClass){
+
+        let col = document.createElement('div');
+        addClasses(col, ['col-2', 'p-0', 'pl-3']);
+        let btn = document.createElement('button');
+        addClasses(btn, ['btn', btnClass, 'd-inline', 'btn-block']);
+        btn.setAttribute('type', btnType);
+        btn.appendChild(document.createTextNode(btnText));
+        col.appendChild(btn);
+
+        return col;
+
+    }
+
     function constructFormSection(sectionDetail) {
 
         let fieldsetEl = document.createElement('fieldset');
@@ -45,15 +83,17 @@ export default function constructForm(formName) {
                 innerEl.classList.add('col-6');
 
                 // create label
-                let labelEl     = document.createElement('label'),
-                    labelText   = document.createTextNode(fieldDetail.label);
-                labelEl.appendChild(labelText);
+                let labelEl         = document.createElement('label'),
+                    labelText       = fieldDetail.isRequired ? fieldDetail.label + ' *' : fieldDetail.label,
+                    labelTextNode   = document.createTextNode(labelText);
+                labelEl.appendChild(labelTextNode);
                 labelEl.setAttribute('for', uniqueName);
                 innerEl.appendChild(labelEl);
 
-                // create input
+                // create input and add relevant classes and attributes
                 let type = (fieldDetail.fieldType === 'select' || fieldDetail.fieldType === 'textarea') ? fieldDetail.fieldType : 'input',
                     inputEl = document.createElement(type);
+                if(fieldDetail.additionalClasses && fieldDetail.additionalClasses.length > 0) addClasses(inputEl, fieldDetail.additionalClasses)
                 inputEl.classList.add('form-control');
                 inputEl.setAttribute('id', uniqueName);
                 inputEl.setAttribute('name', fieldDetail.fieldName);
@@ -72,17 +112,22 @@ export default function constructForm(formName) {
             }
 
             function constructDataList(fieldDetail) {
-                console.log(fieldDetail);
+
                 let dl = document.createElement('datalist'),
                     option, text;
+
                 dl.setAttribute('id', fieldDetail.fieldName + 'List')
+
                 for (let l = 0; l < fieldDetail.values.length; l++) {
                     option = document.createElement('option');
                     text = document.createTextNode(fieldDetail.values[l]);
                     option.appendChild(text);
                     dl.appendChild(option);
+
                 }
+
                 return dl;
+                
             }
 
             return containerEl;

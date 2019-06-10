@@ -5,9 +5,10 @@ const data = {
             structure: [{
                     sectionTitle: "Identity and Contact Details",
                     fields: [
-                        ["cd_accountType", "cd_accountName"], 
-                        ["cd_businessName"], 
-                        ["cd_mainContactFirstName", "cd_mainContactLastName"], 
+                        ["cd_accountType", "cd_accountName"],
+                        ["cd_businessName"],
+                        ["cd_mainContactFirstName", "cd_mainContactLastName"],
+                        ["cd_secondaryContactFirstName", "cd_secondaryContactLastName"],
                         ["cd_mainContactLandline", "cd_mainContactMobile"],
                         ["cd_mainContactEmail"]
                     ]
@@ -15,15 +16,15 @@ const data = {
                 {
                     sectionTitle: "Address Details",
                     fields: [
-                        ["cd_billingAddressStreetNumber", "cd_billingAddressStreetName"], 
-                        ["cd_billingAddressSuburb", "cd_billingAddressPostCode"], 
+                        ["cd_billingAddressStreetNumber", "cd_billingAddressStreetName"],
+                        ["cd_billingAddressSuburb", "cd_billingAddressPostCode"],
                         ["cd_territory"]
                     ]
                 },
                 {
                     sectionTitle: "Marketing Details",
                     fields: [
-                        ["cd_customerDemographic", "cd_estimatedCustomerIncome"], 
+                        ["cd_customerDemographic", "cd_estimatedCustomerIncome"],
                         ["cd_acquisitionChannel"]
                     ]
                 }
@@ -35,7 +36,8 @@ const data = {
                     fieldType: "datalist",
                     values: ["Single", "Couple", "Business"],
                     readOnly: 0,
-                    isRequired: 1
+                    isRequired: 1,
+                    additionalClasses: ["account-name"]
                 },
                 cd_accountName: {
                     label: "Account Name",
@@ -49,14 +51,32 @@ const data = {
                     fieldName: "mainContactFirstName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 1
+                    isRequired: 1,
+                    additionalClasses: ["account-name"]
                 },
                 cd_mainContactLastName: {
                     label: "Main Contact Last Name",
                     fieldName: "mainContactLastName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 1
+                    isRequired: 1,
+                    additionalClasses: ["account-name"]
+                },
+                cd_secondaryContactFirstName: {
+                    label: "Secondary Contact First Name",
+                    fieldName: "secondaryContactFirstName",
+                    fieldType: "Text",
+                    readOnly: 0,
+                    isRequired: 0,
+                    additionalClasses: ["account-name"]
+                },
+                cd_secondaryContactLastName: {
+                    label: "Secondary Contact Last Name",
+                    fieldName: "secondaryContactLastName",
+                    fieldType: "Text",
+                    readOnly: 0,
+                    isRequired: 0,
+                    additionalClasses: ["account-name"]
                 },
                 cd_mainContactEmail: {
                     label: "Main Contact Email",
@@ -84,7 +104,8 @@ const data = {
                     fieldName: "businessName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 0
+                    isRequired: 0,
+                    additionalClasses: ["account-name"]
                 },
                 cd_billingAddressStreetNumber: {
                     label: "Billing Address Street Number",
@@ -146,7 +167,7 @@ const data = {
                     values: ["Referral from Partner Business", "Word of Mouth", "Vehicle Signage", "Print Campaign (HAH Kapiti)", "Print Advertising (HAH Kapiti - BAU)", "Online Referral (HAH National - BAU)", "Facebook Advertising (HAH National - BAU)", "Facebook Advertising (HAH Kapiti - BAU)", "Facebook Campaign (HAH Kapiti)", "Other Marketing Campaign (HAH National)", "Flyer Drop", "Gift Voucher", "Sweet Louise Voucher"],
                     readOnly: 0,
                     isRequired: 1
-                },
+                }
             }
         }
     }
