@@ -1,0 +1,115 @@
+:root {
+    --gunmetal-grey: #394a58;
+    --light-grey: #88959E;
+    --hubby-maroon: #c60062;
+    --off-white: #F9F9F9;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
+* {
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    -o-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
+    font-weight: 100;
+    font-size: 12px;
+    line-height: 30px;
+    /*color: #777;*/
+    color: var(--gunmetal-grey);
+    background: #aeb4ab;
+}
+
+legend {
+    font-size: 1.25rem;
+}
+
+.jumbotron {
+    padding: 1rem;
+    margin-bottom: 20px;
+}
+
+.container {
+    background: #F9F9F9;
+    padding: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+fieldset.form-group legend {
+    /* margin-left: 5px; */
+    padding: 0 10px;
+    width: inherit;
+}
+
+fieldset.form-group {
+    border: 1px solid var(--light-grey);
+    padding: 0 5px 20px 5px;
+}
+
+input.form-control {
+    margin-bottom: 10px
+}
+
+div#tabRow div.tab-col {
+    padding: 0
+}
+
+section#appBody div.row {
+    height: 100%; 
+    width: 100%;
+    margin: 0;
+}
+
+div#tabRow div.card-body {
+    padding: 0.75rem 1.25rem;
+}
+
+div#tabRow div.card-body h4 {
+    margin-bottom: 0;
+}
+
+#tabRow {
+    transform: translate(0px, 12px)
+}
+
+#tabRow .card {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+#tabRow .active-tab {
+    transform: translate(0px, -10px);
+    height: 64px;
+    border-bottom: var(--off-white) !important;
+    /* font-size: 1.5rem !important; */
+    color: var(--hubby-maroon);
+    transition: transform linear 0.05s;
+    transform: height linear 0.05s;
+    /* transition: font-size linear 0.05s; */
+}
+
+#contentBody {
+    transform: translate(0px, 2px);
+    
+}
+
+#contentBody .card {
+    border-top: none;
+}

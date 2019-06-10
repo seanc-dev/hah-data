@@ -1,0 +1,33 @@
+{
+  "name": "hah-kapiti-forms",
+  "version": "1.0.0",
+  "description": "",
+  "engines": {
+    "node": "10.14.1",
+    "npm": "6.9.0"
+  },
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanc-dev/HAHK-forms.git"
+  },
+  "author": "SeanC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seanc-dev/HAHK-forms/issues"
+  },
+  "homepage": "https://github.com/seanc-dev/HAHK-forms#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.0.0",
+    "ejs": "^2.6.1",
+    "express": "^4.17.1"
+  }
+}
