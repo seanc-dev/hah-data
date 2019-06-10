@@ -97,6 +97,7 @@ export default function constructForm(formName) {
                 inputEl.classList.add('form-control');
                 inputEl.setAttribute('id', uniqueName);
                 inputEl.setAttribute('name', fieldDetail.fieldName);
+                if (fieldDetail.pattern) inputEl.setAttribute('pattern', fieldDetail.pattern)
                 if (type === 'input') inputEl.setAttribute('type', fieldDetail.fieldType);
                 if (fieldDetail.isRequired) inputEl.required = true;
                 if (fieldDetail.readOnly) inputEl.setAttribute('readonly', true);

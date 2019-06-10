@@ -67,7 +67,7 @@ const data = {
                     fieldName: "secondaryContactFirstName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 0,
+                    isRequired: 1,
                     additionalClasses: ["account-name"]
                 },
                 cd_secondaryContactLastName: {
@@ -75,7 +75,7 @@ const data = {
                     fieldName: "secondaryContactLastName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 0,
+                    isRequired: 1,
                     additionalClasses: ["account-name"]
                 },
                 cd_mainContactEmail: {
@@ -90,14 +90,16 @@ const data = {
                     fieldName: "mainContactLandline",
                     fieldType: "tel",
                     readOnly: 0,
-                    isRequired: 0
+                    isRequired: 0,
+                    pattern: /^[\+]?[(]?[0-9]{2}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/im
                 },
                 cd_mainContactMobile: {
                     label: "Main Contact Mobile",
                     fieldName: "mainContactMobile",
                     fieldType: "tel",
                     readOnly: 0,
-                    isRequired: 0
+                    isRequired: 0,
+                    pattern: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
                 },
                 cd_businessName: {
                     label: "Business Name",
