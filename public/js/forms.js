@@ -125,6 +125,7 @@ export default function constructForm(formName) {
 
             function addOptions(housingEl, values){
                 let option, text;
+                console.log(values)
                 for (let l = 0; l < values.length; l++) {
                     option = document.createElement('option');
                     option.setAttribute('value', values[l]);

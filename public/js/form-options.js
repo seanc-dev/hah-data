@@ -195,7 +195,6 @@ const data = {
                         ["jd_invoiceAmount", "jd_materialsCost"],
                         ["jd_costSubcontractor", "jd_costOther"],
                         ["jd_daveHours", "jd_westyHours"],
-                        ["jd_boofHours", "jd_workSatisfaction"],
                         ["jd_boofHours"]
                     ]
                 },
@@ -209,16 +208,17 @@ const data = {
             fields: {
                 jd_accountName: {
                     label: "Account Name",
-                    name: "accountName",
-                    type: "datalist",
+                    fieldName: "accountName",
+                    fieldType: "datalist",
+                    values: [""],
                     readOnly: 0,
                     isRequired: 1,
                     validationDetail: "Give all unique existing values as options, sorted alphabetically. Do not allow new values to be entered"
                 },
                 jd_clientId: {
                     label: "",
-                    name: "clientId",
-                    type: "hidden",
+                    fieldName: "clientId",
+                    fieldType: "hidden",
                     readOnly: 0,
                     isRequired: 1,
                     additionalClasses: ["d-none"],
@@ -226,136 +226,136 @@ const data = {
                 },
                 jd_billingStreetAddress: {
                     label: "Billing Street Address",
-                    name: "billingStreetAddress",
-                    type: "textarea",
+                    fieldName: "billingStreetAddress",
+                    fieldType: "textarea",
                     readOnly: 1,
                     isRequired: 0,
                     validationDetail: "Value from client details sheet, field billingStreetAddress (column J) to be populated as static text (this will help the user to understand whether they have selected the correct accountName value in field 1)"
                 },
                 jd_workLocationStreetAddress: {
                     label: "Street Adress Where Work Completed",
-                    name: "workLocationStreetAddress",
-                    type: "text",
+                    fieldName: "workLocationStreetAddress",
+                    fieldType: "text",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_workLocationSuburb: {
                     label: "Suburb Where Work Completed",
-                    name: "workLocationSuburb",
-                    type: "select",
+                    fieldName: "workLocationSuburb",
+                    fieldType: "select",
                     values: ["", "Paraparaumu", "Raumati Beach", "Raumati South", "Otaihanga", "Waikanae", "Waikanae Beach"],
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_primaryJobType: {
                     label: "Primary Job Type",
-                    name: "primaryJobType",
-                    type: "select",
+                    fieldName: "primaryJobType",
+                    fieldType: "select",
                     values: ["", "Maintenance", "Painting", "Fencing", "Paving", "Gardening", "Deck", "Installation", "Bathroom Reno", "Kitchen Reno", "Laundry Reno", "Sub-Contractor", "Rubbish Removal", "Furniture Removal", "Other Landscaping", "Other Carpentry", "Plaster Repairs"],
                     readOnly: 0,
                     isRequired: 1
                 },
                 jd_secondaryJobType: {
                     label: "Seconday Job Type",
-                    name: "secondaryJobType",
-                    type: "select",
+                    fieldName: "secondaryJobType",
+                    fieldType: "select",
                     values: ["", "Maintenance", "Painting", "Fencing", "Paving", "Gardening", "Deck", "Installation", "Bathroom Reno", "Kitchen Reno", "Laundry Reno", "Sub-Contractor", "Rubbish Removal", "Furniture Removal", "Other Landscaping", "Other Carpentry", "Plaster Repairs"],
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_indoorsOutdoors: {
                     label: "Indoors or Outdoors",
-                    name: "indoorsOutdoors",
-                    type: "select",
+                    fieldName: "indoorsOutdoors",
+                    fieldType: "select",
                     values: ["", "Indoors", "Outdoors"],
                     readOnly: 0,
                     isRequired: 1
                 },
                 jd_dateJobEnquiry: {
                     label: "Date of Job Enquiry",
-                    name: "dateJobEnquiry",
-                    type: "date",
+                    fieldName: "dateJobEnquiry",
+                    fieldType: "date",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_dateJobQuoted: {
                     label: "Date Job Quoted",
-                    name: "dateJobQuoted",
-                    type: "date",
+                    fieldName: "dateJobQuoted",
+                    fieldType: "date",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_dateInvoiceSent: {
                     label: "Date Invoice Sent",
-                    name: "dateInvoiceSent",
-                    type: "date",
+                    fieldName: "dateInvoiceSent",
+                    fieldType: "date",
                     readOnly: 0,
                     isRequired: 1
                 },
                 jd_invoiceAmount: {
                     label: "Amount Invoiced (excl. GST)",
-                    name: "invoiceAmount",
-                    type: "number",
+                    fieldName: "invoiceAmount",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 1
                 },
                 jd_materialsCost: {
                     label: "Materials Cost",
-                    name: "materialsCost",
-                    type: "number",
+                    fieldName: "materialsCost",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_costSubcontractor: {
                     label: "Sub-Contractor Cost",
-                    name: "costSubcontractor",
-                    type: "number",
+                    fieldName: "costSubcontractor",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_costOther: {
                     label: "Other Cost (Excluding Staff Cost)",
-                    name: "costOther",
-                    type: "number",
+                    fieldName: "costOther",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
                 },
                 jd_daveHours: {
                     label: "Dave Hours",
-                    name: "daveHours",
-                    type: "number",
+                    fieldName: "daveHours",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_westyHours: {
                     label: "Westy Hours",
-                    name: "westyHours",
-                    type: "number",
+                    fieldName: "westyHours",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_peteHours: {
                     label: "Pete Hours",
-                    name: "peteHours",
-                    type: "number",
+                    fieldName: "peteHours",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_boofHours: {
                     label: "Boof Hours",
-                    name: "boofHours",
-                    type: "number",
+                    fieldName: "boofHours",
+                    fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_workSatisfaction: {
                     label: "Satisfaction With Work?",
-                    name: "workSatisfaction",
-                    type: "select",
+                    fieldName: "workSatisfaction",
+                    fieldType: "select",
                     values: [1, 2, 3, 4, 5],
                     readOnly: 0,
                     isRequired: 1
