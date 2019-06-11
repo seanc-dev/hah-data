@@ -12,9 +12,9 @@ export default function constructForm(formName) {
     }
 
     // create buttons fieldset
-    let submitFieldset = document.createElement('fieldset');
-    submitFieldset.classList.add('border-0');
-    submitFieldset.classList.add('d-flex');
+    let buttonsFieldset = document.createElement('fieldset');
+    buttonsFieldset.classList.add('border-0');
+    buttonsFieldset.classList.add('d-flex');
     let row = document.createElement('div');
     addClasses(row, ['row', 'justify-content-end'])
 
@@ -23,10 +23,10 @@ export default function constructForm(formName) {
     row.appendChild(constructButtonCol('Submit', 'submit', 'btn-secondary'));
 
     // append row to buttons fieldset
-    submitFieldset.appendChild(row);
+    buttonsFieldset.appendChild(row);
 
     // append button fieldset to form
-    formEle.appendChild(submitFieldset);
+    formEle.appendChild(buttonsFieldset);
 
     function addClasses(ele, classArr){
         for(let q = 0; q < classArr.length; q++){
@@ -103,6 +103,7 @@ export default function constructForm(formName) {
                 if (fieldDetail.readOnly) inputEl.setAttribute('readonly', true);
 
                 if (fieldDetail.fieldType === 'datalist') inputEl.setAttribute('list', fieldDetail.fieldName + 'List');
+                if (fieldDetail.fieldType === 'select') addOptions(inputEl, fieldDetail.values);
 
                 innerEl.appendChild(inputEl);
 
@@ -114,21 +115,24 @@ export default function constructForm(formName) {
 
             function constructDataList(fieldDetail) {
 
-                let dl = document.createElement('datalist'),
-                    option, text;
+                let dl = document.createElement('datalist');
 
                 dl.setAttribute('id', fieldDetail.fieldName + 'List')
 
-                for (let l = 0; l < fieldDetail.values.length; l++) {
-                    option = document.createElement('option');
-                    text = document.createTextNode(fieldDetail.values[l]);
-                    option.appendChild(text);
-                    dl.appendChild(option);
-
-                }
-
-                return dl;
+                return addOptions(dl, fieldDetail.values);
                 
+            }
+
+            function addOptions(housingEl, values){
+                let option, text;
+                for (let l = 0; l < values.length; l++) {
+                    option = document.createElement('option');
+                    option.setAttribute('value', values[l]);
+                    text = document.createTextNode(values[l]);
+                    option.appendChild(text);
+                    housingEl.appendChild(option);
+                }
+                return housingEl
             }
 
             return containerEl;

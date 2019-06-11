@@ -5,13 +5,14 @@ $(document).ready(function () {
     function init() {
 
         constructForm('clientDetails');
+        constructForm('jobDetails');
 
         // event handler elements
         let tabCols             = $('.tab-card'),
-            inputs              = $('input'),
+            inputs              = $('.form-control'),
             accountNameEles     = $('.account-name'),
             accountNameInput    = $('input[name="accountName"]'),
-            accountTypeEl       = $('input[name="accountType"]'),
+            accountTypeEl       = $('[name="accountType"]'),
             mainFirstEl         = $('input[name="mainContactFirstName"]'),
             mainLastEl          = $('input[name="mainContactLastName"]'),
             secondaryFirstEl    = $('input[name="secondaryContactFirstName"]'),
@@ -25,8 +26,9 @@ $(document).ready(function () {
         // handle accountName construction
         accountNameEles.on('input', () => {
             let value = updateAccountName(),
-                reg     = /\b(\w*undefined\w*)\b/g
+                reg     = /\b(\w*undefined\w*)\b/g;
             if(value === undefined || value.search(reg) > -1) value = '';
+            // console.log(value);
             accountNameInput.val(value);
         });
 
@@ -39,7 +41,6 @@ $(document).ready(function () {
                 secondaryFirstVal = capitaliseWords(secondaryFirstEl.val()),
                 secondaryLastVal = capitaliseWords(secondaryLastEl.val());
 
-            if(!accountTypeVal) return;
             if(accountTypeVal === 'Business') return businessNameVal;
             if(accountTypeVal === 'Single') return mainLastVal + ', ' + mainFirstVal;
             if(accountTypeVal === 'Couple'){
@@ -70,16 +71,20 @@ $(document).ready(function () {
 
         function handleFormTabClick(formTabArr) {
             formTabArr.on('click', function () {
+
+                // set clicked tab active and all others inactive
                 formTabArr.each(function (i, element) {
                     element.classList.remove("active-tab");
                 });
                 this.classList.add("active-tab");
-                var bodySections = $('.body-section')
-                bodySections.each(function (i, element) {
-                    element.classList.add('d-none');
-                });
-                var activeSection = $(this).find('span').text().toLowerCase();
-                $('#' + activeSection).removeClass('d-none');
+
+                // toggle form content
+                $('.form-content').addClass('d-none');
+
+                let clickedTabName = $(this).attr('data-tab-id');
+                console.log(clickedTabName)
+                $('#' + clickedTabName).removeClass('d-none');
+
             });
         }
 
