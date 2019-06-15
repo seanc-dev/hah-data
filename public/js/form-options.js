@@ -2,11 +2,12 @@ const data = {
     business: "kapiti",
     formData: {
         clientDetails: {
+            restfulName: "clients",
             structure: [{
                     sectionTitle: "Identity and Contact Details",
                     fields: [
                         ["cd_accountType", "cd_accountName"],
-                        ["cd_businessName"],
+                        ["cd_businessName", "cd_createdDateTimeNZT"],
                         ["cd_mainContactFirstName", "cd_mainContactLastName"],
                         ["cd_secondaryContactFirstName", "cd_secondaryContactLastName"],
                         ["cd_mainContactLandline", "cd_mainContactMobile"],
@@ -16,8 +17,7 @@ const data = {
                 {
                     sectionTitle: "Address Details",
                     fields: [
-                        ["cd_billingAddressStreetNumber", "cd_billingAddressStreetName"],
-                        ["cd_billingAddressSuburb", "cd_billingAddressPostCode"],
+                        ["cd_billingAddressStreet", "cd_billingAddressSuburb"],
                         ["cd_territory"]
                     ]
                 },
@@ -30,6 +30,14 @@ const data = {
                 }
             ],
             fields: {
+                cd_createdDateTimeNZT: {
+                    label: "",
+                    fieldName: "createdDateTimeNZT",
+                    fieldType: "hidden",
+                    readOnly: 0,
+                    isRequired: 0,
+                    additionalClasses: ["d-none"]
+                },
                 cd_accountType: {
                     label: "Account Type",
                     fieldName: "accountType",
@@ -37,6 +45,7 @@ const data = {
                     values: ["", "Single", "Couple", "Business"],
                     readOnly: 0,
                     isRequired: 1,
+                    submitExclude: 1,
                     additionalClasses: ["account-name"]
                 },
                 cd_accountName: {
@@ -67,7 +76,8 @@ const data = {
                     fieldName: "secondaryContactFirstName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 1,
+                    isRequired: 0,
+                    submitExclude: 1,
                     additionalClasses: ["account-name"]
                 },
                 cd_secondaryContactLastName: {
@@ -75,7 +85,8 @@ const data = {
                     fieldName: "secondaryContactLastName",
                     fieldType: "Text",
                     readOnly: 0,
-                    isRequired: 1,
+                    isRequired: 0,
+                    submitExclude: 1,
                     additionalClasses: ["account-name"]
                 },
                 cd_mainContactEmail: {
@@ -90,16 +101,14 @@ const data = {
                     fieldName: "mainContactLandline",
                     fieldType: "tel",
                     readOnly: 0,
-                    isRequired: 0,
-                    pattern: /^[\+]?[(]?[0-9]{2}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/im
+                    isRequired: 0
                 },
                 cd_mainContactMobile: {
                     label: "Main Contact Mobile",
                     fieldName: "mainContactMobile",
                     fieldType: "tel",
                     readOnly: 0,
-                    isRequired: 0,
-                    pattern: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+                    isRequired: 0
                 },
                 cd_businessName: {
                     label: "Business Name",
@@ -109,23 +118,9 @@ const data = {
                     isRequired: 0,
                     additionalClasses: ["account-name"]
                 },
-                cd_billingAddressStreetNumber: {
-                    label: "Billing Address Street Number",
-                    fieldName: "billingAddressStreetNumber",
-                    fieldType: "Text",
-                    readOnly: 0,
-                    isRequired: 1
-                },
-                cd_billingAddressStreetName: {
-                    label: "Billing Address Street Name",
-                    fieldName: "billingAddressStreetName",
-                    fieldType: "Text",
-                    readOnly: 0,
-                    isRequired: 1
-                },
-                cd_billingAddressPostCode: {
-                    label: "Billing Address Post Code",
-                    fieldName: "billingAddressPostCode",
+                cd_billingAddressStreet: {
+                    label: "Billing Street Address",
+                    fieldName: "billingAddressStreet",
                     fieldType: "Text",
                     readOnly: 0,
                     isRequired: 1
@@ -135,6 +130,13 @@ const data = {
                     fieldName: "billingAddressSuburb",
                     fieldType: "select",
                     values: ["", "Paraparaumu", "Paraparaumu Beach", "Raumati Beach", "Raumati South", "Otaihanga", "Waikanae", "Waikanae Beach"],
+                    readOnly: 0,
+                    isRequired: 1
+                },
+                cd_billingAddressCity: {
+                    label: "Billing Address City",
+                    fieldName: "billingAddressCity",
+                    fieldType: "datalist",
                     readOnly: 0,
                     isRequired: 1
                 },
@@ -169,14 +171,15 @@ const data = {
                     values: ["", "Referral from Partner Business", "Word of Mouth", "Vehicle Signage", "Print Campaign (HAH Kapiti)", "Print Advertising (HAH Kapiti - BAU)", "Online Referral (HAH National - BAU)", "Facebook Advertising (HAH National - BAU)", "Facebook Advertising (HAH Kapiti - BAU)", "Facebook Campaign (HAH Kapiti)", "Other Marketing Campaign (HAH National)", "Flyer Drop", "Gift Voucher", "Sweet Louise Voucher"],
                     readOnly: 0,
                     isRequired: 1
-                },
+                }
             }
         },
         jobDetails: {
+            restfulName: "jobs",
             structure: [{
                     sectionTitle: "Account and Location Details",
                     fields: [
-                        ["jd_accountName", "jd_billingStreetAddress"],
+                        ["jd_accountName", "jd_billingAddress"],
                         ["jd_workLocationStreetAddress", "jd_workLocationSuburb"]
                     ]
                 },
@@ -184,33 +187,42 @@ const data = {
                     sectionTitle: "Job Type and Date Details",
                     fields: [
                         ["jd_primaryJobType", "jd_secondaryJobType"],
-                        ["jd_indoorsOutdoors"],
+                        ["jd_indoorsOutdoors", "jd_createdDateTimeNZT"],
                         ["jd_dateJobEnquiry", "jd_dateJobQuoted"],
-                        ["jd_dateInvoiceSent"]
+                        ["jd_dateWorkCommenced", "jd_dateInvoiceSent"]
                     ]
                 },
                 {
                     sectionTitle: "Job Cost Details",
                     fields: [
                         ["jd_invoiceAmount", "jd_materialsCost"],
-                        ["jd_costSubcontractor", "jd_costOther"],
+                        ["jd_costSubcontractor", "jd_tipFeesCost"],
+                        ["jd_costOther"],
                         ["jd_daveHours", "jd_westyHours"],
-                        ["jd_boofHours"]
+                        ["jd_peteHours", "jd_boofHours"]
                     ]
                 },
                 {
                     sectionTitle: "Job Feedback",
                     fields: [
-                        ["jd_workSatisfaction"]
+                        ["jd_workSatisfaction", "jd_clientId"]
                     ]
                 }
             ],
             fields: {
+                jd_createdDateTimeNZT: {
+                    label: "",
+                    fieldName: "createdDateTimeNZT",
+                    fieldType: "hidden",
+                    readOnly: 0,
+                    isRequired: 0,
+                    additionalClasses: ["d-none"]
+                },
                 jd_accountName: {
                     label: "Account Name",
                     fieldName: "accountName",
                     fieldType: "datalist",
-                    values: [""],
+                    values: ["Test"],
                     readOnly: 0,
                     isRequired: 1,
                     validationDetail: "Give all unique existing values as options, sorted alphabetically. Do not allow new values to be entered"
@@ -220,16 +232,17 @@ const data = {
                     fieldName: "clientId",
                     fieldType: "hidden",
                     readOnly: 0,
-                    isRequired: 1,
+                    isRequired: 0,
                     additionalClasses: ["d-none"],
                     validationDetail: "Lookup from client details sheet, column B, using accountName field to match to value in column C"
                 },
-                jd_billingStreetAddress: {
-                    label: "Billing Street Address",
-                    fieldName: "billingStreetAddress",
+                jd_billingAddress: {
+                    label: "Billing Address",
+                    fieldName: "billingAddress",
                     fieldType: "textarea",
                     readOnly: 1,
                     isRequired: 0,
+                    submitExclude: 1,
                     validationDetail: "Value from client details sheet, field billingStreetAddress (column J) to be populated as static text (this will help the user to understand whether they have selected the correct accountName value in field 1)"
                 },
                 jd_workLocationStreetAddress: {
@@ -285,6 +298,13 @@ const data = {
                     readOnly: 0,
                     isRequired: 0
                 },
+                jd_dateWorkCommenced: {
+                    label: "Date Work Commenced",
+                    fieldName: "dateWorkCommenced",
+                    fieldType: "date",
+                    readOnly: 0,
+                    isRequired: 0
+                },
                 jd_dateInvoiceSent: {
                     label: "Date Invoice Sent",
                     fieldName: "dateInvoiceSent",
@@ -302,6 +322,13 @@ const data = {
                 jd_materialsCost: {
                     label: "Materials Cost",
                     fieldName: "materialsCost",
+                    fieldType: "number",
+                    readOnly: 0,
+                    isRequired: 0
+                },
+                jd_tipFeesCost: {
+                    label: "Tip Fees",
+                    fieldName: "tipFeesCost",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
@@ -326,6 +353,7 @@ const data = {
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
+                    additionalClasses: ["staff-hours"],
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_westyHours: {
@@ -334,6 +362,7 @@ const data = {
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
+                    additionalClasses: ["staff-hours"],
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_peteHours: {
@@ -342,6 +371,7 @@ const data = {
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
+                    additionalClasses: ["staff-hours"],
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_boofHours: {
@@ -350,13 +380,14 @@ const data = {
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
+                    additionalClasses: ["staff-hours"],
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_workSatisfaction: {
                     label: "Satisfaction With Work?",
                     fieldName: "workSatisfaction",
                     fieldType: "select",
-                    values: [1, 2, 3, 4, 5],
+                    values: ["", 5, 4, 3, 2, 1],
                     readOnly: 0,
                     isRequired: 1
                 }

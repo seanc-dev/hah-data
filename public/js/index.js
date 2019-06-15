@@ -1,91 +1,68 @@
-import constructForm from './forms.js'
+import forms    from './forms.js';
+import handlers from './handlers.js';
+import lib      from './library.js';
 
 $(document).ready(function () {
 
     function init() {
 
-        constructForm('clientDetails');
-        constructForm('jobDetails');
+        document.appData = {
+            businessName: 'kapiti'
+        }
+
+        let $clientDetailsForm  = $('form#clientDetailsForm');
+
+        forms.constructForm('clientDetails');
+        forms.constructForm('jobDetails');
+        forms.setAccountNameOptions();
 
         // event handler elements
-        let tabCols             = $('.tab-card'),
-            inputs              = $('.form-control'),
-            accountNameEles     = $('.account-name'),
-            accountNameInput    = $('input[name="accountName"]'),
-            accountTypeEl       = $('[name="accountType"]'),
-            mainFirstEl         = $('input[name="mainContactFirstName"]'),
-            mainLastEl          = $('input[name="mainContactLastName"]'),
-            secondaryFirstEl    = $('input[name="secondaryContactFirstName"]'),
-            secondaryLastEl     = $('input[name="secondaryContactLastName"]'),
-            businessNameEl      = $('input[name="businessName"]');
+        let accountNameEles     = $('.account-name'),
+            accountNameInput    = $('#clientDetails-accountName');
 
         // event handlers
-        handleFormTabClick(tabCols);
-        handleInputFocus(inputs);
+        handlers.handleFormTabClick();
+        handlers.handleInputFocus();
+        handlers.handleFormClear();
+        handlers.handleAccountNameBlur();
+        handlers.handleJobFormValidationOnClick();
+        handlers.handleFormSubmit();
 
         // handle accountName construction
         accountNameEles.on('input', () => {
-            let value = updateAccountName(),
+            let value = lib.updateAccountName(),
                 reg     = /\b(\w*undefined\w*)\b/g;
             if(value === undefined || value.search(reg) > -1) value = '';
-            // console.log(value);
             accountNameInput.val(value);
         });
 
-        function updateAccountName(){
-
-            let accountTypeVal = capitaliseWords(accountTypeEl.val()),
-                businessNameVal = capitaliseWords(businessNameEl.val()),
-                mainFirstVal = capitaliseWords(mainFirstEl.val()),
-                mainLastVal = capitaliseWords(mainLastEl.val()),
-                secondaryFirstVal = capitaliseWords(secondaryFirstEl.val()),
-                secondaryLastVal = capitaliseWords(secondaryLastEl.val());
-
-            if(accountTypeVal === 'Business') return businessNameVal;
-            if(accountTypeVal === 'Single') return mainLastVal + ', ' + mainFirstVal;
-            if(accountTypeVal === 'Couple'){
-                if(mainLastVal === secondaryLastVal) return mainLastVal + ', ' + mainFirstVal + ' & ' + secondaryFirstVal;
-                return mainLastVal + ', ' + mainFirstVal + ' & ' + secondaryLastVal + ', ' + secondaryFirstVal;
-            }
+        // add dummy data
+        let dummyData = {
+            accountType: 'Business',
+            accountName: 'B',
+            businessName: 'B',
+            createdDateTimeNZT: '15/06/2019, 14:35:07',
+            mainContactFirstName: 'F',
+            mainContactLastName: 's',
+            mainContactLandline: '',
+            mainContactMobile: '',
+            mainContactEmail: '',
+            billingAddressStreet: 's',
+            billingAddressSuburb: 'Paraparaumu',
+            territory: 'Raumati',
+            customerDemographic: 'Active Retiree',
+            estimatedCustomerIncome: '$50,001 - $70,000',
+            acquisitionChannel: 'Word of Mouth'
         }
 
-        function capitaliseWords(str){
-            if(!str) return
-            let wordsArr = str.split(' ');
-            for(let i = 0; i < wordsArr.length; i++){
-                let word = wordsArr[i]
-                wordsArr[i] = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-            }
-            return wordsArr.join(' ');
-        }
-
-        // functions
-        function handleInputFocus(inputs){
-            inputs.focus(function(){
-                $(this).closest('div').find('label').addClass('active');
-            });
-            inputs.blur(function(){
-                $(this).closest('div').find('label').removeClass('active');
-            });
-        }
-
-        function handleFormTabClick(formTabArr) {
-            formTabArr.on('click', function () {
-
-                // set clicked tab active and all others inactive
-                formTabArr.each(function (i, element) {
-                    element.classList.remove("active-tab");
-                });
-                this.classList.add("active-tab");
-
-                // toggle form content
-                $('.form-content').addClass('d-none');
-
-                let clickedTabName = $(this).attr('data-tab-id');
-                console.log(clickedTabName)
-                $('#' + clickedTabName).removeClass('d-none');
-
-            });
+        for (let key in dummyData) {
+            let el
+            if(key === 'accountType') {
+                el = $('#clientDetails-accountType')
+            } else {
+                el = $('[name="' + key + '"]')
+            };
+            el.val(dummyData[key]);
         }
 
     }

@@ -53,8 +53,16 @@
                     <div class="col-12 px-0">
                         <div class="card">
                             <div class="card-body">
-                                <form id="clientDetailsForm" class="" action="http://wilder.azurewebsites.net/echo"
-                                    method="get" accept-charset="utf-8">
+                                <div class="error-message-row row px-0 d-none">
+                                    <div class="col-12 px-0">
+                                        <div class="card border-0">
+                                            <div class="card-body px-0">
+                                                <span class="error-message"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form id="clientDetailsForm" class="" action="" method="get" accept-charset="utf-8">
                                 </form>
                             </div>
                         </div>
@@ -64,8 +72,16 @@
                     <div class="col-12 px-0">
                         <div class="card">
                             <div class="card-body">
-                                <form id="jobDetailsForm" class="" action="http://wilder.azurewebsites.net/echo"
-                                    method="get" accept-charset="utf-8">
+                                <div class="error-message-row row px-0 d-none">
+                                    <div class="col-12 px-0">
+                                        <div class="card border-0">
+                                            <div class="card-body px-0">
+                                                <span class="error-message"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form id="jobDetailsForm" class="" action="" method="get" accept-charset="utf-8">
                                 </form>
                             </div>
                         </div>
@@ -88,11 +104,11 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" type="text/javascript"
-        charset="utf-8" async defer></script>
-    <script type="module" src="/js/config.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" type="text/javascript" charset="utf-8" async defer></script>
     <script type="module" src="/js/form-options.js" type="text/javascript" charset="utf-8" async defer></script>
     <script type="module" src="/js/forms.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script type="module" src="/js/handlers.js" type="text/javascript" charset="utf-8" async defer></script>
     <script type="module" src="/js/index.js" type="text/javascript" charset="utf-8" async defer></script>
 </body>
 

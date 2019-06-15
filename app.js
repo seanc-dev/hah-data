@@ -36,9 +36,9 @@ app.use(bodyParser.text());
 //     next();
 // });
 
-// route
-app.get("/", function(req, res){
-    res.render("forms")
-});
+// ROUTES //
+app.use("/:orgId/", require("./routes/index"));
+app.use("/:orgId/clients", require("./routes/clients"));
+app.use("/:orgId/jobs", require("./routes/jobs"));
 
-app.listen(process.env.PORT, process.env.IP, () => console.log("HAH-Kapiti-Forms running on port " + process.env.PORT + "!"));
+app.listen(process.env.PORT, process.env.IP, () => console.log("HAH-Kapiti-Forms running on port " + process.env.PORT));

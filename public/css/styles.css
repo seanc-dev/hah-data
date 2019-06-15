@@ -6,6 +6,7 @@
 }
 
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
+
 * {
     margin: 0;
     padding: 0;
@@ -19,7 +20,8 @@
     text-rendering: optimizeLegibility;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     width: 100%;
     margin: 0;
@@ -38,13 +40,6 @@ body {
 
 legend {
     font-size: 1.25rem;
-}
-
-.form-control:focus{
-    border-color: #cccccc;
-    -webkit-box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
-    -moz-box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
-    box-shadow: 0px 0px 3px 1px rgba(136,149,158,0.75);
 }
 
 /* .form-control:focus{
@@ -76,10 +71,28 @@ label.active {
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
-fieldset.form-group legend {
-    /* margin-left: 5px; */
-    padding: 0 10px;
-    width: inherit;
+.error-message {
+    color: red;
+}
+
+.form-submit:hover {
+    background: var(--hubby-maroon);
+    border: 1px solid var(--hubby-maroon);
+}
+
+.form-control:focus {
+    border-color: #cccccc;
+    -webkit-box-shadow: 0px 0px 3px 1px rgba(136, 149, 158, 0.75);
+    -moz-box-shadow: 0px 0px 3px 1px rgba(136, 149, 158, 0.75);
+    box-shadow: 0px 0px 3px 1px rgba(136, 149, 158, 0.75);
+}
+
+.form-control[readonly] {
+    box-shadow: none;
+}
+
+fieldset > .row {
+    padding-bottom: 5px;
 }
 
 fieldset.form-group {
@@ -91,12 +104,18 @@ input.form-control {
     margin-bottom: 10px
 }
 
+fieldset.form-group legend {
+    /* margin-left: 5px; */
+    padding: 0 10px;
+    width: inherit;
+}
+
 div#tabRow div.tab-col {
     padding: 0
 }
 
 section#appBody div.row {
-    height: 100%; 
+    height: 100%;
     width: 100%;
     margin: 0;
 }
@@ -114,7 +133,7 @@ div#tabRow div.card-body h4 {
 }
 
 #tabRow .card {
-    border-bottom: 1px solid rgba(0,0,0,.125);
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
 }
 
 #tabRow .active-tab {
@@ -130,7 +149,7 @@ div#tabRow div.card-body h4 {
 
 #contentBody {
     transform: translate(0px, 2px);
-    
+
 }
 
 #contentBody .card {
