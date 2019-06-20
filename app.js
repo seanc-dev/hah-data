@@ -7,12 +7,12 @@ const   bodyParser      = require('body-parser'),
 
 console.log("Testing..");
 
-// if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     
-//     const   dotenv = require("dotenv");
-//     dotenv.config();
+    const   dotenv = require("dotenv");
+    dotenv.config();
 
-// }
+}
 
 const   app = express();
 
