@@ -5,8 +5,12 @@ const   bodyParser      = require('body-parser'),
         express         = require('express'),
         ejs             = require("ejs");
 
-if (process.env.NODE_ENV === "development") const dotenv = require("dotenv")
-if (process.env.NODE_ENV === "development") dotenv.config();
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+    
+    const   dotenv = require("dotenv");
+    dotenv.config();
+
+}
 
 const   app = express();
 
