@@ -1,14 +1,17 @@
 // const   expressSession  = require("express-session"),
 //         methodOverride  = require("method-override"),
 //         LocalStrategy   = require("passport-local"),
+console.log("Testing app.js commenced");
+
 const   bodyParser      = require('body-parser'),
         express         = require('express'),
         ejs             = require("ejs");
 
-console.log("Testing..");
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     
+    console.log("dotenv creation if entered")
+
     const   dotenv = require("dotenv");
     dotenv.config();
 
@@ -22,6 +25,8 @@ app.use(express.static(__dirname + '/public/'));
 app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.text());
+
+console.log("App config intitialised");
 
 // // AUTH CONFIG //
 // app.use(expressSession({
@@ -46,5 +51,7 @@ app.use(bodyParser.text());
 app.use("/:orgId/", require("./routes/index"));
 app.use("/:orgId/clients", require("./routes/clients"));
 app.use("/:orgId/jobs", require("./routes/jobs"));
+
+console.log("App routes initialised");
 
 app.listen(process.env.PORT, process.env.IP, () => console.log("HAH-Kapiti-Forms running on port " + process.env.PORT));
