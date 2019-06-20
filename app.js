@@ -1,7 +1,6 @@
 // const   expressSession  = require("express-session"),
 //         methodOverride  = require("method-override"),
 //         LocalStrategy   = require("passport-local"),
-console.log("Testing app.js commenced");
 
 const   bodyParser      = require('body-parser'),
         express         = require('express'),
@@ -9,8 +8,6 @@ const   bodyParser      = require('body-parser'),
 
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-    
-    console.log("dotenv creation if entered")
 
     const   dotenv = require("dotenv");
     dotenv.config();
@@ -18,6 +15,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 }
 
 const   app = express();
+
+console.log("App variables initialised");
 
 // config
 app.use(bodyParser.urlencoded({extended : true}));

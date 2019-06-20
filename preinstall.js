@@ -8,4 +8,13 @@
 //     console.log(file);
 // });
 
-console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+
+    console.log("NODE_ENV === development");
+
+} else {
+
+    console.log("NODE_ENV !== development");
+
+}
