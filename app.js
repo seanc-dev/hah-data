@@ -3,9 +3,9 @@
 //         LocalStrategy   = require("passport-local"),
 const   bodyParser      = require('body-parser'),
         express         = require('express'),
-        dotenv          = require("dotenv"),
-        ejs             = require("ejs")
+        ejs             = require("ejs");
 
+if (process.env.NODE_ENV === "development") const dotenv = require("dotenv")
 if (process.env.NODE_ENV === "development") dotenv.config();
 
 const   app = express();
