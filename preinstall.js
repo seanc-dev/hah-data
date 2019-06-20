@@ -8,4 +8,4 @@
 //     console.log(file);
 // });
 
-console.log(GOOGLE_APPLICATION_CREDENTIALS);
+console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);
