@@ -7,7 +7,7 @@ fs.readFile("./" + process.env.GOOGLE_CREDENTIALS_LOCATION, function(file){
     console.log(file);
 });
 
-console.log(require("./google-credentials-heroku.json"));
+// console.log(require("./google-credentials-heroku.json"));
 
 console.log("preinstall completed successfully with credentials:");
 
