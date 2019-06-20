@@ -4,4 +4,6 @@ fs.writeFile("./google-credentials-heroku.json", process.env.GOOGLE_CONFIG, (err
 
 console.log("preinstall completed successfully with credentials:");
 
-console.log(fs.readFile("./google-credentials-heroku.json"));
+fs.readFile("./google-credentials-heroku.json", function(file){
+    console.log(file);
+});
