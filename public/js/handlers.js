@@ -33,7 +33,6 @@ const handlers = {
 
             // call validation function
             let validation = forms.validateJobForm();
-            console.log(validation);
 
             // if validation passes (is 'true' boolean), submit form
             if(validation === true) {
@@ -46,7 +45,7 @@ const handlers = {
                 } else {
                     submitBtn.off('click');
                     $jobDetailsForm.find('.form-submit').click();
-                    handleJobFormValidationOnClick();
+                    this.handleJobFormValidationOnClick();
                 };
             } else {
                 // else, fail validation and present custom error message
@@ -102,7 +101,9 @@ const handlers = {
         $('.form-submit').click(function(e){
 
             let now = new Date();
-            now = now.toLocaleString('en-GB');
+            now = now.toLocaleString('en-GB').replace(/,/g, '');
+
+            console.log(now);
 
             $('input[name="createdDateTimeNZT"]').val(now);
 

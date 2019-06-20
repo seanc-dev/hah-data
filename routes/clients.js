@@ -1,14 +1,15 @@
-const   express     = require("express");
+const   express = require("express");
 
-const   ss          = require("../lib/spreadsheet.js"),
-        DataObject  = require("../lib/classes/dataobject.js");
+const   mapping = require("../lib/mapping.js"),
+        ss      = require("../lib/spreadsheet.js"),
+        Client  = require("../lib/classes/client.js");
 
-const   router      = express.Router({mergeParams: true});
+const   router  = express.Router({mergeParams: true});
 
 // index route
 router.get("/", (req, res) => {
     if(req.query.requestType === "clients") {
-        let clientsArr = ss.getClientDetailsArray()
+        let clientsArr = ss.getClientDetailsArray(req.params.orgId)
             .then((result) => {
                 res.send(result);
             })
@@ -17,7 +18,7 @@ router.get("/", (req, res) => {
                 res.send("Error retrieving client details");
             });
     } else if(req.query.requestType === "clientAddress") {
-        ss.getAddressDetailsArray(req.query.clientId)
+        ss.getAddressDetailsArray(req.params.orgId, req.query.clientId)
             .then((result) => {
                 res.send(result);
             })
@@ -28,16 +29,16 @@ router.get("/", (req, res) => {
 });
 
 router.get("/rows", function(req, res) {
-    ss.getRowsArray(2, 1, 2)
+    ss.getRowsArrayDataOnly(req.params.orgId, "job", mapping["job"], 1, "clientid=3")
         .then((result) => {
             res.send(result);
         })
+        .catch(console.error);
 });
 
 // create route
 router.post("/", (req, res) => {
-    let newObj = new DataObject(req.params.orgId, 'client', req.body);
-    console.log(newObj);
+    new Client(req.params.orgId, false, req.body);
     res.redirect("/" + req.params.orgId);
 })
 

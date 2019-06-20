@@ -195,8 +195,8 @@ const data = {
                 {
                     sectionTitle: "Job Cost Details",
                     fields: [
-                        ["jd_invoiceAmount", "jd_materialsCost"],
-                        ["jd_costSubcontractor", "jd_tipFeesCost"],
+                        ["jd_amountInvoiced", "jd_costMaterials"],
+                        ["jd_costSubcontractor", "jd_costTipFees"],
                         ["jd_costOther"],
                         ["jd_daveHours", "jd_westyHours"],
                         ["jd_peteHours", "jd_boofHours"]
@@ -312,23 +312,23 @@ const data = {
                     readOnly: 0,
                     isRequired: 1
                 },
-                jd_invoiceAmount: {
+                jd_amountInvoiced: {
                     label: "Amount Invoiced (excl. GST)",
-                    fieldName: "invoiceAmount",
+                    fieldName: "amountInvoiced",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 1
                 },
-                jd_materialsCost: {
+                jd_costMaterials: {
                     label: "Materials Cost",
-                    fieldName: "materialsCost",
+                    fieldName: "costMaterials",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
                 },
-                jd_tipFeesCost: {
+                jd_costTipFees: {
                     label: "Tip Fees",
-                    fieldName: "tipFeesCost",
+                    fieldName: "costTipFees",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0
@@ -348,8 +348,8 @@ const data = {
                     isRequired: 0
                 },
                 jd_daveHours: {
-                    label: "Dave Hours",
-                    fieldName: "daveHours",
+                    label: "Dave Hours Worked",
+                    fieldName: "hoursWorkedDave",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
@@ -357,8 +357,8 @@ const data = {
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_westyHours: {
-                    label: "Westy Hours",
-                    fieldName: "westyHours",
+                    label: "Westy Hours Worked",
+                    fieldName: "hoursWorkedWesty",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
@@ -366,8 +366,8 @@ const data = {
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_peteHours: {
-                    label: "Pete Hours",
-                    fieldName: "peteHours",
+                    label: "Pete Hours Worked",
+                    fieldName: "hoursWorkedPete",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,
@@ -375,8 +375,8 @@ const data = {
                     validationDetail: "Must have > 0 hours across all staff"
                 },
                 jd_boofHours: {
-                    label: "Boof Hours",
-                    fieldName: "boofHours",
+                    label: "Boof Hours Worked",
+                    fieldName: "hoursWorkedBoof",
                     fieldType: "number",
                     readOnly: 0,
                     isRequired: 0,

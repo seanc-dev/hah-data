@@ -83,6 +83,7 @@ const forms = {
                 for (let k = 0; k < fieldsArr.length; k++) {
 
                     let fieldDetail = fieldData[fieldsArr[k]];
+                    console.log(fieldsArr[k])
                     let uniqueName = formName + '-' + fieldDetail.fieldName;
 
                     // create column element
@@ -106,6 +107,7 @@ const forms = {
                     if (!fieldDetail.submitExclude) inputEl.setAttribute('name', fieldDetail.fieldName);
                     if (fieldDetail.pattern) inputEl.setAttribute('pattern', fieldDetail.pattern)
                     if (type === 'input') inputEl.setAttribute('type', fieldDetail.fieldType);
+                    if (fieldDetail.fieldType === 'number') inputEl.setAttribute('step', '0.01');
                     if (fieldDetail.isRequired) inputEl.required = true;
                     if (fieldDetail.readOnly) inputEl.setAttribute('readonly', true);
 
@@ -158,7 +160,7 @@ const forms = {
             return val.accountName === accountName
         });
 
-        return axios.get('/clients?requestType=clientAddress&clientId=' + (Number(clientObj.clientId) + 1));
+        return axios.get('/' + document.appData.businessName + '/clients?requestType=clientAddress&clientId=' + (Number(clientObj.clientId) + 1));
 
     },
 
@@ -195,7 +197,8 @@ const forms = {
     validateJobForm: function () {
 
         // check if account name entered matches one from list
-        let optionsNodeList = $jobDetailsForm.find('#accountNameList').children(),
+        let $jobDetailsForm = $('#jobDetailsForm'),
+            optionsNodeList = $jobDetailsForm.find('#accountNameList').children(),
             accountName = $jobDetailsForm.find('#jobDetails-accountName').val(),
             accountNameVals = [];
 
