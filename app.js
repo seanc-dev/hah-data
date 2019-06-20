@@ -5,6 +5,8 @@ const   bodyParser      = require('body-parser'),
         express         = require('express'),
         ejs             = require("ejs");
 
+console.log("Testing..");
+
 // if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     
 //     const   dotenv = require("dotenv");
