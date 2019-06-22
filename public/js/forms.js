@@ -186,7 +186,7 @@ const forms = {
                 }
 
             })
-            .catch(console.log);
+            .catch(console.error);
 
     },
 
