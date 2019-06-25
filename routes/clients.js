@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
             .catch((err) => {
                 console.error("Failed to retrieve clients array");
                 console.error(err);
-                res.send("Error retrieving client details");
+                res.send(err);
             });
     } else if(req.query.requestType === "clientAddress") {
         ss.getAddressDetailsArray(req.params.orgId, req.query.clientId)
@@ -26,6 +26,7 @@ router.get("/", (req, res) => {
             .catch((err) => {
                 console.error("Failed to retrieve clients address");
                 console.error(err);
+                res.send(err);
             });
     }
 });
