@@ -9,10 +9,22 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
     <!-- <link rel="stylesheet" href="public/stylesheets/styles.css"> -->
-    <title>Hire a Hubby Kapiti Form Central</title>
+    <title>Hire a Hubby <%= businessName %> Form Central</title>
 </head>
 
 <body>
+
+    <div id="businessName" class="d-none"><%= businessName %></div>
+
+    <div id="loadingOverlay">
+            <div id="loadingMessage">
+                <div id="loader">
+                        <div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                </div>
+            </div>
+        </div>
+        <script src="/js/loading-overlay.js"></script>
+
     <div class="container my-3">
         <div class="jumbotron">
             <h1 class="display-4 text-center">

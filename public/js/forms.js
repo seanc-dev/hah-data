@@ -1,14 +1,15 @@
-import data from './form-options.js';
-
 const forms = {
     constructForm: function (formName) {
+
+        const data  = document.appData.formOptions;
+
         //  find form element
         let formEle = document.getElementById(formName + 'Form'),
-            structureArr = data.formData[formName].structure,
-            fieldData = data.formData[formName].fields;
+            structureArr = data[formName].structure,
+            fieldData = data[formName].fields;
 
         formEle.setAttribute('method', 'POST');
-        formEle.setAttribute('action', '/' + document.appData.businessName + '/' + data.formData[formName].restfulName);
+        formEle.setAttribute('action', '/' + document.appData.businessName + '/' + data[formName].restfulName);
 
         //  for each item in the structure array, create fieldset.form-group with legend of the sectionTitle
         for (let i = 0; i < structureArr.length; i++) {

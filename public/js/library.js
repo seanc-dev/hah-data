@@ -11,6 +11,23 @@ const lib = {
         return wordsArr.join(' ');
     },
 
+    initialiseAppData: function () {
+
+        return axios.get("/" + document.appData.businessName + "/?data=true")
+            .then(function(result){
+
+                return result
+
+            })
+            .catch(function(err){
+
+                console.error("Error in lib.initialiseAppData axios call");
+                console.error(err);
+
+            });
+
+    },
+
     getClientObj: function (accountName) {
 
         if (!document.clients) return console.error('Cannot retrieve client data, please reload page');
