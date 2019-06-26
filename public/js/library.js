@@ -25,13 +25,13 @@ const lib = {
 
     },
 
-    updateAccountName: function () {
+    getAccountNameValue: function () {
 
         const   accountTypeEl       = $('#clientDetails-accountType'),
-                mainFirstEl         = $('input[name="mainContactFirstName"]'),
-                mainLastEl          = $('input[name="mainContactLastName"]'),
-                secondaryFirstEl    = $('input[name="secondaryContactFirstName"]'),
-                secondaryLastEl     = $('input[name="secondaryContactLastName"]'),
+                mainFirstEl         = $('#clientDetails-mainContactFirstName'),
+                mainLastEl          = $('#clientDetails-mainContactLastName'),
+                secondaryFirstEl    = $('#clientDetails-secondaryContactFirstName'),
+                secondaryLastEl     = $('#clientDetails-secondaryContactLastName'),
                 businessNameEl      = $('#clientDetails-businessName');
 
         let accountTypeVal      = this.capitaliseWords(accountTypeEl.val()),
@@ -42,10 +42,13 @@ const lib = {
             secondaryLastVal    = this.capitaliseWords(secondaryLastEl.val());
 
         if(accountTypeVal === 'Business') return businessNameVal;
-        if(accountTypeVal === 'Single') return mainLastVal + ', ' + mainFirstVal;
+        if(accountTypeVal === 'Individual') return mainLastVal + ', ' + mainFirstVal;
         if(accountTypeVal === 'Couple'){
             if(mainLastVal === secondaryLastVal) return mainLastVal + ', ' + mainFirstVal + ' & ' + secondaryFirstVal;
-            return mainLastVal + ', ' + mainFirstVal + ' & ' + secondaryLastVal + ', ' + secondaryFirstVal;
+            let val  = mainLastVal + ', ' + mainFirstVal + ' & ' + secondaryLastVal + ', ' + secondaryFirstVal;
+            console.log('couple type if passed')
+            console.log(val)
+            return val
         }
 
     }

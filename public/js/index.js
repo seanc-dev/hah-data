@@ -16,10 +16,6 @@ $(document).ready(function () {
         forms.constructForm('jobDetails');
         forms.setAccountNameOptions();
 
-        // event handler elements
-        let accountNameEles     = $('.account-name'),
-            accountNameInput    = $('#clientDetails-accountName');
-
         // event handlers
         handlers.handleFormTabClick();
         handlers.handleInputFocus();
@@ -27,14 +23,7 @@ $(document).ready(function () {
         handlers.handleAccountNameBlur();
         handlers.handleJobFormValidationOnClick();
         handlers.handleFormSubmit();
-
-        // handle accountName construction
-        accountNameEles.on('input', () => {
-            let value = lib.updateAccountName(),
-                reg     = /\b(\w*undefined\w*)\b/g;
-            if(value === undefined || value.search(reg) > -1) value = '';
-            accountNameInput.val(value);
-        });
+        handlers.handleAccountTypeInput();
 
         // add dummy data
         let dummyData = {

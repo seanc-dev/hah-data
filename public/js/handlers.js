@@ -26,6 +26,17 @@ const handlers = {
 
     },
 
+    handleAccountTypeInput: function () {
+
+        $('.account-name').on('input', () => {
+            let value = lib.getAccountNameValue(),
+                reg     = /\b(\w*undefined\w*)\b/g;
+            if(value === undefined || value.search(reg) > -1) value = '';
+            $('#clientDetails-accountName').val(value);
+        });
+
+    },
+
     handleJobFormValidationOnClick: function () {
         $jobDetailsForm.find('.form-submit').on('click', function(e){
 

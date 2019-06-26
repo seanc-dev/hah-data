@@ -42,7 +42,7 @@ const data = {
                     label: "Account Type",
                     fieldName: "accountType",
                     fieldType: "select",
-                    values: ["", "Single", "Couple", "Business"],
+                    values: ["", "Individual", "Couple", "Business"],
                     readOnly: 0,
                     isRequired: 1,
                     submitExclude: 1,
