@@ -6,6 +6,9 @@ $(document).ready(function () {
 
     function init() {
 
+        // remove body d-none once loaded static content (ensures loader is uninterrupted)
+        document.querySelector('body').classList.remove('d-none');
+
         document.appData = {
             businessName: document.getElementById("businessName").innerText
         }
@@ -61,7 +64,13 @@ $(document).ready(function () {
                     console.error(err);
                 });
 
+            // build forms..
             buildForms();
+
+            // kill loader
+            let event = new CustomEvent('appready')
+            document.dispatchEvent(event);
+            console.log('App ready!');
 
         }
 

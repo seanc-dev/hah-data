@@ -1,24 +1,27 @@
 #loadingOverlay {
     position:fixed;
-    z-index:99999;
+    z-index:9;
     top:0;
     left:0;
     bottom:0;
     right:0;
-    /* background: white; */
+    background: var(--off-white);
     /* opacity: 0.75; */
-    background: rgba(255,255,255,0.2);
+    /* background: rgba(255,255,255,0.8); */
     transition: opacity 0.5s 0.4s;
 }
 
 #loadingMessage {
     position:absolute;
-    top:35%;
+    top:50%;
+    transform: translateY(-50%);
     margin: auto;
     letter-spacing: 3px;
     width:100%;
     text-align:center;
-    color: rgba(0,0,0,0.5);
+    color: var(--gunmetal-grey);
+    /* opacity: 0.8 */
+    /* color: rgba(0,0,0,1); */
 }
 
 .page-loaded {
