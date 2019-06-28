@@ -8,11 +8,15 @@ const   router      = express.Router({mergeParams: true});
 
 // show form
 router.get("/", function(req, res){
-    if (req.params.orgId === "kapiti" || req.params.orgId === "wellington") {
+    let orgId = req.params.orgId
+    if (orgId === "kapiti" || orgId === "wellington") {
         if (!req.query.data) {
-            res.render("forms", {businessName: req.params.orgId})
+            res.render("forms", {
+                businessName: orgId,
+                businessNameDisplay: orgId[0].toUpperCase() + orgId.slice(1)
+            });
         } else {
-            org.getData(req.params.orgId)
+            org.getData(orgId)
                 .then(function(result){
                     res.send(result);
                 })

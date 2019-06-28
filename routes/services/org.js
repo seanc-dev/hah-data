@@ -10,7 +10,9 @@ module.exports = {
 
                 return {
                     clientDetail: result,
-                    formOptions: formOptions[orgId]
+                    formOptions: formOptions[orgId],
+                    businessName: orgId,
+                    businessNameDisplay: orgId[0].toUpperCase() + orgId.slice(1)
                 }
 
             })
