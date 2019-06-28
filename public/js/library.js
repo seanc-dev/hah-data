@@ -68,6 +68,15 @@ const lib = {
             return val
         }
 
+    },
+
+    setCreatedDate: function() {
+
+        let now = new Date();
+        now = now.toLocaleString('en-GB').replace(/,/g, '');
+
+        $('input[name="createdDateTimeNZT"]').val(now);
+        
     }
 }
 

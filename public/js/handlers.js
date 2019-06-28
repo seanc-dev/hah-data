@@ -52,6 +52,7 @@ const handlers = {
                 $jobDetailsErrorRow.addClass('d-none');
                 if($jobDetailsForm[0].checkValidity()){
                     submitBtn.off('click');
+                    lib.setCreatedDate();
                     submitBtn.click();
                 } else {
                     submitBtn.off('click');
@@ -78,6 +79,24 @@ const handlers = {
         });
     },
 
+    handleFormClear: function(){
+
+        $('.btn-outline-secondary').click(function(e){
+            $(e.target).closest('form')[0].reset();
+        });
+        
+    },
+
+    handleFormSubmit: function () {
+
+        $('.form-submit').click(function(e){
+
+            lib.setCreatedDate();
+
+        });
+
+    },
+
     handleFormTabClick: function() {
 
         let formTabArr = $('.tab-card')
@@ -94,29 +113,6 @@ const handlers = {
 
             let clickedTabName = $(this).attr('data-tab-id');
             $('#' + clickedTabName).removeClass('d-none');
-
-        });
-
-    },
-
-    handleFormClear: function(){
-
-        $('.btn-outline-secondary').click(function(e){
-            $(e.target).closest('form')[0].reset();
-        });
-        
-    },
-
-    handleFormSubmit: function () {
-
-        $('.form-submit').click(function(e){
-
-            let now = new Date();
-            now = now.toLocaleString('en-GB').replace(/,/g, '');
-
-            console.log(now);
-
-            $('input[name="createdDateTimeNZT"]').val(now);
 
         });
 
