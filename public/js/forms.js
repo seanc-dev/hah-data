@@ -1,7 +1,7 @@
 const forms = {
     constructForm: function (formName) {
 
-        const data  = document.appData.formOptions;
+        const data = document.appData.formOptions;
 
         //  find form element
         let formEle = document.getElementById(formName + 'Form'),
@@ -118,6 +118,7 @@ const forms = {
                     innerEl.appendChild(inputEl);
 
                     if (fieldDetail.fieldType === 'datalist') innerEl.appendChild(constructDataList(fieldDetail));
+                    if (fieldDetail.fieldType === 'hidden') innerEl.classList.add('d-none');
 
                     containerEl.appendChild(innerEl);
 
@@ -155,8 +156,45 @@ const forms = {
 
     },
 
+    initAutocomplete: function () {
+
+        function initAddy(fields) {
+            console.log(fields);
+            console.log(document.getElementById(fields.searchField))
+            let addyComplete = new AddyComplete(document.getElementById(fields.searchField));
+            console.log(addyComplete);
+            addyComplete.options.excludePostBox = false;
+            addyComplete.fields = {
+                address1: document.getElementById(fields.address1),
+                suburb: document.getElementById(fields.suburb),
+                city: document.getElementById(fields.city),
+                postcode: document.getElementById(fields.postcode),
+            }
+        }
+
+        initAddy({
+            searchField: 'clientDetails-billingAddressStreet',
+            address1: 'clientDetails-billingAddressStreet',
+            suburb: 'clientDetails-billingAddressSuburb',
+            city: 'clientDetails-billingAddressCity',
+            postcode: 'clientDetails-billingAddressPostcode',
+            latitude: 'clientDetails-billingAddressLatitude',
+            longitude: 'clientDetails-billingAddressLongitude'
+        });
+        initAddy({
+            searchField: 'jobDetails-workLocationStreetAddress',
+            address1: 'jobDetails-workLocationStreetAddress',
+            suburb: 'jobDetails-workLocationSuburb',
+            city: 'jobDetails-workLocationCity',
+            postcode: 'jobDetails-workLocationPostcode',
+            latitude: 'jobDetails-workLocationLatitude',
+            longitude: 'jobDetails-workLocationLongitude'
+        });
+
+    },
+
     retrieveClientAddress: function (accountName) {
-        
+
         let clientObj = document.clients.find((val) => {
             return val.accountName === accountName
         });
@@ -177,7 +215,7 @@ const forms = {
 
                 $accountNameDatalist.empty();
 
-                for(let i = 0; i < document.clients.length; i++) {
+                for (let i = 0; i < document.clients.length; i++) {
 
                     let option = document.createElement('option');
                     option.setAttribute('value', document.clients[i].accountName);

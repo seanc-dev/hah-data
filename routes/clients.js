@@ -2,7 +2,8 @@ const   express = require("express");
 
 const   mapping = require("../lib/mapping.js"),
         ss      = require("../lib/spreadsheet.js"),
-        Client  = require("../lib/classes/client.js");
+        Client  = require("../lib/classes/client.js"),
+        geocode = require("./services/geocode.js");
 
 const   router  = express.Router({mergeParams: true});
 
@@ -31,18 +32,23 @@ router.get("/", (req, res) => {
     }
 });
 
-router.get("/rows", function(req, res) {
-    ss.getRowsArrayDataOnly(req.params.orgId, "job", mapping["job"], 1, "clientid=3")
-        .then((result) => {
-            res.send(result);
-        })
-        .catch(console.error);
-});
-
 // create route
 router.post("/", (req, res) => {
-    new Client(req.params.orgId, false, req.body);
-    res.redirect("/" + req.params.orgId);
-})
+
+    // let location = req.body.billingAddressStreet + " " + req.body.billingAddressSuburb + " " + req.body.billingAddressCity + " " + req.body.billingAddressPostcode
+    // console.log(location);
+    // geocode(location)
+    // .then(function(result){
+        // console.log(result);
+        new Client(req.params.orgId, false, req.body);
+        res.redirect("/" + req.params.orgId);
+    // })
+    // .catch((err) => {
+    //     console.error("Failed to geocode Client's Billing Address");
+    //     console.error(err);
+    //     res.send("err");
+    // });
+
+});
 
 module.exports = router;
