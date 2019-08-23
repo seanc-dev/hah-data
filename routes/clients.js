@@ -35,19 +35,22 @@ router.get("/", (req, res) => {
 // create route
 router.post("/", (req, res) => {
 
-    // let location = req.body.billingAddressStreet + " " + req.body.billingAddressSuburb + " " + req.body.billingAddressCity + " " + req.body.billingAddressPostcode
-    // console.log(location);
-    // geocode(location)
-    // .then(function(result){
-        // console.log(result);
+    let location = req.body.billingAddressStreet + " " + req.body.billingAddressSuburb + " " + req.body.billingAddressCity + " " + req.body.billingAddressPostcode
+    geocode(location)
+    .then(function(result){
+        console.log(result);
+        req.body.billingAddressLatitude = result[0].latitude
+        req.body.billingAddressLongitude = result[0].longitude
+        req.body.billingAddressFormatted = result[0].formattedAddress
+        req.body.billingAddressGPID = result[0].extra.googlePlaceId
         new Client(req.params.orgId, false, req.body);
         res.redirect("/" + req.params.orgId);
-    // })
-    // .catch((err) => {
-    //     console.error("Failed to geocode Client's Billing Address");
-    //     console.error(err);
-    //     res.send("err");
-    // });
+    })
+    .catch((err) => {
+        console.error("Failed to geocode Client's Billing Address");
+        console.error(err);
+        res.send("err");
+    });
 
 });
 
