@@ -244,9 +244,6 @@ const forms = {
             accountNameVals.push($(optionsNodeList[i]).val());
         }
 
-        console.log('validateClientForm accountNameVals:')
-        console.log(accountNameVals)
-
         if (accountNameVals.includes(accountName)) return "Account " + accountName + " already exists in database. Please submit jobs under existing client record."
 
         // if all validation passed, return true
@@ -256,22 +253,14 @@ const forms = {
 
     validateJobForm: function () {
 
-        alert('validateJobForm run')
         // check if account name entered matches one from list
         let $jobDetailsForm = $('#jobDetailsForm'),
             accountName = $jobDetailsForm.find('#jobDetails-accountName').val(),
             accountNameVals = [];
 
-        console.log('validateJobForm document.appData.clientDetail:')
-        console.log(document.appData.clientDetail);
-
         for (let i = 0; i < document.appData.clientDetail.length; i++) {
             accountNameVals.push(document.appData.clientDetail[i].accountName);
         }
-
-        console.log('validateJobForm accountNameVals:');
-        console.log(accountNameVals);
-        console.log(accountName);
         if (!accountNameVals.includes(accountName)) return "Please ensure Account Name is a valid option from the drop-down list. It must have already been created using the Client Details form."
 
         // check if dates entered 

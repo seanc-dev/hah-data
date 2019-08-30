@@ -57,14 +57,12 @@ const handlers = {
                 if (formType === 'client') validation = forms.validateClientForm();
                 if (formType === 'job') validation = forms.validateJobForm();
 
-                alert('validation: ' + validation)
                 // if validation passes (is 'true' boolean), submit form
                 if(validation === true) {
                     let submitBtn = $form.find('.form-submit');
                     $errorRow.find('span').val("");
                     $errorRow.addClass('d-none');
                     if($form[0].checkValidity()){
-                        console.log('form valid, initialising submission');
                         submitBtn.off('click');
                         lib.setCreatedDate();
                         submitBtn.click();
