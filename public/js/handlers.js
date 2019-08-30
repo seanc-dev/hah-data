@@ -1,8 +1,10 @@
 import forms    from './forms.js';
 import lib      from './library.js';
 
-const   $jobDetailsForm     = $('form#jobDetailsForm'),
-        $jobDetailsErrorRow = $jobDetailsForm.closest('.form-content').find('.error-message-row');
+const   $jobDetailsForm         = $('form#jobDetailsForm'),
+        $clientDetailsForm      = $('form#clientDetailsForm'),
+        $jobDetailsErrorRow     = $jobDetailsForm.closest('.form-content').find('.error-message-row'),
+        $clientDetailsErrorRow  = $clientDetailsForm.closest('.form-content').find('.error-message-row');
 
 const handlers = {
 
@@ -15,6 +17,8 @@ const handlers = {
             forms.retrieveClientAddress(accountNameField.val())
                 .then((result) => {
                     $('#jobDetails-billingAddress').html(result.data[0] + '\n' + result.data[1]);
+                    $('#jobDetails-workLocationStreetAddress').val(result.data[0]);
+                    $('#jobDetails-workLocationSuburb').val(result.data[1]);
                 })
                 .catch((err) => {
                     console.error(err);
@@ -37,36 +41,49 @@ const handlers = {
 
     },
 
-    handleJobFormValidationOnClick: function () {
-        $jobDetailsForm.find('.form-submit').on('click', function(e){
+    handleFormValidationOnClick: function () {
 
-            e.preventDefault();
+        validateForm($clientDetailsForm, $clientDetailsErrorRow, 'client');
+        validateForm($jobDetailsForm, $jobDetailsErrorRow, 'job');
 
-            // call validation function
-            let validation = forms.validateJobForm();
+        function validateForm($form, $errorRow, formType) {
+            
+            $form.find('.form-submit').on('click', function(e){
 
-            // if validation passes (is 'true' boolean), submit form
-            if(validation === true) {
-                let submitBtn = $jobDetailsForm.find('.form-submit');
-                $jobDetailsErrorRow.find('span').val("");
-                $jobDetailsErrorRow.addClass('d-none');
-                if($jobDetailsForm[0].checkValidity()){
-                    submitBtn.off('click');
-                    lib.setCreatedDate();
-                    submitBtn.click();
+                e.preventDefault();
+
+                let validation
+
+                if (formType === 'client') validation = forms.validateClientForm();
+                if (formType === 'job') validation = forms.validateJobForm();
+
+                alert('validation: ' + validation)
+                // if validation passes (is 'true' boolean), submit form
+                if(validation === true) {
+                    let submitBtn = $form.find('.form-submit');
+                    $errorRow.find('span').val("");
+                    $errorRow.addClass('d-none');
+                    if($form[0].checkValidity()){
+                        console.log('form valid, initialising submission');
+                        submitBtn.off('click');
+                        lib.setCreatedDate();
+                        submitBtn.click();
+                    } else {
+                        submitBtn.off('click');
+                        $form.find('.form-submit').click();
+                        validateForm($form, $errorRow, validation);
+                    };
                 } else {
-                    submitBtn.off('click');
-                    $jobDetailsForm.find('.form-submit').click();
-                    this.handleJobFormValidationOnClick();
-                };
-            } else {
-                // else, fail validation and present custom error message
-                $jobDetailsErrorRow.removeClass('d-none');
-                let errorSpan = $jobDetailsErrorRow.find('span');
-                errorSpan[0].innerText = validation
-            }
+                    // else, fail validation and present custom error message
+                    $errorRow.removeClass('d-none');
+                    let errorSpan = $errorRow.find('.error-message');
+                    errorSpan[0].innerText = 'Error: ' + validation
+                }
+    
+            });
 
-        });
+        }
+        
     },
 
     handleInputFocus: function(){

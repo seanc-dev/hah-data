@@ -73,6 +73,13 @@ label.active {
 
 .error-message {
     color: red;
+    font-size: 1rem;
+}
+
+.error-message-row .card-body {
+    background-color: lightpink;
+    padding: 10px !important;
+    margin-bottom: 10px
 }
 
 .form-submit:hover {

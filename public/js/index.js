@@ -39,6 +39,7 @@ $(document).ready(function () {
 
                 })
                 .catch((err) => {
+                    alert("There was an error loading the forms. Please refresh the page.")
                     console.error('Error in lib.initialiseAppData in index.init');
                     console.error(err)
                 });
@@ -61,6 +62,7 @@ $(document).ready(function () {
 
                 })
                 .catch((err) => {
+                    alert("There was an error loading the forms. Please refresh the page.")
                     console.error("Error in index.js else lib.initialiseAppData");
                     console.error(err);
                 });
@@ -89,7 +91,7 @@ $(document).ready(function () {
             handlers.handleInputFocus();
             handlers.handleFormClear();
             handlers.handleAccountNameBlur();
-            handlers.handleJobFormValidationOnClick();
+            handlers.handleFormValidationOnClick();
             handlers.handleFormSubmit();
             handlers.handleAccountTypeInput();
 

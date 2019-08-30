@@ -1,3 +1,5 @@
+import lib  from './library.js';
+
 const forms = {
     constructForm: function (formName) {
 
@@ -84,7 +86,6 @@ const forms = {
                 for (let k = 0; k < fieldsArr.length; k++) {
 
                     let fieldDetail = fieldData[fieldsArr[k]];
-                    console.log(fieldsArr[k])
                     let uniqueName = formName + '-' + fieldDetail.fieldName;
 
                     // create column element
@@ -159,10 +160,9 @@ const forms = {
     initAutocomplete: function () {
 
         function initAddy(fields) {
-            console.log(fields);
-            console.log(document.getElementById(fields.searchField))
+
             let addyComplete = new AddyComplete(document.getElementById(fields.searchField));
-            console.log(addyComplete);
+            
             addyComplete.options.excludePostBox = false;
             addyComplete.fields = {
                 address1: document.getElementById(fields.address1),
@@ -225,26 +225,53 @@ const forms = {
                 }
 
             })
-            .catch(console.error);
+            .catch(function(err){
+                console.error(err);
+
+            });
 
     },
 
     validateClientForm: function () {
 
-    },
-
-    validateJobForm: function () {
-
         // check if account name entered matches one from list
-        let $jobDetailsForm = $('#jobDetailsForm'),
-            optionsNodeList = $jobDetailsForm.find('#accountNameList').children(),
-            accountName = $jobDetailsForm.find('#jobDetails-accountName').val(),
+        let $clientDetailsForm = $('#clientDetailsForm'),
+            optionsNodeList = $('#jobDetailsForm').find('#accountNameList').children(),
+            accountName = $clientDetailsForm.find('#clientDetails-accountName').val(),
             accountNameVals = [];
 
         for (let i = 0; i < optionsNodeList.length; i++) {
             accountNameVals.push($(optionsNodeList[i]).val());
         }
 
+        console.log('validateClientForm accountNameVals:')
+        console.log(accountNameVals)
+
+        if (accountNameVals.includes(accountName)) return "Account " + accountName + " already exists in database. Please submit jobs under existing client record."
+
+        // if all validation passed, return true
+        return true;
+
+    },
+
+    validateJobForm: function () {
+
+        alert('validateJobForm run')
+        // check if account name entered matches one from list
+        let $jobDetailsForm = $('#jobDetailsForm'),
+            accountName = $jobDetailsForm.find('#jobDetails-accountName').val(),
+            accountNameVals = [];
+
+        console.log('validateJobForm document.appData.clientDetail:')
+        console.log(document.appData.clientDetail);
+
+        for (let i = 0; i < document.appData.clientDetail.length; i++) {
+            accountNameVals.push(document.appData.clientDetail[i].accountName);
+        }
+
+        console.log('validateJobForm accountNameVals:');
+        console.log(accountNameVals);
+        console.log(accountName);
         if (!accountNameVals.includes(accountName)) return "Please ensure Account Name is a valid option from the drop-down list. It must have already been created using the Client Details form."
 
         // check if dates entered 
@@ -254,14 +281,14 @@ const forms = {
 
         for (let i = 0; i < $dateFields.length; i++) {
             let dateVal = new Date($($dateFields[i]).val());
-            console.log(dateVal);
+            
             if (dateVal !== 'Invalid Date' && (dateVal > cd || dateVal < tenYearsBack)) return "Please ensure all entered dates are in the past within the last 10 years."
         }
 
         // check to ensure at least 1 hour of work has been entered
         let sum = 0;
         $jobDetailsForm.find('.staff-hours').each((i, field) => sum += $(field).val());
-        console.log(sum);
+        
         if (sum == 0) return "Please ensure the total of hours entered for this job is greater than zero."
 
         // if all validation passed, return true
