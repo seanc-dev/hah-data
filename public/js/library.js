@@ -30,9 +30,9 @@ const lib = {
 
     getClientObj: function (accountName) {
 
-        if (!document.clients) return console.error('Cannot retrieve client data, please reload page');
+        if (!document.appData.clientDetail) return console.error('Cannot retrieve client data, please reload page');
 
-        let clientObj = document.clients.find((obj) => {
+        let clientObj = document.appData.clientDetail.find((obj) => {
             return obj.accountName === accountName
         });
 

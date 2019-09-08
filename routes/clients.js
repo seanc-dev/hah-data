@@ -49,7 +49,7 @@ router.post("/", (req, res) => {
     .catch((err) => {
         console.error("Failed to geocode Client's Billing Address");
         console.error(err);
-        res.send("err");
+        res.send(err);
     });
 
 });

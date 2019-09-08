@@ -195,7 +195,7 @@ const forms = {
 
     retrieveClientAddress: function (accountName) {
 
-        let clientObj = document.clients.find((val) => {
+        let clientObj = document.appData.clientDetail.find((val) => {
             return val.accountName === accountName
         });
 
@@ -209,26 +209,23 @@ const forms = {
         axios.get('/' + document.appData.businessName + '/clients?requestType=clients')
             .then((response) => {
 
-                document.clients = response.data;
+                document.appData.clientDetail = response.data;
 
                 let $accountNameDatalist = $('#accountNameList');
 
                 $accountNameDatalist.empty();
 
-                for (let i = 0; i < document.clients.length; i++) {
+                for (let i = 0; i < response.data; i++) {
 
                     let option = document.createElement('option');
-                    option.setAttribute('value', document.clients[i].accountName);
-                    option.appendChild(document.createTextNode(document.clients[i].accountName));
+                    option.setAttribute('value', response.data[i].accountName);
+                    option.appendChild(document.createTextNode(response.data[i].accountName));
                     $accountNameDatalist[0].appendChild(option);
 
                 }
 
             })
-            .catch(function(err){
-                console.error(err);
-
-            });
+            .catch(console.error);
 
     },
 

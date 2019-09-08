@@ -1,6 +1,6 @@
-import forms    from './forms.js';
+import forms from './forms.js';
 import handlers from './handlers.js';
-import lib      from './library.js';
+import lib from './library.js';
 
 $(document).ready(function () {
 
@@ -18,38 +18,41 @@ $(document).ready(function () {
 
         if(!appData || appData.businessName !== document.appData.businessName) {
 
-            lib.initialiseAppData()
-                .then(function(result){
+        lib.initialiseAppData()
+            .then(function (result) {
 
-                    console.log(result); 
+                console.log(result);
 
-                    // set app data
-                    document.appData.formOptions = result.data.formOptions;
-                    document.appData.clientDetail = result.data.clientDetail;
+                // set app data
+                document.appData.formOptions = result.data.formOptions;
+                document.appData.clientDetail = result.data.clientDetail;
 
-                    localStorage.setItem('appData', JSON.stringify(document.appData));
+                localStorage.setItem('appData', JSON.stringify(document.appData));
 
-                    // build forms
-                    buildForms();
+                // build forms
+                buildForms();
 
-                    // kill loader
-                    let event = new CustomEvent('appready')
-                    document.dispatchEvent(event);
-                    console.log('App ready!');
+                // kill loader
+                let event = new CustomEvent('appready')
+                document.dispatchEvent(event);
+                console.log('App ready!');
 
-                })
-                .catch((err) => {
-                    alert("There was an error loading the forms. Please refresh the page.")
-                    console.error('Error in lib.initialiseAppData in index.init');
-                    console.error(err)
-                });
+            })
+            .catch((err) => {
+                alert("There was an error loading the forms. Please refresh the page.")
+                console.error('Error in lib.initialiseAppData in index.init');
+                console.error(err)
+            });
 
         } else {
 
             appData = JSON.parse(localStorage.getItem('appData'));
             document.appData.formOptions = appData.formOptions;
             document.appData.clientDetail = appData.clientDetail;
-            lib.initialiseAppData()
+
+            setTimeout(function(){
+
+                lib.initialiseAppData()
                 .then(function(result){
 
                 // set app data
@@ -75,11 +78,13 @@ $(document).ready(function () {
             document.dispatchEvent(event);
             console.log('App ready!');
 
+            }, 2000);
+            
         }
 
-        function buildForms(){
+        function buildForms() {
 
-            let $clientDetailsForm  = $('form#clientDetailsForm');
+            let $clientDetailsForm = $('form#clientDetailsForm');
 
             forms.constructForm('clientDetails');
             forms.constructForm('jobDetails');
