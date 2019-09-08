@@ -1,0 +1,8 @@
+20190908 1:
+1.  Fix 'Error: undefined' issue.
+    -   Custom error message presenting as undefined when form resubmit attempted after validation had already failed. 
+    -   Removed complexity re removing and re-adding submit event handler and this did it.
+2.  Fix issue with client details list updating on refresh before previously submitted client submitted to DB.
+    -   Added setTimeout delay to 'local storage already exists' option so that the ajax reload takes extra 2 seconds.
+        -   This is an absolutely hideous fix, but it is temporary.
+    -   This will require rebuild into SPA to fix properly (please see working.txt).

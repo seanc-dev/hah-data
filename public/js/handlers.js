@@ -16,13 +16,15 @@ const handlers = {
 
             forms.retrieveClientAddress(accountNameField.val())
                 .then((result) => {
+
+                    if (!result.data[0] || result.data[0].length < 1) return $('#jobDetails-billingAddress').html("No address in database." + '\n' + "Please update client record.")
+
                     $('#jobDetails-billingAddress').html(result.data[0] + '\n' + result.data[1]);
                     $('#jobDetails-workLocationStreetAddress').val(result.data[0]);
                     $('#jobDetails-workLocationSuburb').val(result.data[1]);
+
                 })
-                .catch((err) => {
-                    console.error(err);
-                });
+                .catch(console.error);
 
             $('#jobDetails-clientId').val(lib.getClientObj(accountNameField.val()).clientId);
 
