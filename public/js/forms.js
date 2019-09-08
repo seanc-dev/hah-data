@@ -215,7 +215,7 @@ const forms = {
 
                 $accountNameDatalist.empty();
 
-                for (let i = 0; i < response.data; i++) {
+                for (let i = 0; i < response.data.length; i++) {
 
                     let option = document.createElement('option');
                     option.setAttribute('value', response.data[i].accountName);
