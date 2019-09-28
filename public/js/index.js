@@ -101,40 +101,40 @@ $(document).ready(function () {
             handlers.handleAccountTypeInput();
             handlers.handleAlertHide();
 
-            function applyTestData(){
+        //     function applyTestData(){
 
-                let data = { 
-                    accountType: 'Business',
-                    accountName: 'Test Test Test Ltd.',
-                    businessName: 'Test Test Test Ltd.',
-                    mainContactFirstName: 'Coley',
-                    mainContactLastName: 'Coley',
-                    mainContactLandline: '',
-                    mainContactMobile: '+64273493710',
-                    mainContactEmail: 'seanco.dev@gmail.com',
-                    billingAddressStreet: '11 Island View Terrace',
-                    billingAddressSuburb: 'Cockle Bay',
-                    billingAddressCity: 'Auckland',
-                    billingAddressPostcode: '2014',
-                    territory: 'South Wellington',
-                    customerDemographic: 'Baby Boomer (50-65 ish)',
-                    estimatedCustomerIncome: 'Pension',
-                    acquisitionChannel: 'Word of Mouth',
-                }
+        //         let data = { 
+        //             accountType: 'Business',
+        //             accountName: 'Test Test Test Ltd.',
+        //             businessName: 'Test Test Test Ltd.',
+        //             mainContactFirstName: 'Coley',
+        //             mainContactLastName: 'Coley',
+        //             mainContactLandline: '',
+        //             mainContactMobile: '+64273493710',
+        //             mainContactEmail: 'seanco.dev@gmail.com',
+        //             billingAddressStreet: '11 Island View Terrace',
+        //             billingAddressSuburb: 'Cockle Bay',
+        //             billingAddressCity: 'Auckland',
+        //             billingAddressPostcode: '2014',
+        //             territory: 'South Wellington',
+        //             customerDemographic: 'Baby Boomer (50-65 ish)',
+        //             estimatedCustomerIncome: 'Pension',
+        //             acquisitionChannel: 'Word of Mouth',
+        //         }
     
-                for (let key in data) {
+        //         for (let key in data) {
     
-                    let el = document.getElementById('clientDetails-' + key);
+        //             let el = document.getElementById('clientDetails-' + key);
                     
-                    el.value = data[key]
+        //             el.value = data[key]
                     
-                }
+        //         }
     
-            }
+        //     }
     
-            applyTestData();
+        //     applyTestData();
 
-        }
+        // }
 
     }
 

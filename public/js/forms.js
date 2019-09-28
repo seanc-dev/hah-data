@@ -23,7 +23,7 @@ const forms = {
         buttonsFieldset.classList.add('border-0');
         buttonsFieldset.classList.add('d-flex');
         let row = document.createElement('div');
-        addClasses(row, ['row', 'justify-content-end'])
+        addClasses(row, ['row', 'justify-content-end']);
 
         // append buttons to fieldset
         // row.appendChild(constructButtonCol('Clear', 'button', ['btn-outline-secondary']));

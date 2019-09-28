@@ -4,11 +4,12 @@ the sheet.
 
 This will require changing form submission to ajax. What's involved?
     a.  Change form routing from a post method post to an axios post call to that same endpoint.
-        -   $('form').serializeArray()[0] to get form data
+        -   $('form').serializeArray().reduce to get form data
         -   Add e.preventDefault() to successful submission flow.
         -   Perform form validation against DB at submission. Fail submission if validation fails, else pass submission.
         -   Fire axios POST to /[form type] in submit function.
     c.  Update clientDetails array on submission (completed).
+    d.  Update job details datalist options on submission.
     e.  Clear form upon successful submission.
         -   formElement.reset() to reset form element
     f.  Modularise 'error-message' span so that it can also indicate success. This should also clear when a user switches between
