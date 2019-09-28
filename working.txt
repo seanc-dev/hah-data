@@ -1,13 +1,15 @@
+
 Need to turn this into a single page app so there isn't the trouble with refreshing the clients list before it has updated in 
 the sheet.
 
-This will mean the following:
-1.  Change form submission to ajax.
-    What's involved in changing form submission to ajax? 
-    a.  Change form routing from a post method post to an axios put call to that same endpoint.
-    b.  Add e.preventDefault() to successful submission flow.
+This will require changing form submission to ajax. What's involved?
+    a.  Change form routing from a post method post to an axios post call to that same endpoint.
+        -   $('form').serializeArray()[0] to get form data
+        -   Add e.preventDefault() to successful submission flow.
+        -   Perform form validation against DB at submission. Fail submission if validation fails, else pass submission.
+        -   Fire axios POST to /[form type] in submit function.
     c.  Update clientDetails array on submission (completed).
-    d.  Perform form validation against DB at submission (re-initiate loading overlay while this is in progress).
     e.  Clear form upon successful submission.
+        -   formElement.reset() to reset form element
     f.  Modularise 'error-message' span so that it can also indicate success. This should also clear when a user switches between
         forms.

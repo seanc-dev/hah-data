@@ -1,3 +1,8 @@
+#loadingOverlay.submit-loader {
+    opacity: 0.5 !important;
+    transition: opacity 0.2s
+}
+
 #loadingOverlay {
     position:fixed;
     z-index:9;
@@ -8,7 +13,7 @@
     background: var(--off-white);
     /* opacity: 0.75; */
     /* background: rgba(255,255,255,0.8); */
-    transition: opacity 0.5s 0.4s;
+    transition: opacity 0.2s 0.2s;
 }
 
 #loadingMessage {
@@ -20,15 +25,13 @@
     width:100%;
     text-align:center;
     color: var(--gunmetal-grey);
-    /* opacity: 0.8 */
-    /* color: rgba(0,0,0,1); */
 }
 
 .page-loaded {
-    opacity: 0
+    opacity: 0 !important;
 }
 
-.lds-default {
+/* .lds-default {
     display: inline-block;
     position: relative;
     width: 64px;
@@ -123,4 +126,4 @@
     50% {
         transform: scale(1.5);
     }
-}
+} */

@@ -3,8 +3,8 @@ import lib from './library.js';
 
 const $jobDetailsForm = $('form#jobDetailsForm'),
     $clientDetailsForm = $('form#clientDetailsForm'),
-    $jobDetailsErrorRow = $jobDetailsForm.closest('.form-content').find('.error-message-row'),
-    $clientDetailsErrorRow = $clientDetailsForm.closest('.form-content').find('.error-message-row');
+    $jobDetailsStatusDiv = $jobDetailsForm.closest('.form-content').find('.status-message'),
+    $clientDetailsStatusDiv = $clientDetailsForm.closest('.form-content').find('.status-message');
 
 const handlers = {
 
@@ -43,60 +43,6 @@ const handlers = {
 
     },
 
-    handleFormValidationOnClick: function () {
-
-        validateForm($clientDetailsForm, $clientDetailsErrorRow, 'client');
-        validateForm($jobDetailsForm, $jobDetailsErrorRow, 'job');
-
-        function validateForm($form, $errorRow, formType) {
-
-            $form.find('.form-submit').on('click', function (e) {
-
-                // e.preventDefault();
-
-                let validation
-
-                if (formType === 'client') validation = forms.validateClientForm();
-                if (formType === 'job') validation = forms.validateJobForm();
-
-                // if validation passes (is 'true' boolean), submit form
-                if (validation === true) {
-                    let submitBtn = $form.find('.form-submit');
-                    $errorRow.find('span').val("");
-                    $errorRow.addClass('d-none');
-                    if ($form[0].checkValidity()) {
-                        lib.setCreatedDate();
-                        if (formType === 'client') {
-
-                            // find values to add to clientDetail array
-                            let accountNameVal  = $form.find('input[name="accountName"]').val(),
-                                clientIdVal     = document.appData.clientDetail.slice(-1)[0].clientId + 1;
-
-                            // set clientId in form
-                            $form.find('#clientDetails-clientId').val(clientIdVal);
-
-                            // append new item to array
-                            document.appData.clientDetail.push({
-                                clientId: clientIdVal,
-                                accountName: accountNameVal
-                            });
-
-                        }
-                    }
-                } else {
-                    // else, fail validation and present custom error message
-                    e.preventDefault();
-                    $errorRow.removeClass('d-none');
-                    let errorSpan = $errorRow.find('.error-message');
-                    errorSpan[0].innerText = 'Error: ' + validation
-                }
-
-            });
-
-        }
-
-    },
-
     handleInputFocus: function () {
         let inputs = $('.form-control');
         inputs.focus(function () {
@@ -107,19 +53,69 @@ const handlers = {
         });
     },
 
-    handleFormClear: function () {
-
-        $('.btn-outline-secondary').click(function (e) {
-            $(e.target).closest('form')[0].reset();
-        });
-
-    },
-
     handleFormSubmit: function () {
 
         $('.form-submit').click(function (e) {
 
+            e.preventDefault();
+
+            let $form = $(this).closest('form');
+            let formType = $form[0].dataset.name.charAt(0).toUpperCase() + $form[0].dataset.name.slice(1);
+            let $statusDiv = $form.closest('.form-content').find('.status-message');
+
             lib.setCreatedDate();
+            
+            let validation
+
+            if (formType === 'Client') validation = forms.validateClientForm();
+            if (formType === 'Job') validation = forms.validateJobForm();
+
+            // check default validity. If fails, report validity
+            if ($form[0].checkValidity()) {
+
+                // check custom validation. if successful, submit and append client details to array. If unsuccessful, report in error message.
+                if (validation === true) {
+
+                    forms.submitFormFlow($form, formType, $statusDiv);
+                    
+                    if (formType === 'Client') {
+
+                        // find values to add to clientDetail array
+                        let accountNameVal  = $form.find('input[name="accountName"]').val(),
+                            clientIdVal     = document.appData.clientDetail.slice(-1)[0].clientId + 1;
+
+                        // set clientId in form
+                        $form.find('#clientDetails-clientId').val(clientIdVal);
+
+                        // append new item to array
+                        document.appData.clientDetail.push({
+                            clientId: clientIdVal,
+                            accountName: accountNameVal
+                        });
+
+                        // append new option node to datalist for job details account name field
+                        let option = document.createElement('option');
+                        option.setAttribute('value', accountNameVal);
+                        document.getElementById('accountNameList').appendChild(option);
+
+                    }
+
+                } else {
+
+                    // else, fail validation and present custom error message
+                    $statusDiv.removeClass('d-none');
+                    $statusDiv.removeClass('alert-success');
+                    $statusDiv.addClass('alert-danger');
+                    $statusDiv.find('span')[0].innerHTML = '<strong>Error:</strong> ' + validation
+                    $statusDiv.focus();
+
+                }
+
+            } else {
+
+                $form[0].reportValidity();
+
+            }
 
         });
 
@@ -143,6 +139,18 @@ const handlers = {
             $('#' + clickedTabName).removeClass('d-none');
 
         });
+
+    },
+
+    handleAlertHide: function () {
+
+        $('.alert').on('close.bs.alert', function(e){
+
+            e.preventDefault();
+
+            this.classList.add('d-none');
+
+        })
 
     }
 

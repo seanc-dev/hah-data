@@ -26,7 +26,7 @@ const forms = {
         addClasses(row, ['row', 'justify-content-end'])
 
         // append buttons to fieldset
-        row.appendChild(constructButtonCol('Clear', 'button', ['btn-outline-secondary']));
+        // row.appendChild(constructButtonCol('Clear', 'button', ['btn-outline-secondary']));
         row.appendChild(constructButtonCol('Submit', 'submit', ['btn-secondary', 'form-submit']));
 
         // append row to buttons fieldset
@@ -114,7 +114,7 @@ const forms = {
                     if (fieldDetail.readOnly) inputEl.setAttribute('readonly', true);
 
                     if (fieldDetail.fieldType === 'datalist') inputEl.setAttribute('list', fieldDetail.fieldName + 'List');
-                    if (fieldDetail.fieldType === 'select') addOptions(inputEl, fieldDetail.values);
+                    if (fieldDetail.fieldType === 'select') addDatalistOptions(inputEl, fieldDetail.values);
 
                     innerEl.appendChild(inputEl);
 
@@ -131,11 +131,11 @@ const forms = {
 
                     dl.setAttribute('id', fieldDetail.fieldName + 'List')
 
-                    return addOptions(dl, fieldDetail.values);
+                    return addDatalistOptions(dl, fieldDetail.values);
 
                 }
 
-                function addOptions(housingEl, values) {
+                function addDatalistOptions(housingEl, values) {
                     let option, text;
                     for (let l = 0; l < values.length; l++) {
                         option = document.createElement('option');
@@ -229,6 +229,84 @@ const forms = {
 
     },
 
+    submitFormFlow: function(form, formName, statusDiv){
+
+        lib.initSpinner();
+
+        // pull out and transform form data
+        let formData = form.serializeArray().reduce(function(obj, val){
+            obj[val.name] = val.value
+            return obj
+        },{});
+
+        // fire off axios request to releant post endpoint to create record in db
+        axios.post('/' + document.appData.businessName + '/' + form[0].dataset.name + 's', formData)
+        .then(function(result){
+
+            // if result other than 200 received, flag error
+            if (!result.status === 200) {
+
+                new Error('Form submit POST request failed with status code ' + result.status + ' and status text: ' + result.statusText);
+
+            } else {
+
+                let message = formName + ' record successfully added to database for ' + formData.accountName;
+                
+                // trigger success alert
+                initAlert('Success', message, statusDiv);
+
+                // clear form
+                form[0].reset();
+
+            }
+
+        })
+        .catch(function (error) {
+
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.error(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error', error.message);
+            }
+            console.error(error.config);
+
+            // trigger error alert with message
+            initAlert('Error', formName + ' record could not be added to the database.\n' + error.message, statusDiv);
+
+        })
+        .then(lib.endSpinner);
+
+        function initAlert(type, message, alertDiv) {
+
+            alertDiv.removeClass('d-none');
+            alertDiv.find('span')[0].innerHTML = '<strong>' + type + ':</strong> ' + message;
+
+            if (type === 'Success') {
+
+                alertDiv.removeClass('alert-danger');
+                alertDiv.addClass('alert-success');
+                
+            } else if (type === 'Error') {
+
+                statusDiv.removeClass('alert-success');
+                statusDiv.addClass('alert-danger');
+
+            }
+
+        }
+
+    },
+
     validateClientForm: function () {
 
         // check if account name entered matches one from list
@@ -280,7 +358,8 @@ const forms = {
         // if all validation passed, return true
         return true;
 
-    }
+    },
+
 }
 
 export default forms

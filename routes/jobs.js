@@ -13,19 +13,27 @@ router.post("/", (req, res) => {
 
     geocode(location)
     .then(function(result){
+
         console.log(result);
+
         req.body.workLocationLatitude = result[0].latitude
         req.body.workLocationLongitude = result[0].longitude
         req.body.workLocationFormattedAddress = result[0].formattedAddress
         req.body.workLocationGPID = result[0].extra.googlePlaceId
+
         new Job(req.params.orgId, false, req.body);
+
         res.redirect("/" + req.params.orgId);
     })
     .catch((err) => {
+
         console.error("Failed to geocode Client's Billing Address");
         console.error(err);
+
         new Job(req.params.orgId, false, req.body);
+        
         res.redirect("/" + req.params.orgId);
+
     });
 
 })

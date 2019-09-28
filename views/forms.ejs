@@ -18,7 +18,7 @@
     <div id="loadingOverlay">
         <div id="loadingMessage">
             <h2>Loading...</h2>
-            <div id="loader">
+            <!-- <div id="loader">
                 <div class="lds-default">
                     <div></div>
                     <div></div>
@@ -32,9 +32,9 @@
                     <div></div>
                     <div></div>
                     <div></div>
-                </div>
-            </div>
+                </div> -->
         </div>
+    </div>
     </div>
     <script src="/js/loading-overlay.js"></script>
 
@@ -66,30 +66,20 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-4 tab-col" data-tab-id="staffDetails">
-                    <div class="card tab-card">
-                        <div class="card-body">
-                            <i class="fas fa-rocket"></i>
-                            <h4><span>Staff Rates</span></h4>
-                        </div>
-                    </div>
-                </div> -->
             </div>
             <div id="contentBody">
                 <div id="clientDetails" class="form-content row">
                     <div class="col-12 px-0">
                         <div class="card">
                             <div class="card-body">
-                                <div class="error-message-row row px-0 d-none">
-                                    <div class="col-12 px-0">
-                                        <div class="card border-0">
-                                            <div class="card-body px-0">
-                                                <span class="error-message"></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="status-message alert alert-dismissable py-1 px-3 my-2 d-none">
+                                    <span></span>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
-                                <form id="clientDetailsForm" class="" action="" method="get" accept-charset="utf-8">
+                                <form id="clientDetailsForm" data-name="client" class="" action="" method="get"
+                                    accept-charset="utf-8">
                                 </form>
                             </div>
                         </div>
@@ -99,16 +89,14 @@
                     <div class="col-12 px-0">
                         <div class="card">
                             <div class="card-body">
-                                <div class="error-message-row row px-0 d-none">
-                                    <div class="col-12 px-0">
-                                        <div class="card border-0">
-                                            <div class="card-body px-0">
-                                                <span class="error-message"></span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="status-message alert alert-dismissable py-1 px-3 my-2 d-none">
+                                    <span></span>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
-                                <form id="jobDetailsForm" class="" action="" method="get" accept-charset="utf-8">
+                                <form id="jobDetailsForm" data-name="job" class="" action="" method="get"
+                                    accept-charset="utf-8">
                                 </form>
                             </div>
                         </div>
@@ -130,10 +118,14 @@
 
     </div>
 
-    <script src='https://www.addy.co.nz/scripts/addy.js?loadcss=true&enableLocation=false&key=13ecb92d1b934e1db5328eebdc715e6e' type='text/javascript' async=true></script>
+    <script
+        src='https://www.addy.co.nz/scripts/addy.js?loadcss=true&enableLocation=false&key=13ecb92d1b934e1db5328eebdc715e6e'
+        type='text/javascript' async=true></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
         integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"
+        integrity="sha256-PieqE0QdEDMppwXrTzSZQr6tWFX3W5KkyRVyF1zN3eg=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" type="text/javascript"
         charset="utf-8" async defer></script>
     <script type="module" src="/js/forms.js" type="text/javascript" charset="utf-8" async defer></script>

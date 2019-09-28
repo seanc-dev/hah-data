@@ -1,16 +1,18 @@
-const   express = require("express");
+const express = require("express");
 
-const   mapping = require("../lib/mapping.js"),
-        ss      = require("../lib/spreadsheet.js"),
-        Client  = require("../lib/classes/client.js"),
-        geocodeAddress = require("./services/geocode.js");
+const mapping = require("../lib/mapping.js"),
+    ss = require("../lib/spreadsheet.js"),
+    Client = require("../lib/classes/client.js"),
+    geocodeAddress = require("./services/geocode.js");
 
-const   router  = express.Router({mergeParams: true});
+const router = express.Router({
+    mergeParams: true
+});
 
 // index route
 router.get("/", (req, res) => {
-    if(req.query.requestType === "clients") {
-        let clientsArr = ss.getClientDetailsArray(req.params.orgId)
+    if (req.query.requestType === "clients") {
+        ss.getClientDetailsArray(req.params.orgId)
             .then((result) => {
                 res.send(result);
             })
@@ -19,7 +21,7 @@ router.get("/", (req, res) => {
                 console.error(err);
                 res.send(err);
             });
-    } else if(req.query.requestType === "clientAddress") {
+    } else if (req.query.requestType === "clientAddress") {
         ss.getAddressDetailsString(req.params.orgId, req.query.clientId)
             .then((result) => {
                 res.send(result);
@@ -37,27 +39,51 @@ router.post("/", (req, res) => {
 
     let location = req.body.billingAddressStreet + " " + req.body.billingAddressSuburb + " " + req.body.billingAddressCity + " " + req.body.billingAddressPostcode
 
-    geocodeAddress(location)
-    .then(function(result){
+    ss.getClientDetailsArray(req.params.orgId)
+        .then((result) => { // test for account name similarity
 
-        // console.log(result);
-        req.body.billingAddressLatitude = result[0].latitude
-        req.body.billingAddressLongitude = result[0].longitude
-        req.body.billingAddressFormatted = result[0].formattedAddress
-        req.body.billingAddressGPID = result[0].extra.googlePlaceId
+            if (result.find((el) => {el.accountName === req.body.accountName})) {
 
-        new Client(req.params.orgId, false, req.body);
+                let errorMessage = "Client record with that account name already exists in database";
+                console.error(errorMessage);
+                res.send(new Error(errorMessage));
 
-        res.redirect("/" + req.params.orgId);
+            }
 
-    })
-    .catch((err) => {
+        })
+        // .then((result) => {this is where I would add the test for address similarity if requested (note - should be replaced by db keys later)})
+        .catch((error) => {
 
-        console.error("Failed to geocode Client's Billing Address");
-        console.error(err);
-        res.send(err);
+            console.error(error);
+            res.send(new Error("Failed to check entered record against existing Client database"));
 
-    });
+        })
+        .then((result) => {
+
+            geocodeAddress(location)
+            .then(function (result) {
+
+                req.body.billingAddressLatitude = result[0].latitude
+                req.body.billingAddressLongitude = result[0].longitude
+                req.body.billingAddressFormatted = result[0].formattedAddress
+                req.body.billingAddressGPID = result[0].extra.googlePlaceId
+
+                let client = new Client(req.params.orgId, false, req.body);
+                res.send({id: client._id});
+
+            })
+            .catch((err) => {
+
+                console.error("Failed to geocode Client's Billing Address");
+                console.error(err);
+
+                let client = new Client(req.params.orgId, false, req.body);
+
+                res.send({id: client._id});
+
+            });
+
+        })
 
 });
 

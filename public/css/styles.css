@@ -71,15 +71,8 @@ label.active {
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
-.error-message {
-    color: red;
+.status-message {
     font-size: 1rem;
-}
-
-.error-message-row .card-body {
-    background-color: lightpink;
-    padding: 10px !important;
-    margin-bottom: 10px
 }
 
 .form-submit:hover {
@@ -98,7 +91,7 @@ label.active {
     box-shadow: none;
 }
 
-fieldset > .row {
+fieldset>.row {
     padding-bottom: 5px;
 }
 
@@ -161,4 +154,51 @@ div#tabRow div.card-body h4 {
 
 #contentBody .card {
     border-top: none;
+}
+
+.status-message {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 20px;
+    z-index: 1;
+}
+
+@keyframes spinner-line-fade-more {
+
+    0%,
+    100% {
+        opacity: 0;
+        /* minimum opacity */
+    }
+
+    1% {
+        opacity: 1;
+    }
+}
+
+@keyframes spinner-line-fade-quick {
+
+    0%,
+    39%,
+    100% {
+        opacity: 0.25;
+        /* minimum opacity */
+    }
+
+    40% {
+        opacity: 1;
+    }
+}
+
+@keyframes spinner-line-fade-default {
+
+    0%,
+    100% {
+        opacity: 0.22;
+        /* minimum opacity */
+    }
+
+    1% {
+        opacity: 1;
+    }
 }
