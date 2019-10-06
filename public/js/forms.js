@@ -15,7 +15,9 @@ const forms = {
 
         //  for each item in the structure array, create fieldset.form-group with legend of the sectionTitle
         for (let i = 0; i < structureArr.length; i++) {
+
             formEle.appendChild(constructFormSection(structureArr[i]));
+
         }
 
         // create buttons fieldset
@@ -257,6 +259,7 @@ const forms = {
 
                 // clear form
                 form[0].reset();
+                if (formName === 'Job') form.find('#jobDetails-billingAddress').val("");
 
             }
 

@@ -73,7 +73,7 @@ const handlers = {
             // check default validity. If fails, report validity
             if ($form[0].checkValidity()) {
 
-                // check custom validation. if successful, submit and append client details to array. If unsuccessful, report in error message.
+                // check custom validation. if successful, submit and append client details to array. If unsuccessful, report in error message
                 if (validation === true) {
 
                     forms.submitFormFlow($form, formType, $statusDiv);
