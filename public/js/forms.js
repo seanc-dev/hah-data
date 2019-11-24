@@ -215,6 +215,9 @@ const forms = {
 
                 let $accountNameDatalist = $('#accountNameList');
 
+                console.log('setAccountNameOptions fun $("#accountNameDatalist")');
+                console.log($accountNameDatalist);
+
                 $accountNameDatalist.empty();
 
                 for (let i = 0; i < response.data.length; i++) {

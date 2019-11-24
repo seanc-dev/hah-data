@@ -116,6 +116,29 @@ const lib = {
 
     },
 
+    removeClassesByRegexp: function ($element, regexp) {
+
+        return $element.removeClass(function (index, className) {
+            return (className.match(regexp) || []).join(' ');
+        });
+
+    },
+
+    revealStatusMessage: function (dimension, alertType, alertTitle, alertText) {
+
+        if (!dimension || !alertType || !alertText) return new Error("Error: Function activateStatusMessage requires dimension, alertType, and alertText values");
+
+        let $statusDiv = $('#' + dimension + 'DetailsForm').closest('.form-content').find('.status-message');
+        let message = alertTitle ? '<strong>' + alertTitle + ':</strong> ' + alertText : alertText;
+
+        $statusDiv.removeClass('d-none');
+        lib.removeClassesByRegexp($statusDiv, /(alert-)\w+/g);
+        $statusDiv.addClass('alert-' + alertType.toLowerCase());
+        $statusDiv.find('span')[0].innerHTML = message
+        $statusDiv.focus();
+
+    },
+
     setCreatedDate: function () {
 
         let now = new Date();

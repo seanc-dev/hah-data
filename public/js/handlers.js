@@ -1,10 +1,10 @@
 import forms from './forms.js';
 import lib from './library.js';
 
-const $jobDetailsForm = $('form#jobDetailsForm'),
-    $clientDetailsForm = $('form#clientDetailsForm'),
-    $jobDetailsStatusDiv = $jobDetailsForm.closest('.form-content').find('.status-message'),
-    $clientDetailsStatusDiv = $clientDetailsForm.closest('.form-content').find('.status-message');
+// const $jobDetailsForm = $('form#jobDetailsForm'),
+//     $clientDetailsForm = $('form#clientDetailsForm'),
+    // $jobDetailsStatusDiv = $jobDetailsForm.closest('.form-content').find('.status-message'),
+    // $clientDetailsStatusDiv = $clientDetailsForm.closest('.form-content').find('.status-message');
 
 const handlers = {
 
@@ -103,11 +103,12 @@ const handlers = {
                 } else {
 
                     // else, fail validation and present custom error message
-                    $statusDiv.removeClass('d-none');
-                    $statusDiv.removeClass('alert-success');
-                    $statusDiv.addClass('alert-danger');
-                    $statusDiv.find('span')[0].innerHTML = '<strong>Error:</strong> ' + validation
-                    $statusDiv.focus();
+                    lib.revealStatusMessage(formType.toLowerCase(), 'danger', 'Error', validation)
+                    // $statusDiv.removeClass('d-none');
+                    // lib.removeClassesByRegexp($statusDiv, /(alert-)\w+/g);
+                    // $statusDiv.addClass('alert-danger');
+                    // $statusDiv.find('span')[0].innerHTML = '<strong>Error:</strong> ' + validation
+                    // $statusDiv.focus();
 
                 }
 
