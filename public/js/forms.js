@@ -1,4 +1,4 @@
-import lib  from './library.js';
+import lib from './library.js';
 
 const forms = {
     constructForm: function (formName) {
@@ -164,7 +164,7 @@ const forms = {
         function initAddy(fields) {
 
             let addyComplete = new AddyComplete(document.getElementById(fields.searchField));
-            
+
             addyComplete.options.excludePostBox = false;
             addyComplete.fields = {
                 address1: document.getElementById(fields.address1),
@@ -201,115 +201,212 @@ const forms = {
             return val.accountName === accountName
         });
 
-        return axios.get('/' + document.appData.businessName + '/clients?requestType=clientAddress&clientId=' + (Number(clientObj.clientId) + 1));
+        return axios.get('/' + document.appData.businessName + '/clients?requestType=address&clientId=' + (Number(clientObj.clientId) + 1));
 
     },
 
-    setAccountNameOptions: function () {
+    setViewKeys: function () {
 
-        // pull through clients deets
-        axios.get('/' + document.appData.businessName + '/clients?requestType=clients')
-            .then((response) => {
+        doWork('client');
+        doWork('job');
 
-                document.appData.clientDetail = response.data;
+        async function doWork(dim) {
 
-                let $accountNameDatalist = $('#accountNameList');
+            // retrieve keys for dimension's db record
+            let result;
+            try {
+                result = await axios.get('/' + document.appData.businessName + '/' + dim + 's?requestType=keys');
+            } catch (err) {
+                console.error("Error in setViewKeys doWork async step for " + dim + " dimension");
+                console.error(err);
+            }
 
-                console.log('setAccountNameOptions fun $("#accountNameDatalist")');
-                console.log($accountNameDatalist);
+            // define vars
+            let $viewFieldset = $('#' + dim + 'ViewFormBody fieldset');
+            let fieldLabels = result.data.fieldLabels;
+            let fieldNames = result.data.fieldNames;
 
-                $accountNameDatalist.empty();
+            // loop through keys and create element tree, then apply key to first el
+            for (let i = 0; i < fieldLabels.length; i++) {
 
-                for (let i = 0; i < response.data.length; i++) {
+                // create row
+                let row = createEl('div', ['row']);
+                $viewFieldset[0].appendChild(row);
 
-                    let option = document.createElement('option');
-                    option.setAttribute('value', response.data[i].accountName);
-                    option.appendChild(document.createTextNode(response.data[i].accountName));
-                    $accountNameDatalist[0].appendChild(option);
+                // create column to hold field label
+                let col = createEl('div', ['col-3', 'form-view-text-sm']);
+                col.appendChild(document.createTextNode(lib.capitaliseWords(fieldLabels[i]) + ':'));
+                row.appendChild(col);
 
+                // create column to hold value
+                let col2 = createEl('div', ['col-9', 'form-view-text-lg']);
+                row.appendChild(col2);
+                let input = createEl('input', ["form-control"]);
+                input.setAttribute('type', 'text');
+                input.setAttribute('name', fieldNames[i]);
+                input.setAttribute('readonly', true);
+                col2.appendChild(input)
+
+            }
+
+            function createEl(elType, classes) {
+                let el = document.createElement(elType);
+                for (let i = 0; i < classes.length; i++) {
+                    el.classList.add(classes[i]);
                 }
+                return el;
+            }
 
-            })
-            .catch(console.error);
+        }
 
     },
 
-    submitFormFlow: function(form, formName, statusDiv){
+    setClientDetails: async function () {
+
+        let clientDetails
+        try {
+            // retrieve client details from server
+            clientDetails = await axios.get('/' + document.appData.businessName + '/clients?requestType=detailsArray');
+        } catch (err) {
+            console.error("Error retrieving client details in setClientDetails axios call");
+            return console.error(err);
+        }
+
+        // set values in account name list
+        let $accountNameDatalist = $('#accountNameList');
+        $accountNameDatalist.empty();
+
+        for (let i = 0; i < clientDetails.data.length; i++) {
+
+            let option = document.createElement('option');
+            option.setAttribute('value', clientDetails.data[i].accountName);
+            option.appendChild(document.createTextNode(clientDetails.data[i].accountName));
+            $accountNameDatalist[0].appendChild(option);
+
+        }
+
+        // set options in client select drop-down
+        // find field and empty
+        let $clientDetailsDatalist = $('#clientDetailsList');
+        $clientDetailsDatalist.empty();
+
+        // create datalist options 
+        for (let i = 0; i < clientDetails.data.length; i++) {
+
+            let concat = 'Account: ' +
+                clientDetails.data[i].accountName +
+                ', Billing Address: ' +
+                clientDetails.data[i].billingAddressStreet +
+                ', ' +
+                clientDetails.data[i].billingAddressSuburb
+
+            document.appData.clientDetail[i].concat = concat;
+
+            let option = document.createElement('option');
+            option.setAttribute('value', concat);
+            option.setAttribute('data-key', clientDetails.data[i].clientId);
+            $clientDetailsDatalist[0].appendChild(option);
+
+        }
+
+    },
+
+    setJobOptions: async function () {
+
+        let jobDetail
+        // pull through job deets
+        try {
+            jobDetail = await axios.get('/' + document.appData.businessName + '/jobs?requestType=detailsArray')
+        } catch (err) {
+            console.error("Error in setJobOptions - failed to retrieve job details from Server");
+            return console.error(err);
+        }
+
+        // set array as app variable
+        document.appData.jobDetail = jobDetail.data;
+
+        // find field and empty
+        let $jobDetailDatalist = $('#jobDetailsList');
+        $jobDetailDatalist.empty();
+
+        // create datalist options from 
+        for (let i = 0; i < jobDetail.data.length; i++) {
+
+            let concat = 'Account: ' +
+                jobDetail.data[i].accountName +
+                ', Date Invoice Sent: ' +
+                jobDetail.data[i].dateInvoiceSent +
+                ', Amount Invoiced: ' +
+                jobDetail.data[i].amountInvoiced
+
+            document.appData.jobDetail[i].concat = concat;
+
+            let option = document.createElement('option');
+            option.setAttribute('value', concat);
+            option.setAttribute('data-key', jobDetail.data[i].jobId);
+            $jobDetailDatalist[0].appendChild(option);
+
+        }
+
+    },
+
+    submitFormFlow: function (form, formName, statusDiv) {
 
         lib.initSpinner();
 
         // pull out and transform form data
-        let formData = form.serializeArray().reduce(function(obj, val){
+        let formData = form.serializeArray().reduce(function (obj, val) {
             obj[val.name] = val.value
             return obj
-        },{});
+        }, {});
 
-        // fire off axios request to releant post endpoint to create record in db
+        // fire off axios request to relevant post endpoint to create record in db
         axios.post('/' + document.appData.businessName + '/' + form[0].dataset.name + 's', formData)
-        .then(function(result){
+            .then(function (result) {
 
-            // if result other than 200 received, flag error
-            if (!result.status === 200) {
+                // if result other than 200 received, flag error
+                if (!result.status === 200) {
 
-                new Error('Form submit POST request failed with status code ' + result.status + ' and status text: ' + result.statusText);
+                    new Error('Form submit POST request failed with status code ' + result.status + ' and status text: ' + result.statusText);
 
-            } else {
+                } else {
 
-                let message = formName + ' record successfully added to database for ' + formData.accountName;
-                
-                // trigger success alert
-                initAlert('Success', message, statusDiv);
+                    let message = formName + ' record successfully added to database for ' + formData.accountName;
 
-                // clear form
-                form[0].reset();
-                if (formName === 'Job') form.find('#jobDetails-billingAddress').val("");
+                    // trigger success alert
+                    lib.revealStatusMessage(form.attr('data-name'), 'success', 'Success', message);
 
-            }
+                    // clear form
+                    form[0].reset();
+                    if (formName === 'Job') form.find('#jobDetails-billingAddress').val("");
 
-        })
-        .catch(function (error) {
+                }
 
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.error(error.response.data);
-                console.error(error.response.status);
-                console.error(error.response.headers);
-            } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                console.error(error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.error('Error', error.message);
-            }
-            console.error(error.config);
+            })
+            .catch(function (error) {
 
-            // trigger error alert with message
-            initAlert('Error', formName + ' record could not be added to the database.\n' + error.message, statusDiv);
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error(error.response.data);
+                    console.error(error.response.status);
+                    console.error(error.response.headers);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    console.error(error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error', error.message);
+                }
+                console.error(error.config);
 
-        })
-        .then(lib.endSpinner);
+                // trigger error alert with message
+                lib.revealStatusMessage(formName, 'danger', 'Error', 'Record could not be added to the database.');
 
-        function initAlert(type, message, alertDiv) {
-
-            alertDiv.removeClass('d-none');
-            alertDiv.find('span')[0].innerHTML = '<strong>' + type + ':</strong> ' + message;
-
-            if (type === 'Success') {
-
-                alertDiv.removeClass('alert-danger');
-                alertDiv.addClass('alert-success');
-                
-            } else if (type === 'Error') {
-
-                statusDiv.removeClass('alert-success');
-                statusDiv.addClass('alert-danger');
-
-            }
-
-        }
+            })
+            .then(lib.endSpinner);
 
     },
 
@@ -351,14 +448,14 @@ const forms = {
 
         for (let i = 0; i < $dateFields.length; i++) {
             let dateVal = new Date($($dateFields[i]).val());
-            
+
             if (dateVal !== 'Invalid Date' && (dateVal > cd || dateVal < tenYearsBack)) return "Please ensure all entered dates are in the past within the last 10 years."
         }
 
         // check to ensure at least 1 hour of work has been entered
         let sum = 0;
         $jobDetailsForm.find('.staff-hours').each((i, field) => sum += $(field).val());
-        
+
         if (sum == 0) return "Please ensure the total of hours entered for this job is greater than zero."
 
         // if all validation passed, return true

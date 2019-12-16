@@ -52,4 +52,9 @@ app.use("/:orgId/jobs", require("./routes/jobs"));
 
 console.log("App routes initialised");
 
+process.on('unhandledRejection', (err) => { 
+    console.error(err)
+    process.exit(1)
+})
+
 app.listen(process.env.PORT, process.env.IP, () => console.log("HAH-Kapiti-Forms running on port " + process.env.PORT));

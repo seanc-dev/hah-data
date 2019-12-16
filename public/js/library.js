@@ -132,9 +132,10 @@ const lib = {
         let message = alertTitle ? '<strong>' + alertTitle + ':</strong> ' + alertText : alertText;
 
         $statusDiv.removeClass('d-none');
+        $statusDiv.addClass('alert-dismissable');
         lib.removeClassesByRegexp($statusDiv, /(alert-)\w+/g);
         $statusDiv.addClass('alert-' + alertType.toLowerCase());
-        $statusDiv.find('span')[0].innerHTML = message
+        $statusDiv.find('span')[0].innerHTML = message;
         $statusDiv.focus();
 
     },

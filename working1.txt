@@ -1,0 +1,3 @@
+Two Dataobject "update" cases
+1.  No data object passed into Constructor = Update only computed columns
+2.  Data object passed into Constructor    = Update all columns

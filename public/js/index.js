@@ -21,11 +21,10 @@ $(document).ready(function () {
         lib.initialiseAppData()
             .then(function (result) {
 
-                console.log(result);
-
                 // set app data
                 document.appData.formOptions = result.data.formOptions;
                 document.appData.clientDetail = result.data.clientDetail;
+                console.log(result.data.clientDetail);
 
                 localStorage.setItem('appData', JSON.stringify(document.appData));
 
@@ -61,7 +60,8 @@ $(document).ready(function () {
 
                 localStorage.setItem('appData', JSON.stringify(document.appData));
 
-                forms.setAccountNameOptions();
+                forms.setClientDetails();
+                forms.setJobOptions();
 
                 })
                 .catch((err) => {
@@ -84,19 +84,20 @@ $(document).ready(function () {
 
         function buildForms() {
 
-            let $clientDetailsForm = $('form#clientDetailsForm');
-
+            // form construction
             forms.constructForm('clientDetails');
             forms.constructForm('jobDetails');
-            forms.setAccountNameOptions();
+            forms.setClientDetails();
+            forms.setJobOptions();
+            forms.setViewKeys();
             forms.initAutocomplete();
 
             // event handlers
             handlers.handleFormTabClick();
+            handlers.handlerFormTypeSelect();
+            handlers.handleRecordSelectChange();
             handlers.handleInputFocus();
-            // handlers.handleFormClear();
             handlers.handleAccountNameBlur();
-            // handlers.handleFormValidationOnClick();
             handlers.handleFormSubmit();
             handlers.handleAccountTypeInput();
             handlers.handleAlertHide();

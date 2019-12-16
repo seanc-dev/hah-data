@@ -1,16 +1,18 @@
 
-Need to turn this into a single page app so there isn't the trouble with refreshing the clients list before it has updated in 
-the sheet.
+//  Work left to complete change to New/View/Edit/Delete
 
-This will require changing form submission to ajax. What's involved?
-    a.  Change form routing from a post method post to an axios post call to that same endpoint.
-        -   $('form').serializeArray().reduce to get form data
-        -   Add e.preventDefault() to successful submission flow.
-        -   Perform form validation against DB at submission. Fail submission if validation fails, else pass submission.
-        -   Fire axios POST to /[form type] in submit function.
-    c.  Update clientDetails array on submission (completed).
-    d.  Update job details datalist options on submission.
-    e.  Clear form upon successful submission.
-        -   formElement.reset() to reset form element
-    f.  Modularise 'error-message' span so that it can also indicate success. This should also clear when a user switches between
-        forms.
+//  1.  Fix stickiness of status-message
+//  2.  Implement handler for client/job record selection
+//  3.  Vary axios call for submit on edit
+//  4.  Test :)
+
+//  Rationalise and clean up index.js
+
+//  1.  Remove if/else statement from index.js
+//  2.  Rename initialiseAppData as initialiseFormOptions.
+//  3.  Set buildForms function to run off then statement from initialiseAppData
+
+//  Clean up routes
+
+//  1.  Remove 'keys' call from client and data and add to /data? route
+//  2.  Re-point front end call for keys (in generation of View/Delete view)
