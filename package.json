@@ -31,8 +31,11 @@
     "ejs": "^2.6.1",
     "express": "^4.17.1",
     "google-spreadsheet": "^2.0.7",
-    "lodash": ">=4.17.13",
+    "lodash": ">=4.17.12",
     "node-geocoder": "^3.23.0",
     "spin.js": "^4.0.0"
+  },
+  "devDependencies": {
+    "lodash": ">=4.17.12"
   }
 }
