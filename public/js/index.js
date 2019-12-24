@@ -13,20 +13,8 @@ $(document).ready(function () {
             businessName: document.getElementById("businessName").innerText
         }
 
-        // check if appData stored in local storage. If so, use it to generate forms. If not, generate new data
-        let appData = JSON.parse(localStorage.getItem('appData'));
-
-        if(!appData || appData.businessName !== document.appData.businessName) {
-
         lib.initialiseAppData()
-            .then(function (result) {
-
-                // set app data
-                document.appData.formOptions = result.data.formOptions;
-                document.appData.clientDetail = result.data.clientDetail;
-                console.log(result.data.clientDetail);
-
-                localStorage.setItem('appData', JSON.stringify(document.appData));
+            .then(result => {
 
                 // build forms
                 buildForms();
@@ -37,50 +25,11 @@ $(document).ready(function () {
                 console.log('App ready!');
 
             })
-            .catch((err) => {
+            .catch(err => {
                 alert("There was an error loading the forms. Please refresh the page.")
                 console.error('Error in lib.initialiseAppData in index.init');
                 console.error(err)
             });
-
-        } else {
-
-            appData = JSON.parse(localStorage.getItem('appData'));
-            document.appData.formOptions = appData.formOptions;
-            document.appData.clientDetail = appData.clientDetail;
-
-            setTimeout(function(){
-
-                lib.initialiseAppData()
-                .then(function(result){
-
-                // set app data
-                document.appData.formOptions = result.data.formOptions;
-                document.appData.clientDetail = result.data.clientDetail;
-
-                localStorage.setItem('appData', JSON.stringify(document.appData));
-
-                forms.setClientDetails();
-                forms.setJobOptions();
-
-                })
-                .catch((err) => {
-                    alert("There was an error loading the forms. Please refresh the page.")
-                    console.error("Error in index.js else lib.initialiseAppData");
-                    console.error(err);
-                });
-
-            // build forms..
-            buildForms();
-
-            // kill loader
-            let event = new CustomEvent('appready')
-            document.dispatchEvent(event);
-            console.log('App ready!');
-
-            }, 2000);
-            
-        }
 
         function buildForms() {
 
@@ -88,7 +37,7 @@ $(document).ready(function () {
             forms.constructForm('clientDetails');
             forms.constructForm('jobDetails');
             forms.setClientDetails();
-            forms.setJobOptions();
+            forms.setJobDetails();
             forms.setViewKeys();
             forms.initAutocomplete();
 
@@ -99,41 +48,68 @@ $(document).ready(function () {
             handlers.handleInputFocus();
             handlers.handleAccountNameBlur();
             handlers.handleFormSubmit();
+            handlers.handleDeleteBtnClick();
+            handlers.handleDeleteBtnConfirm();
             handlers.handleAccountTypeInput();
             handlers.handleAlertHide();
 
-        //     function applyTestData(){
+            let clientData = { 
+                accountType: 'Business',
+                accountName: 'Test Test Test Ltd.',
+                businessName: 'Test Test Test Ltd.',
+                mainContactFirstName: 'Coley',
+                mainContactLastName: 'Coley',
+                mainContactLandline: '',
+                mainContactMobile: '+64273493710',
+                mainContactEmail: 'seanco.dev@gmail.com',
+                billingAddressStreet: '11 Island View Terrace',
+                billingAddressSuburb: 'Cockle Bay',
+                billingAddressCity: 'Auckland',
+                billingAddressPostcode: '2014',
+                territory: 'South Wellington',
+                customerDemographic: 'Baby Boomer (50-65 ish)',
+                estimatedCustomerIncome: 'Pension',
+                acquisitionChannel: 'Word of Mouth',
+            }
 
-        //         let data = { 
-        //             accountType: 'Business',
-        //             accountName: 'Test Test Test Ltd.',
-        //             businessName: 'Test Test Test Ltd.',
-        //             mainContactFirstName: 'Coley',
-        //             mainContactLastName: 'Coley',
-        //             mainContactLandline: '',
-        //             mainContactMobile: '+64273493710',
-        //             mainContactEmail: 'seanco.dev@gmail.com',
-        //             billingAddressStreet: '11 Island View Terrace',
-        //             billingAddressSuburb: 'Cockle Bay',
-        //             billingAddressCity: 'Auckland',
-        //             billingAddressPostcode: '2014',
-        //             territory: 'South Wellington',
-        //             customerDemographic: 'Baby Boomer (50-65 ish)',
-        //             estimatedCustomerIncome: 'Pension',
-        //             acquisitionChannel: 'Word of Mouth',
-        //         }
+            let jobData = { accountName: 'Davia, Ido',
+            workLocationStreetAddress: '56 Kiwi Crescent',
+            workLocationSuburb: 'Tawa',
+            workLocationCity: '',
+            workLocationPostcode: '',
+            primaryJobType: 'Maintenance',
+            secondaryJobType: '',
+            indoorsOutdoors: 'Indoors',
+            createdDateTimeNZT: '17/12/2019 22:12:43',
+            dateJobEnquiry: '',
+            dateJobQuoted: '',
+            dateWorkCommenced: '',
+            dateInvoiceSent: '2019-12-03',
+            amountInvoiced: '2',
+            costMaterials: '',
+            costSubcontractor: '',
+            costTipFees: '',
+            costOther: '',
+            hoursWorkedDave: '',
+            workSatisfaction: '5',
+            clientId: '10' }
+
+            applyTestData('client', clientData);
+            applyTestData('job', jobData);
+
+            function applyTestData(dim, data){
     
-        //         for (let key in data) {
+                for (let key in data) {
     
-        //             let el = document.getElementById('clientDetails-' + key);
+                    let el = document.getElementById(dim + 'Details-' + key);
                     
-        //             el.value = data[key]
+                    el.value = data[key];
                     
-        //         }
+                }
     
-        //     }
+            }
     
-        //     applyTestData();
+            applyTestData();
 
         }
 

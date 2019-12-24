@@ -2,15 +2,19 @@
 //  Work left to complete change to New/View/Edit/Delete
 
 //  1.  Fix stickiness of status-message
-//  2.  Implement handler for client/job record selection
-//  3.  Vary axios call for submit on edit
-//  4.  Test :)
+// X2.  Implement handler for client/job record selection
+// X3.  Vary axios call for submit on edit
+//  4.  Correct append of data to client/job details after submit
+//  5.  Test :)
 
 //  Rationalise and clean up index.js
 
 //  1.  Remove if/else statement from index.js
 //  2.  Rename initialiseAppData as initialiseFormOptions.
 //  3.  Set buildForms function to run off then statement from initialiseAppData
+
+    //  Need to consider whether this is the best architecture. Might be better to pool all axios calls in one place
+    //  so app can be loaded completely before loading screen clears.
 
 //  Clean up routes
 

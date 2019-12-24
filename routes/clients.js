@@ -4,7 +4,7 @@ const lib = require("../lib/library.js"),
     ss = require("../lib/spreadsheet.js"),
     Client = require("../lib/classes/client.js"),
     geocodeAddress = require("./services/geocode.js"),
-    dataObjInit = require("./services/index.js").dataObjInit;
+    getData = require('./services/getData.js');
 
 const config = require("../lib/config.js");
 
@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
                 res.status(500).send(err);
             });
     } else if (req.query.requestType === "address") {
-        ss.getAddressDetailsString(req.params.orgId, req.query.clientId)
+        getData.getAddressString(req)
             .then((result) => {
                 res.send(result);
             })
@@ -36,22 +36,13 @@ router.get("/", (req, res) => {
             });
     } else if (req.query.requestType === 'keys') {
         let client = new Client(req.params.orgId, 1, false);
-        client.init("view")
-            .then((result) => {
-                // get keys for client record (fieldnames)
-                let keysArr = Object.keys(result);
-                let fieldLabels = [];
-                // map in labels from fieldnames and send to client
-                for (i = 0; i < keysArr.length; i++) {
-                    fieldLabels[i] = lib.getFieldLabelFromName(require("../lib/mapping.js")[req.params.orgId]["client"], keysArr[i]);
-                }
-                return res.send({fieldLabels: fieldLabels, fieldNames: keysArr});
-            })
-                .catch((err) => {
-                    console.error("Failed to retrieve db record keys in clients index route: keys");
-                    console.error(err);
-                    res.status(500).send(err);
-                });
+        getData.getKeys(client, req, res)
+        .then((result) => {
+            res.send(result);
+        })
+        .catch((err) => {
+            res.status(500).send(err);
+        });
     }
 });
 
@@ -66,7 +57,7 @@ router.post("/", (req, res) => {
             if (result.find((el) => {el.accountName === req.body.accountName})) {
                 let errorMessage = "Client record with that account name already exists in database";
                 console.error(errorMessage);
-                res.send(new Error(errorMessage));
+                res.status(500).send(new Error(errorMessage));
             }
 
         })
@@ -86,7 +77,13 @@ router.post("/", (req, res) => {
                 req.body.billingAddressGPID = result[0].extra.googlePlaceId
 
                 let client = new Client(req.params.orgId, false, req.body);
-                dataObjInit(client, "new", "create", req, res);
+                getData.dataObjInit(client, "new", "create")
+                .then(result => res.send(result))
+                .catch(err => {
+                    console.error("Error in client create route dataObjInit");
+                    console.error(err);
+                    res.status(500).send(err)
+                });
 
             })
             .catch((err) => {
@@ -95,14 +92,20 @@ router.post("/", (req, res) => {
                 console.error(err);
                 
                 let client = new Client(req.params.orgId, false, req.body);
-                dataObjInit(client, "new", "create", req, res);
+                getData.dataObjInit(client, "new", "create")
+                .then(result => res.send(result))
+                .catch(err => {
+                    console.error("Error in client create route dataObjInit");
+                    console.error(err);
+                    res.status(500).send(err)
+                });
 
             });
 
         })
         .catch(function(err){
             console.error(err);
-            res.send(err);
+            res.status(500).send(err);
         });
 
 });
@@ -110,36 +113,48 @@ router.post("/", (req, res) => {
 // show
 router.get("/:id", (req, res) => {
 
-    client = new Client(req.params.orgId, req.params.id, false);
-    dataObjInit(client, "view", "show", req, res)
+    let client = new Client(req.params.orgId, req.params.id, false);
+    getData.dataObjInit(client, "view", "show")
         .then((result) => {
+            res.send(result);
             console.log("Retrieved details for client with id " + req.params.id);
         })
-        .catch(console.error);
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+        });
 
 });
 
 // update
 router.put("/:id", (req, res) => {
 
-    new Client(req.params.orgId, req.params.id, req.body);
-    dataObjInit(client, "edit", "update", req, res)
+    let client = new Client(req.params.orgId, req.params.id, req.body);
+    getData.dataObjInit(client, "edit", "update")
         .then((result) => {
             console.log("Updated details for client with id " + req.params.id);
+            res.send(result);
         })
-        .catch(console.error);
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+        });
 
 });
 
 // destroy
 router.delete("/:id", (req, res) => {
 
-    new Client(req.params.orgId, req.params.id, req.body, "");
-    dataObjInit(client, "delete", "destroy", req, res)
+    let client = new Client(req.params.orgId, req.params.id, req.body, "");
+    getData.dataObjInit(client, "delete", "destroy")
         .then((result) => {
             console.log("Deleted details for client with id " + req.params.id);
+            res.send(result);
         })
-        .catch(console.error);
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+        });
 
 });
 

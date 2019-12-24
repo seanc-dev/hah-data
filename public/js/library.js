@@ -4,6 +4,12 @@
 
 const lib = {
 
+    appendOptionNode: function (parent, value) {
+        let option = document.createElement('option');
+        option.setAttribute('value', value);
+        return parent.appendChild(option);
+    },
+
     capitaliseWords: function (str) {
         if (!str) return
         let wordsArr = str.split(' ');
@@ -14,34 +20,31 @@ const lib = {
         return wordsArr.join(' ');
     },
 
-    initialiseAppData: function () {
+    initialiseAppData: async function () {
 
-        return axios.get("/" + document.appData.businessName + "/?data=true")
-            .then(function (result) {
+        let resultArr;
+        try {
+            console.log(document.appData.businessName);
+            resultArr = await Promise.all([
+                // this retrieves the data required to construct the forms
+                axios.get("/" + document.appData.businessName + "/?data=true"),
+                // this retrieves client client data
+                axios.get('/' + document.appData.businessName + '/clients?requestType=detailsArray'),
+                // this retrieves job data
+                axios.get('/' + document.appData.businessName + '/jobs?requestType=detailsArray')
+            ]);
+        } catch (err) {
+            console.error(err);
+            return err;
+        }
 
-                return result
+        console.log(resultArr);
 
-            })
-            .catch(function (err) {
+        document.appData.formOptions = resultArr[0].data.formOptions;
+        document.appData.clientDetail = resultArr[1].data;
+        document.appData.jobDetail = resultArr[2].data;
 
-                console.error("Error in lib.initialiseAppData axios call");
-                console.error(err);
-
-            });
-
-    },
-
-    getClientObj: function (accountName) {
-
-        if (!document.appData.clientDetail) return console.error('Cannot retrieve client data, please reload page');
-
-        let clientObj = document.appData.clientDetail.find((obj) => {
-            return obj.accountName === accountName
-        });
-
-        if (clientObj === -1) clientObj = "No such account name";
-
-        return clientObj;
+        return true;
 
     },
 
@@ -70,6 +73,39 @@ const lib = {
             console.log(val)
             return val
         }
+
+    },
+
+    getClientObj: function (accountName) {
+
+        if (!document.appData.clientDetail) return console.error('Cannot retrieve client data, please reload page');
+
+        let clientObj = document.appData.clientDetail.find((obj) => {
+            return obj.accountName === accountName
+        });
+
+        if (clientObj === -1) clientObj = "No such account name";
+
+        return clientObj;
+
+    },
+
+    googleDateNumberToGBFormat: function (GS_date_num) {
+        let GS_earliest_date = new Date(1899, 11, 30),
+            //GS_earliest_date gives negative time since it is before 1/1/1970
+            GS_date_in_ms = GS_date_num * 24 * 60 * 60 * 1000;
+        return new Intl.DateTimeFormat('en-GB').format(new Date(GS_date_in_ms + GS_earliest_date.getTime()));
+    },
+
+    nzdCurrencyFormat: function (num) {
+
+        let nzdFormat = new Intl.NumberFormat('en-NZ', {
+            style: 'currency',
+            currency: 'NZD',
+            minimumFractionDigits: 2
+        });
+
+        return nzdFormat.format(num);
 
     },
 
@@ -147,7 +183,27 @@ const lib = {
 
         $('input[name="createdDateTimeNZT"]').val(now);
 
+    },
+
+    setJobAddressFields: async function (accountNameVal) {
+
+        let clientObj = this.getClientObj(accountNameVal);
+        console.log(clientObj);
+        let streetAddress = clientObj.billingAddressStreet;
+        let suburb = clientObj.billingAddressSuburb;
+
+        if (!streetAddress || streetAddress.length < 1) {
+            return $('#jobDetails-billingAddress').html("No address in database." + '\n' + "Please update client record.")
+        }
+
+        $('#jobDetails-billingAddress').html(streetAddress + '\n' + suburb);
+        $('#jobDetails-workLocationStreetAddress').val(streetAddress);
+        $('#jobDetails-workLocationSuburb').val(suburb);
+
+        $('#jobDetails-clientId').val(clientObj.clientId);
+
     }
+
 }
 
 export default lib

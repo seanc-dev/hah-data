@@ -9,19 +9,7 @@ const handlers = {
 
         accountNameField.blur(function (e) {
 
-            forms.retrieveClientAddress(accountNameField.val())
-                .then((result) => {
-
-                    if (!result.data[0] || result.data[0].length < 1) return $('#jobDetails-billingAddress').html("No address in database." + '\n' + "Please update client record.")
-
-                    $('#jobDetails-billingAddress').html(result.data[0] + '\n' + result.data[1]);
-                    $('#jobDetails-workLocationStreetAddress').val(result.data[0]);
-                    $('#jobDetails-workLocationSuburb').val(result.data[1]);
-
-                })
-                .catch(console.error);
-
-            $('#jobDetails-clientId').val(lib.getClientObj(accountNameField.val()).clientId);
+            lib.setJobAddressFields(accountNameField.val());
 
         })
 
@@ -29,11 +17,17 @@ const handlers = {
 
     handleAccountTypeInput: function () {
 
-        $('.account-name').on('input', () => {
-            let value = lib.getAccountNameValue(),
-                reg = /\b(\w*undefined\w*)\b/g;
-            if (value === undefined || value.search(reg) > -1) value = '';
-            $('#clientDetails-accountName').val(value);
+        $('#clientDetailsForm').find('.account-name').on('input', function (e) {
+
+            if ($(this).closest('.form-content').find('.form-type-select').val().toLowerCase() === 'new') {
+
+                let value = lib.getAccountNameValue(),
+                    reg = /\b(\w*undefined\w*)\b/g;
+                if (value === undefined || value.search(reg) > -1) value = '';
+                $('#clientDetails-accountName').val(value);
+
+            }
+
         });
 
     },
@@ -58,6 +52,8 @@ const handlers = {
             let formType = $form[0].dataset.name.charAt(0).toUpperCase() + $form[0].dataset.name.slice(1);
             let $statusDiv = $form.closest('.form-content').find('.status-message');
 
+            $(this).closest('.form-content').find('.form-record-select-div input').val('');
+
             lib.setCreatedDate();
 
             let validation
@@ -72,28 +68,6 @@ const handlers = {
                 if (validation === true) {
 
                     forms.submitFormFlow($form, formType, $statusDiv);
-
-                    if (formType === 'Client') {
-
-                        // find values to add to clientDetail array
-                        let accountNameVal = $form.find('input[name="accountName"]').val(),
-                            clientIdVal = document.appData.clientDetail.slice(-1)[0].clientId + 1;
-
-                        // set clientId in form
-                        $form.find('#clientDetails-clientId').val(clientIdVal);
-
-                        // append new item to array
-                        document.appData.clientDetail.push({
-                            clientId: clientIdVal,
-                            accountName: accountNameVal
-                        });
-
-                        // append new option node to datalist for job details account name field
-                        let option = document.createElement('option');
-                        option.setAttribute('value', accountNameVal);
-                        document.getElementById('accountNameList').appendChild(option);
-
-                    }
 
                 } else {
 
@@ -141,9 +115,15 @@ const handlers = {
             let $formBody = $(this).closest('.card').find('.form-body');
             let $form = $formBody.find('form');
             let $recordView = $formBody.find('.form-view-body');
-            let $formInputs = $form.find('input select');
+            let $formRecordSelect = $(this).closest('.row').find('.form-record-select-div');
+            let $formInputs = $form.find('input, select');
             let dim = $form.attr('data-name');
             toggleRecordSelectVisibility = toggleRecordSelectVisibility.bind(this);
+
+            $formRecordSelect.find('input').val('');
+            $.each($formBody.find('.form-control'), function (i, el) {
+                $(el).val('');
+            });
 
             if (formType === "New") {
 
@@ -157,8 +137,18 @@ const handlers = {
                 $form[0].reset()
                 toggleReadOnly(false);
 
+                // If dim === 'job', clear billingAddress textarea
+                if (dim === 'job') $('#jobDetails-billingAddress').val('');
+
                 // Remove info popup
                 $('#' + dim + 'DetailsForm').closest('.form-content').find('.status-message').alert('close');
+
+                // ensure accountType field is required
+                if (dim === 'client') {
+                    let $accTypeField = $('#clientDetails-accountType')
+                    $accTypeField[0].required = true;
+                    $accTypeField.closest('.col-6').find('label').text('Account Type *')
+                }
 
             } else if (formType === "View") {
 
@@ -189,6 +179,16 @@ const handlers = {
                 $form[0].reset()
                 toggleReadOnly(false);
 
+                // set accountName as readonly=true
+                $('input[name="accountName"]').attr('readonly', true);
+
+                // if dim === 'client' set accountType to non-required
+                if (dim === 'client') {
+                    let $accTypeField = $('#clientDetails-accountType')
+                    $accTypeField[0].required = false;
+                    $accTypeField.closest('.col-6').find('label').text('Account Type')
+                }
+
             } else if (formType === "Delete") {
 
                 // Ensure record select is visible
@@ -206,10 +206,6 @@ const handlers = {
             }
 
             function toggleRecordSelectVisibility(bool) {
-
-                let $formRecordSelect = $(this).closest('.row').find('.form-record-select-div');
-
-                console.log($formRecordSelect);
 
                 if (bool) {
                     $formRecordSelect.removeClass('d-none');
@@ -235,13 +231,13 @@ const handlers = {
 
                 $formInputs.attr('readonly', bool);
                 let readOnlyFieldName = dim === 'client' ? 'clientDetails-accountName' : 'jobDetails-billingAddress';
-                $formInputs.find('#' + readOnlyFieldName).attr('readonly', true);
+                $form.find('#' + readOnlyFieldName).attr('readonly', true);
 
             }
 
             function revealPopUp() {
 
-                lib.revealStatusMessage(dim, 'info', false, 'Please select a ' + dim + ' to ' + formType.toLowerCase());
+                lib.revealStatusMessage(dim, 'info', false, 'Select a ' + dim + ' to ' + formType.toLowerCase());
 
             }
 
@@ -262,37 +258,45 @@ const handlers = {
 
     },
 
-    handleRecordSelectChange: async function () {
+    handleRecordSelectChange: function () {
 
         $('.form-record-select-div').find('input').change(function (e) {
 
-            console.log('record select change handler entered')
-
-            let $contentEl = $(this).closest('.form-content')
-            let ft = $contentEl.find('form').attr('data-name');
+            let $contentEl = $(this).closest('.form-content');
+            let $defaultBody = $contentEl.find('.default-form-body');
             let $viewBody = $contentEl.find('.form-view-body');
+            let dim = $contentEl.find('form').attr('data-name');
             let str = $(this).val();
-            let id = document.appData[ft + 'Detail'].find(obj => str === obj.concat)[ft + 'Id'];
+            let id = document.appData[dim + 'Detail'].find(obj => str === obj.concat)[dim + 'Id'];
+            let formAction = $contentEl.find('.form-type-select').val();
 
-            axios.get('/' + document.appData.businessName + '/' + ft + 's/' + id)
+            $contentEl.find('.alert').alert('close');
+
+            lib.initSpinner();
+
+            axios.get('/' + document.appData.businessName + '/' + dim + 's/' + id)
                 .then((result) => {
 
                     let keys = Object.keys(result.data);
-                    console.log(result.data);
-                    $viewBody.find('input');
+
+                    let $bodyEl = formAction === 'Edit' ? $defaultBody : $viewBody;
 
                     // loop through returned properties and apply as values to relevant cells
                     for (let i = 0; i < keys.length; i++) {
 
-                        $viewBody.find('input[name="' + keys[i] + '"]').val(result.data[keys[i]]);
+                        $bodyEl.find('[name="' + keys[i] + '"]').val(result.data[keys[i]]);
+                        $contentEl.find('.status-message .alert').alert('close')
 
                     }
+
+                    if (dim === 'job') lib.setJobAddressFields($('#jobDetails-accountName').val());
 
                 })
                 .catch((err) => {
                     console.error(err);
-                    lib.revealStatusMessage(ft, 'danger', 'Error', 'Failed to retrieve client details from Database. Please refresh page.')
+                    lib.revealStatusMessage(dim, 'danger', 'Error', 'Failed to retrieve client details from Database. Please refresh page.')
                 })
+                .then(lib.endSpinner);
 
         })
 
@@ -302,25 +306,34 @@ const handlers = {
 
         $('.delete-btn').click(function (e) {
 
+
+
+            $('#deleteConfirmModal').modal({
+                backdrop: true
+            });
+
+        })
+
+    },
+
+    handleDeleteBtnConfirm: function () {
+
+        $('.delete-confirm-btn').click(function (e) {
+
             // initiate loading spinner
             lib.initSpinner();
+            let $viewBody = $(this).closest('.form-content').find('.form-view-body');
+            let formType = $(this).closest('.form-content').find('form').attr('data-name');
+            let accountName = $viewBody.find('input[name="accountName"]').val();
+            let id = $viewBody.find('input[name="' + formType + 'Id"]').val();
 
-            let $form = $(this).closest('.form-content').find('form');
-            let formType = $form.attr('data-name');
-            let field = 'selected' + lib.capitaliseWords(formType);
-            let accountName = $form.find('input[name="accountName"]').val();
-            let id
-
-            if (document.appData[field]) id = document.appData[field];
-
-            axios('delete', '/' + document.appData.businessName + '/' + formType + 's/' + id)
+            axios.delete('/' + document.appData.businessName + '/' + formType + 's/' + id)
                 .then((result) => {
                     // implement success message and clear fields
                     lib.revealStatusMessage(formType, 'success', 'Success', 'Deleted ' + formType + ' record for ' + accountName);
-                    $(this).closest('.form-view-body').find('input').empty();
-                }).bind(this)
+                    $viewBody.find('input').empty();
+                })
                 .catch((err) => {
-                    // log error and implement failure message
                     console.error(err);
                     lib.revealStatusMessage(formType, 'error', 'Error', 'Failed to delete record');
                 })

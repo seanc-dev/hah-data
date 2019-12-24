@@ -221,6 +221,8 @@ const forms = {
                 console.error(err);
             }
 
+            console.log(result);
+
             // define vars
             let $viewFieldset = $('#' + dim + 'ViewFormBody fieldset');
             let fieldLabels = result.data.fieldLabels;
@@ -261,152 +263,180 @@ const forms = {
 
     },
 
-    setClientDetails: async function () {
+    setClientDetails: function () {
 
-        let clientDetails
-        try {
-            // retrieve client details from server
-            clientDetails = await axios.get('/' + document.appData.businessName + '/clients?requestType=detailsArray');
-        } catch (err) {
-            console.error("Error retrieving client details in setClientDetails axios call");
-            return console.error(err);
-        }
+        let clientDetail = document.appData.clientDetail;
 
         // set values in account name list
         let $accountNameDatalist = $('#accountNameList');
         $accountNameDatalist.empty();
 
-        for (let i = 0; i < clientDetails.data.length; i++) {
+        for (let i = 0; i < clientDetail.length; i++) {
 
-            let option = document.createElement('option');
-            option.setAttribute('value', clientDetails.data[i].accountName);
-            option.appendChild(document.createTextNode(clientDetails.data[i].accountName));
-            $accountNameDatalist[0].appendChild(option);
+            let optionNode = lib.appendOptionNode($accountNameDatalist[0], clientDetail[i].accountName)
+            optionNode.appendChild(document.createTextNode(clientDetail[i].accountName));
 
         }
 
-        // set options in client select drop-down
+        // set options in client select drop-down //
         // find field and empty
         let $clientDetailsDatalist = $('#clientDetailsList');
         $clientDetailsDatalist.empty();
 
         // create datalist options 
-        for (let i = 0; i < clientDetails.data.length; i++) {
+        for (let i = 0; i < clientDetail.length; i++) {
 
             let concat = 'Account: ' +
-                clientDetails.data[i].accountName +
+                clientDetail[i].accountName +
                 ', Billing Address: ' +
-                clientDetails.data[i].billingAddressStreet +
+                clientDetail[i].billingAddressStreet +
                 ', ' +
-                clientDetails.data[i].billingAddressSuburb
+                clientDetail[i].billingAddressSuburb
 
             document.appData.clientDetail[i].concat = concat;
 
-            let option = document.createElement('option');
-            option.setAttribute('value', concat);
-            option.setAttribute('data-key', clientDetails.data[i].clientId);
-            $clientDetailsDatalist[0].appendChild(option);
+            // create new option node, append to record select datalist, and set data-key as clientId
+            lib.appendOptionNode($clientDetailsDatalist[0], concat).setAttribute('data-key', clientDetail[i].clientId);
 
         }
 
     },
 
-    setJobOptions: async function () {
+    setJobDetails: function () {
 
-        let jobDetail
-        // pull through job deets
-        try {
-            jobDetail = await axios.get('/' + document.appData.businessName + '/jobs?requestType=detailsArray')
-        } catch (err) {
-            console.error("Error in setJobOptions - failed to retrieve job details from Server");
-            return console.error(err);
-        }
-
-        // set array as app variable
-        document.appData.jobDetail = jobDetail.data;
+        let jobDetail = document.appData.jobDetail;
 
         // find field and empty
         let $jobDetailDatalist = $('#jobDetailsList');
         $jobDetailDatalist.empty();
 
         // create datalist options from 
-        for (let i = 0; i < jobDetail.data.length; i++) {
+        for (let i = 0; i < jobDetail.length; i++) {
+
+            let invoiceDateFormatted = typeof jobDetail[i].dateInvoiceSent === 'string' ?
+                jobDetail[i].dateInvoiceSent :
+                lib.googleDateNumberToGBFormat(jobDetail[i].dateInvoiceSent);
 
             let concat = 'Account: ' +
-                jobDetail.data[i].accountName +
+                jobDetail[i].accountName +
                 ', Date Invoice Sent: ' +
-                jobDetail.data[i].dateInvoiceSent +
+                invoiceDateFormatted +
                 ', Amount Invoiced: ' +
-                jobDetail.data[i].amountInvoiced
+                lib.nzdCurrencyFormat(jobDetail[i].amountInvoiced)
 
             document.appData.jobDetail[i].concat = concat;
 
-            let option = document.createElement('option');
-            option.setAttribute('value', concat);
-            option.setAttribute('data-key', jobDetail.data[i].jobId);
-            $jobDetailDatalist[0].appendChild(option);
+            // create new option node, append to record select datalist, and set data-key as jobId
+            lib.appendOptionNode($jobDetailDatalist[0], concat).setAttribute('data-key', jobDetail[i].jobId);
+
 
         }
 
     },
 
-    submitFormFlow: function (form, formName, statusDiv) {
+    submitFormFlow: async function (form, formName, statusDiv) {
 
         lib.initSpinner();
 
+        let formAction = form.closest('.form-content').find('.form-type-select').val().toLowerCase();
+
         // pull out and transform form data
         let formData = form.serializeArray().reduce(function (obj, val) {
-            obj[val.name] = val.value
-            return obj
+            obj[val.name] = val.value;
+            return obj;
         }, {});
 
-        // fire off axios request to relevant post endpoint to create record in db
-        axios.post('/' + document.appData.businessName + '/' + form[0].dataset.name + 's', formData)
-            .then(function (result) {
+        if (formAction === 'new') {
 
-                // if result other than 200 received, flag error
-                if (!result.status === 200) {
+            try {
+                await axios.post('/' + document.appData.businessName + '/' + form[0].dataset.name + 's', formData);
+            } catch (err) {
+                registerSubmitError(err)
+            }
 
-                    new Error('Form submit POST request failed with status code ' + result.status + ' and status text: ' + result.statusText);
+            if (formName === 'Client') appendNewObj('client', ['accountName', 'billingAddressStreet', 'billingAddressSuburb']);
+            if (formName === 'Job') appendNewObj('job', ['accountName', 'dateInvoiceSent', 'amountInvoiced']);
 
-                } else {
+            function appendNewObj(dim, arr) {
 
-                    let message = formName + ' record successfully added to database for ' + formData.accountName;
+                let obj = {};
 
-                    // trigger success alert
-                    lib.revealStatusMessage(form.attr('data-name'), 'success', 'Success', message);
+                // build object of values (id and arr vals)
+                obj[dim + 'Id'] = document.appData[dim + 'Detail'].slice(-1)[0][dim + 'Id'] + 1;
+                for (let i = 0; i < arr.length; i++) obj[arr[i]] = form.find('#' + dim + 'Details-' + arr[i]).val();
 
-                    // clear form
-                    form[0].reset();
-                    if (formName === 'Job') form.find('#jobDetails-billingAddress').val("");
+                // push into relevant appData array
+                document.appData[dim + "Detail"].push(obj);
 
-                }
+                // if new client created, append new option node to datalist for job details account name field
+                if (dim === "client") lib.appendOptionNode(document.getElementById('accountNameList'), obj.accountName);
 
-            })
-            .catch(function (error) {
+            }
 
-                if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
-                    console.error(error.response.data);
-                    console.error(error.response.status);
-                    console.error(error.response.headers);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                    // http.ClientRequest in node.js
-                    console.error(error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.error('Error', error.message);
-                }
-                console.error(error.config);
+        } else if (formAction === 'edit') {
 
-                // trigger error alert with message
-                lib.revealStatusMessage(formName, 'danger', 'Error', 'Record could not be added to the database.');
+            try {
+                await axios.put('/' + document.appData.businessName + '/' + form[0].dataset.name + 's/' + formData[formName.toLowerCase() + 'Id'], formData)
+            } catch (err) {
+                registerSubmitError(err)
+            }
 
-            })
-            .then(lib.endSpinner);
+            if (formName === 'Client') {
+                updateObj('clientId', 'client', ['accountName', 'billingAddressStreet', 'billingAddressSuburb']);
+                updateObj('clientId', 'job', ['accountName']);
+            }
+            if (formName === 'Job') updateObj('jobId', 'job', ['accountName', 'dateInvoiceSent', 'amountInvoiced']);
+
+            function updateObj(searchKey, updateDim, arr) {
+
+                // this function updates the data objects held in arrays in document.appData[* + Details]
+
+                // 1. find objects in relevant appData array with search key
+                let objArr = document.appData[updateDim + "Detail"].filter((val) => {
+                    return val[searchKey] == formData[searchKey];
+                });
+
+                // 2. loop through array of objects
+                objArr.forEach(obj => {
+                    // a. update values
+                    arr.reduce((acc, val) => {
+                        acc[val] = formData[val];
+                        return acc;
+                    }, obj);
+                });
+
+                return objArr;
+
+            }
+
+        }
+
+        function registerSubmitError(err) {
+            let v = formAction === 'new' ? 'created' : 'updated';
+            lib.revealStatusMessage(formName, 'danger', 'Error', 'Record could not be ' +
+                v +
+                '. Please refresh page and try again.');
+            return console.error(err);
+        }
+
+        this.setClientDetails();
+        this.setJobDetails();
+
+        // trigger success alert
+        let v = formAction === 'new' ? 'created' : 'updated',
+            message = formData.accountName +
+            ' ' +
+            formName.toLowerCase() +
+            ' record successfully ' +
+            v +
+            '.';
+        lib.revealStatusMessage(form.attr('data-name'), 'success', 'Success', message);
+
+        // clear form
+        form[0].reset();
+        if (formName === 'Job') form.find('#jobDetails-billingAddress').val("");
+
+        lib.endSpinner();
 
     },
 

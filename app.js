@@ -46,7 +46,7 @@ console.log("App config intitialised");
 // });
 
 // ROUTES //
-app.use("/:orgId/", require("./routes/index"));
+app.use("/", require("./routes/index"));
 app.use("/:orgId/clients", require("./routes/clients"));
 app.use("/:orgId/jobs", require("./routes/jobs"));
 
