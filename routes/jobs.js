@@ -53,7 +53,9 @@ router.post("/", (req, res) => {
             let job = new Job(req.params.orgId, false, req.body);
             getData.dataObjInit(job, "new", "create")
                 .then((result) => {
-                    console.log("Successfully created job record for jobid" + result.id)
+                    console.log('job create route getData.dataObjInit(job, "new", "create") result:')
+                    console.log(result);
+                    console.log("Successfully created job record for jobid " + result.id)
                     res.send(result);
                 })
                 .catch((err) => {
@@ -103,8 +105,7 @@ router.get("/:id", (req, res) => {
 
 // update
 router.put("/:id", (req, res) => {
-
-    let job = new Job(req.params.orgId, req.params.id, false);
+    let job = new Job(req.params.orgId, req.params.id, req.body);
     getData.dataObjInit(job, "edit", "update")
         .then((result) => {
             console.log("Updated details for job with id " + req.params.id);
