@@ -108,6 +108,8 @@ router.put("/:id", (req, res) => {
     let job = new Job(req.params.orgId, req.params.id, req.body);
     getData.dataObjInit(job, "edit", "update")
         .then((result) => {
+            console.log("jobs update route init func result:")
+            console.log(result)
             console.log("Updated details for job with id " + req.params.id);
             res.send(result);
         })

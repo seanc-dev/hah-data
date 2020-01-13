@@ -277,6 +277,9 @@ const handlers = {
             axios.get('/' + document.appData.businessName + '/' + dim + 's/' + id)
                 .then((result) => {
 
+                    console.log(`handleRecordSelectChange handler axios result`)
+                    console.log(result);
+
                     let keys = Object.keys(result.data);
 
                     let $bodyEl = formAction === 'Edit' ? $defaultBody : $viewBody;

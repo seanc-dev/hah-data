@@ -6,14 +6,15 @@ module.exports = {
 
     dataObjInit: async function (instance, requestType, routeName) {
 
-        try {
-            let data = await instance.init(requestType);
-            return data
-        } catch (err) {
-            console.error("Error in " + instance.dimension + " " + requestType + " dataObjInit service: Failed to initiate instance");
-            console.error(err);
-            return err;
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(instance.init(requestType))
+            } catch (err) {
+                console.error("Error in " + instance.dimension + " " + requestType + " dataObjInit service: Failed to initiate instance");
+                console.error(err);
+                reject(err);
+            }
+        });
 
     },
 
