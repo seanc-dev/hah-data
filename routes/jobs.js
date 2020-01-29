@@ -76,19 +76,6 @@ router.post("/", (req, res) => {
 // show
 router.get("/:id", (req, res) => {
 	getData.crud(res, new Job(req.params.orgId, req.params.id, false), "view");
-
-	// let job = new Job(req.params.orgId, req.params.id, false);
-	// getData
-	// 	.dataObjInit(job, "view", "show")
-	// 	.then(result => {
-	// 		console.log("Retrieved details for job with id " + req.params.id);
-	// 		res.send(result);
-	// 	})
-	// 	.catch(err => {
-	// 		console.error(err);
-	// 		console.error("Error in jobs show route");
-	// 		res.status(500).send(err);
-	// 	});
 });
 
 // update
@@ -98,18 +85,6 @@ router.put("/:id", (req, res) => {
 		new Job(req.params.orgId, req.params.id, req.body),
 		"edit",
 	);
-
-	// let job = new Job(req.params.orgId, req.params.id, req.body);
-	// getData
-	// 	.dataObjInit(job, "edit", "update")
-	// 	.then(result => {
-	// 		console.log("Updated details for job with id " + req.params.id);
-	// 		res.send(result);
-	// 	})
-	// 	.catch(err => {
-	// 		console.error(err);
-	// 		res.status(500).send(err);
-	// 	});
 });
 
 // destroy
@@ -119,18 +94,6 @@ router.delete("/:id", (req, res) => {
 		new Job(req.params.orgId, req.params.id, req.body),
 		"delete",
 	);
-
-	// let job = new Job(req.params.orgId, req.params.id, req.body);
-	// getData
-	// 	.dataObjInit(job, "delete", "destroy")
-	// 	.then(result => {
-	// 		console.log("Deleted details for job with id " + req.params.id);
-	// 		res.send(result);
-	// 	})
-	// 	.catch(err => {
-	// 		console.error(err);
-	// 		res.status(500).send(err);
-	// 	});
 });
 
 module.exports = router;

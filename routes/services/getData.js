@@ -18,8 +18,6 @@ module.exports = {
 		});
 
 		init.then(result => {
-			console.log(`init result`);
-			console.log(result);
 			console.log(
 				`Successful ${requestType} init for ${
 					inst.dimension
@@ -28,29 +26,32 @@ module.exports = {
 				}`,
 			);
 			res.send(result);
+			if (inst.dimension === "job" && requestType !== "view") {
+				inst.initClientUpdate.bind(inst)();
+			}
 		}).catch(err => {
 			console.error(err);
 			res.status(500).send(err);
 		});
 	},
 
-	dataObjInit: async function(inst, requestType, routeName) {
-		console.log(
-			`dataObjInit instance dim = ${inst.dimension}, requestType = ${requestType}`,
-		);
+	// dataObjInit: async function(inst, requestType, routeName) {
+	// 	console.log(
+	// 		`dataObjInit instance dim = ${inst.dimension}, requestType = ${requestType}`,
+	// 	);
 
-		return new Promise((resolve, reject) => {
-			try {
-				resolve(inst.init(requestType));
-			} catch (err) {
-				console.error(
-					`Error in ${inst.dimension} ${requestType} crud service: Failed to initiate instance`,
-				);
-				console.error(err);
-				reject(err);
-			}
-		});
-	},
+	// 	return new Promise((resolve, reject) => {
+	// 		try {
+	// 			resolve(inst.init(requestType));
+	// 		} catch (err) {
+	// 			console.error(
+	// 				`Error in ${inst.dimension} ${requestType} crud service: Failed to initiate instance`,
+	// 			);
+	// 			console.error(err);
+	// 			reject(err);
+	// 		}
+	// 	});
+	// },
 
 	getAddressString: async function(req) {
 		return await ss.getAddressDetailsString(
