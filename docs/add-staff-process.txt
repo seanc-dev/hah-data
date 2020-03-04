@@ -1,0 +1,17 @@
+1.  Add new staff member to lib/staff.js
+  a.  Add name to [orgId].staffNames
+  b.  Add new field entry for staffMemberNameHours
+  c.  Add new field entry for staffMemberNameHourlyRate
+2.  Add new field mappings to lib/mapping.js
+3.  Add new field to form
+  a.  Open lib/form-options.js
+  b.  Under [orgId].jobDetails.structure, for the fields of section 'Job Cost Details', add 'jd_HoursWorkedNewStaffMemberName',
+      to the last array (or create a new one if full).
+  c.  Under [orgId].jobDetails.fields, add a field object (following the existing format) for the new staff member.
+4.  Update test sheet
+  a.  In test spreadsheet job details sheet, add fields for hours and hourly rate of new staff member.
+  b.  In staff rates tab, enter new record for staff member hourly rate.
+5.  Update hourly rate.
+  a.  Open google form for relevant org's staff members' hourly rates and add new question.
+  b.  Either impute entry yourself, or request that client does so.
+6.  Test!
