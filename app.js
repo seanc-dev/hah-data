@@ -2,24 +2,22 @@
 //         methodOverride  = require("method-override"),
 //         LocalStrategy   = require("passport-local"),
 
-const   bodyParser      = require('body-parser'),
-        express         = require('express'),
-        ejs             = require("ejs");
+const bodyParser = require("body-parser"),
+  express = require("express"),
+  ejs = require("ejs");
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-
-    const   dotenv = require("dotenv");
-    dotenv.config();
-
+  const dotenv = require("dotenv");
+  dotenv.config();
 }
 
-const   app = express();
+const app = express();
 
 console.log("App variables initialised");
 
 // config
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(express.static(__dirname + '/public/'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + "/public/"));
 app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.text());
@@ -52,9 +50,11 @@ app.use("/:orgId/jobs", require("./routes/jobs"));
 
 console.log("App routes initialised");
 
-process.on('unhandledRejection', (err) => { 
-    console.error(err)
-    process.exit(1)
-})
+process.on("unhandledRejection", (err) => {
+  console.error(err);
+  process.exit(1);
+});
 
-app.listen(process.env.PORT, process.env.IP, () => console.log("HAH-Kapiti-Forms running on port " + process.env.PORT));
+app.listen(process.env.PORT, process.env.IP, () =>
+  console.log("HAH-Kapiti-Forms running on port " + process.env.PORT)
+);
