@@ -3,8 +3,7 @@
 //         LocalStrategy   = require("passport-local"),
 
 const bodyParser = require("body-parser"),
-  express = require("express"),
-  ejs = require("ejs");
+  express = require("express");
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   const dotenv = require("dotenv");
