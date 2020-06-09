@@ -15,6 +15,7 @@ const router = express.Router({
 // index route
 router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
+    // return array of objects for all records in org. Objects contain clientId, accountName, bililngAddressStreet, billingAddressSuburb
     ss.getClientDetailsArray(req.params.orgId)
       .then((result) => {
         res.send(result);
@@ -25,6 +26,7 @@ router.get("/", (req, res) => {
         res.status(500).send(err);
       });
   } else if (req.query.requestType === "address") {
+    // return billing address street and suburb for 1 record by id (this can probably be retrieved from appData in localStorage on client)
     getData
       .getAddressString(req)
       .then((result) => {
@@ -36,6 +38,7 @@ router.get("/", (req, res) => {
         res.status(500).send(err);
       });
   } else if (req.query.requestType === "keys") {
+    // return object with arrays of field labels and names from db column headers (in sheet currently)
     let client = new Client(req.params.orgId, 1, false);
     getData
       .getKeys(client, req, res)
@@ -50,14 +53,14 @@ router.get("/", (req, res) => {
 
 // create route
 router.post("/", (req, res) => {
-  let location =
-    req.body.billingAddressStreet +
-    " " +
-    req.body.billingAddressSuburb +
-    " " +
-    req.body.billingAddressCity +
-    " " +
-    req.body.billingAddressPostcode;
+  //   let location =
+  //     req.body.billingAddressStreet +
+  //     " " +
+  //     req.body.billingAddressSuburb +
+  //     " " +
+  //     req.body.billingAddressCity +
+  //     " " +
+  //     req.body.billingAddressPostcode;
 
   ss.getClientDetailsArray(req.params.orgId)
     .then((result) => {
@@ -82,29 +85,25 @@ router.post("/", (req, res) => {
       );
     })
     .then((result) => {
-      geocodeAddress(location)
-        .then(function (result) {
-          req.body.billingAddressLatitude = result[0].latitude;
-          req.body.billingAddressLongitude = result[0].longitude;
-          req.body.billingAddressFormatted = result[0].formattedAddress;
-          req.body.billingAddressGPID = result[0].extra.googlePlaceId;
+      //   geocodeAddress(location)
+      //     .then(function (result) {
+      //       req.body.billingAddressLatitude = result[0].latitude;
+      //       req.body.billingAddressLongitude = result[0].longitude;
+      //       req.body.billingAddressFormatted = result[0].formattedAddress;
+      //       req.body.billingAddressGPID = result[0].extra.googlePlaceId;
 
-          getData.crud(
-            res,
-            new Client(req.params.orgId, false, req.body),
-            "new"
-          );
-        })
-        .catch((err) => {
-          console.error("Failed to geocode Client's Billing Address");
-          console.error(err);
+      //       getData.crud(
+      //         res,
+      //         new Client(req.params.orgId, false, req.body),
+      //         "new"
+      //       );
+      //     })
+      //     .catch((err) => {
+      //       console.error("Failed to geocode Client's Billing Address");
+      //       console.error(err);
 
-          getData.crud(
-            res,
-            new Client(req.params.orgId, false, req.body),
-            "new"
-          );
-        });
+      getData.crud(res, new Client(req.params.orgId, false, req.body), "new");
+      // });
     })
     .catch(function (err) {
       console.error(err);
