@@ -53,6 +53,10 @@ router.get("/", (req, res) => {
 
 // create route
 router.post("/", (req, res) => {
+  // 1. search all client records for pre-existing accountName
+  // 2. insert new record in client sheet
+  // 3. return inserted data
+
   //   let location =
   //     req.body.billingAddressStreet +
   //     " " +
@@ -113,11 +117,13 @@ router.post("/", (req, res) => {
 
 // show
 router.get("/:id", (req, res) => {
+  // return single client record by id
   getData.crud(res, new Client(req.params.orgId, req.params.id, false), "view");
 });
 
 // update
 router.put("/:id", (req, res) => {
+  // update single client record by id
   getData.crud(
     res,
     new Client(req.params.orgId, req.params.id, req.body),
@@ -127,6 +133,7 @@ router.put("/:id", (req, res) => {
 
 // destroy
 router.delete("/:id", (req, res) => {
+  // delete single client record by id
   getData.crud(
     res,
     new Client(req.params.orgId, req.params.id, req.body),
