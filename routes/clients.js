@@ -4,7 +4,8 @@ const lib = require("../lib/library.js"),
   ss = require("../lib/spreadsheet.js"),
   Client = require("../lib/classes/client.js"),
   geocodeAddress = require("./services/geocode.js"),
-  getData = require("./services/getData.js");
+  getData = require("./services/getData.js"),
+  queries = require("./services/queries/clients");
 
 const config = require("../lib/config.js");
 
@@ -15,6 +16,7 @@ const router = express.Router({
 // index route
 router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
+    queries.getClientDetails(req, res);
     // return array of objects for all records in org. Objects contain clientId, accountName, bililngAddressStreet, billingAddressSuburb
     ss.getClientDetailsArray(req.params.orgId)
       .then((result) => {
@@ -26,22 +28,23 @@ router.get("/", (req, res) => {
         res.status(500).send(err);
       });
   } else if (req.query.requestType === "address") {
-    // return billing address street and suburb for 1 record by id (this can probably be retrieved from appData in localStorage on client)
-    getData
-      .getAddressString(req)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.error("Failed to retrieve clients address");
-        console.error(err);
-        res.status(500).send(err);
-      });
+    // queries.getAddressDetailsById(req, res, id);
+    // // return billing address street and suburb for 1 record by id (this can probably be retrieved from appData in localStorage on client)
+    // getData
+    //   .getAddressString(req)
+    //   .then((result) => {
+    //     res.send(result);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Failed to retrieve clients address");
+    //     console.error(err);
+    //     res.status(500).send(err);
+    //   });
   } else if (req.query.requestType === "keys") {
     // return object with arrays of field labels and names from db column headers (in sheet currently)
     let client = new Client(req.params.orgId, 1, false);
     getData
-      .getKeys(client, req, res)
+      .getKeys(client.init.bind(null, "view"), client.dimension, req, res)
       .then((result) => {
         res.send(result);
       })
