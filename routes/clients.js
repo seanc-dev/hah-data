@@ -5,7 +5,7 @@ const lib = require("../lib/library.js"),
   Client = require("../lib/classes/client.js"),
   geocodeAddress = require("./services/geocode.js"),
   getData = require("./services/getData.js"),
-  queries = require("./services/queries/clients");
+  queries = require("./services/queries/index");
 
 const config = require("../lib/config.js");
 const { getKeysFromDb } = require("./services/getData.js");

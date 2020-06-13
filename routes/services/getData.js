@@ -1,6 +1,7 @@
 const lib = require("../../lib/library.js"),
   ss = require("../../lib/spreadsheet.js"),
-  mapping = require("../../lib/mapping.js");
+  mapping = require("../../lib/mapping.js"),
+  queries = require("./queries/index");
 
 module.exports = {
   crud: function (res, inst, requestType) {
@@ -102,7 +103,8 @@ module.exports = {
   },
 
   getKeysFromDb: (orgShortName, dim, req, res) => {
-    let obj = getColumnHeaders(dim.toLowerCase())
+    let obj = queries
+      .getColumnHeaders(dim.toLowerCase())
       .then((result) => {
         return {
           fieldLabels: result.map((dbHeader) =>
@@ -125,7 +127,10 @@ module.exports = {
           ),
         };
       })
+      .then((result) => {
+        console.log(result);
+        return result;
+      })
       .catch(console.error);
-    console.log();
   },
 };
