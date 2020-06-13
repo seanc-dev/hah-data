@@ -5,7 +5,7 @@ const Job = require("../lib/classes/job.js"),
   geocode = require("./services/geocode.js"),
   ss = require("../lib/spreadsheet.js"),
   getData = require("./services/getData.js"),
-  queries = require("./services/queries/index");
+  queries = require("./services/queries/job");
 
 const config = require("../lib/config.js");
 
@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
         res.status(500).send(err);
       });
   } else if (req.query.requestType === "keys") {
-    queries.getKeysFromDb(req.params.orgId, "job", req, res);
+    getData.getKeysFromDb(req.params.orgId, "job", req, res);
     let job = new Job(req.params.orgId, 1, false);
     getData
       .getKeys(job, req, res)

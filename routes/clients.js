@@ -5,7 +5,7 @@ const lib = require("../lib/library.js"),
   Client = require("../lib/classes/client.js"),
   geocodeAddress = require("./services/geocode.js"),
   getData = require("./services/getData.js"),
-  queries = require("./services/queries/index");
+  queries = require("./services/queries/client");
 
 const config = require("../lib/config.js");
 const { getKeysFromDb } = require("./services/getData.js");
@@ -42,7 +42,7 @@ router.get("/", (req, res) => {
     //     res.status(500).send(err);
     //   });
   } else if (req.query.requestType === "keys") {
-    getKeysFromDb(req.params.orgId, "client", req, res);
+    getData.getKeysFromDb(req.params.orgId, "client", req, res);
     // return object with arrays of field labels and names from db column headers (in sheet currently)
     let client = new Client(req.params.orgId, 1, false);
     getData
