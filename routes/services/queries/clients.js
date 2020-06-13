@@ -31,14 +31,15 @@ module.exports = {
       }
     );
   },
-  getColumnHeaders: (tableName) => {
-    pool.query(
-      "select column_name from information_schema.columns where table_name = $1",
-      [tableName],
-      (error, results) => {
-        if (error) throw error;
-        console.log(results.rows);
-      }
-    );
+  getColumnHeaders: async (tableName) => {
+    try {
+      let result = await pool.query(
+        "select column_name from information_schema.columns where table_name = $1",
+        [tableName]
+      );
+    } catch (err) {
+      throw err;
+    }
+    return result.rows;
   },
 };

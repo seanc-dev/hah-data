@@ -100,4 +100,32 @@ module.exports = {
       fieldNames: keysArr,
     };
   },
+
+  getKeysFromDb: (orgShortName, dim, req, res) => {
+    let obj = getColumnHeaders(dim.toLowerCase())
+      .then((result) => {
+        return {
+          fieldLabels: result.map((dbHeader) =>
+            lib.getObjectFromKey(
+              orgShortName,
+              dim,
+              "dbHeader",
+              dbHeader,
+              "sheetHeaderName"
+            )
+          ),
+          fieldNames: result.map((dbHeader) =>
+            lib.getObjectFromKey(
+              orgShortName,
+              dim,
+              "dbHeader",
+              dbHeader,
+              "fieldName"
+            )
+          ),
+        };
+      })
+      .catch(console.error);
+    console.log();
+  },
 };
