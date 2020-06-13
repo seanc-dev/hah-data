@@ -8,6 +8,7 @@ const lib = require("../lib/library.js"),
   queries = require("./services/queries/clients");
 
 const config = require("../lib/config.js");
+const { getKeysFromDb } = require("./services/getData.js");
 
 const router = express.Router({
   mergeParams: true,
@@ -41,10 +42,11 @@ router.get("/", (req, res) => {
     //     res.status(500).send(err);
     //   });
   } else if (req.query.requestType === "keys") {
+    getKeysFromDb(req.params.orgId, "client", req, res);
     // return object with arrays of field labels and names from db column headers (in sheet currently)
     let client = new Client(req.params.orgId, 1, false);
     getData
-      .getKeys(client.init.bind(null, "view"), client.dimension, req, res)
+      .getKeys(client, req, res)
       .then((result) => {
         res.send(result);
       })
