@@ -69,38 +69,38 @@ module.exports = {
     return await ss.getJobDetailsArray(req.params.orgId);
   },
 
-  getKeys: async function (dataObjInst, req, res) {
-    let initResult;
-    try {
-      // call Dataobject.init to return data row
-      initResult = await dataObjInst.init("view");
-    } catch (err) {
-      console.error(
-        "Failed to retrieve db record in " +
-          dataObjInst.dimension +
-          "s index route: keys"
-      );
-      console.error(err);
-      return err;
-    }
+  // getKeys: async function (dataObjInst, req, res) {
+  //   let initResult;
+  //   try {
+  //     // call Dataobject.init to return data row
+  //     initResult = await dataObjInst.init("view");
+  //   } catch (err) {
+  //     console.error(
+  //       "Failed to retrieve db record in " +
+  //         dataObjInst.dimension +
+  //         "s index route: keys"
+  //     );
+  //     console.error(err);
+  //     return err;
+  //   }
 
-    // get keys for client record (fieldnames)
-    let keysArr = Object.keys(initResult);
-    let fieldLabels = [];
+  //   // get keys for client record (fieldnames)
+  //   let keysArr = Object.keys(initResult);
+  //   let fieldLabels = [];
 
-    // map in labels from fieldnames and send to client
-    for (i = 0; i < keysArr.length; i++) {
-      fieldLabels[i] = lib.getFieldLabelFromName(
-        mapping[req.params.orgId][dataObjInst.dimension],
-        keysArr[i]
-      );
-    }
+  //   // map in labels from fieldnames and send to client
+  //   for (i = 0; i < keysArr.length; i++) {
+  //     fieldLabels[i] = lib.getFieldLabelFromName(
+  //       mapping[req.params.orgId][dataObjInst.dimension],
+  //       keysArr[i]
+  //     );
+  //   }
 
-    return {
-      fieldLabels: fieldLabels,
-      fieldNames: keysArr,
-    };
-  },
+  //   return {
+  //     fieldLabels: fieldLabels,
+  //     fieldNames: keysArr,
+  //   };
+  // },
 
   getKeysFromDb: (orgShortName, dim, req, res) => {
     queries
