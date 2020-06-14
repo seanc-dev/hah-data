@@ -103,34 +103,36 @@ module.exports = {
   },
 
   getKeysFromDb: (orgShortName, dim, req, res) => {
-    let obj = queries
+    queries
       .getColumnHeaders(dim.toLowerCase())
       .then((result) => {
-        return {
-          fieldLabels: result.map((dbHeader) =>
+        console.log(result);
+        let obj = {
+          fieldLabels: result.map(({ column_name }) => {
             lib.getObjectFromKey(
               orgShortName,
               dim,
               "dbHeader",
-              dbHeader,
+              column_name,
               "sheetHeaderName"
-            )
-          ),
-          fieldNames: result.map((dbHeader) =>
+            );
+          }),
+          fieldNames: result.map(({ column_name }) =>
             lib.getObjectFromKey(
               orgShortName,
               dim,
               "dbHeader",
-              dbHeader,
+              column_name,
               "fieldName"
             )
           ),
         };
+        // console.log(obj);
+        res.send(obj);
       })
-      .then((result) => {
-        console.log(result);
-        return result;
-      })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
   },
 };
