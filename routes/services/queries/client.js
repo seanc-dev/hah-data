@@ -8,10 +8,18 @@ module.exports = {
       (error, results) => {
         if (error) {
           console.error(error);
-          throw error;
+          res.status(500).send(error);
         }
         console.log("getClientDetails results.length: " + results.rows.length);
-        // res.status(200).json(results.rows);
+        let arr = results.rows.map((obj) => {
+          return {
+            clientId: obj.id,
+            accountName: obj.accountname,
+            billingAddressStreet: obj.billingaddressstreet,
+            billingAddressSuburb: obj.billingaddresssuburb,
+          };
+        });
+        res.send(arr);
       }
     );
   },
