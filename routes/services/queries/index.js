@@ -1,20 +1,40 @@
 const { pool } = require("./../../../lib/db_config");
 
 module.exports = {
-  client: require("./client"),
-  job: require("./job"),
-  getColumnHeaders: async (tableName) => {
-    let result;
+  getColumnHeaders: async (tableName, orgShortName) => {
+    let columns, staffColumns;
+
+    // get columns of job table
     try {
-      result = await pool.query(
+      columns = await pool.query(
         "select column_name from information_schema.columns where table_name = $1 and column_name != 'organisationid'",
         [tableName]
       );
+      columns = columns.rows.map(({ column_name }) => column_name);
     } catch (err) {
       console.error(err);
     }
-    console.log(result.rows);
-    return result.rows;
+
+    if (tableName === "job") {
+      // pull through staff member columns for job dim
+      try {
+        staffColumns = await pool.query(
+          "select 'hoursWorked'||replace(staffmembername, ' ', '') as staffHoursColumnName, 'hourlyRate'||replace(staffmembername, ' ', '') as staffRateColumnName from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 order by s.id",
+          [orgShortName]
+        );
+        staffColumns = staffColumns.rows;
+      } catch (err) {
+        console.error(err);
+      }
+
+      // append staffColumns to columns
+      staffColumns.forEach((obj) => {
+        columns.push(obj.staffhourscolumnname);
+        columns.push(obj.staffratecolumnname);
+      });
+    }
+
+    return columns;
   },
   getStaffNames: async (orgShortName) => {
     let result;
