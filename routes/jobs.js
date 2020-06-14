@@ -16,28 +16,29 @@ const router = express.Router({
 // index route
 router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
-    getData
-      .getJobDetailsArray(req)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.error("Failed to retrieve job details array");
-        console.error(err);
-        res.status(500).send(err);
-      });
+    queries.getJobDetails(req, res);
+    // getData
+    //   .getJobDetailsArray(req)
+    //   .then((result) => {
+    //     res.send(result);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Failed to retrieve job details array");
+    //     console.error(err);
+    //     res.status(500).send(err);
+    //   });
   } else if (req.query.requestType === "keys") {
     getData.getKeysFromDb(req.params.orgId, "job", req, res);
-    let job = new Job(req.params.orgId, 1, false);
-    getData
-      .getKeys(job, req, res)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send(err);
-      });
+    // let job = new Job(req.params.orgId, 1, false);
+    // getData
+    //   .getKeys(job, req, res)
+    //   .then((result) => {
+    //     res.send(result);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     res.status(500).send(err);
+    //   });
   }
 });
 

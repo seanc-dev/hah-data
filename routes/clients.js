@@ -1,9 +1,9 @@
 const express = require("express");
 
 const lib = require("../lib/library.js"),
-  ss = require("../lib/spreadsheet.js"),
+  ss = require("../lib/spreadsheet"),
   Client = require("../lib/classes/client.js"),
-  geocodeAddress = require("./services/geocode.js"),
+  // geocodeAddress = require("./services/geocode.js"),
   getData = require("./services/getData.js"),
   queries = require("./services/queries/client");
 
@@ -19,15 +19,15 @@ router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
     queries.getClientDetails(req, res);
     // return array of objects for all records in org. Objects contain clientId, accountName, bililngAddressStreet, billingAddressSuburb
-    ss.getClientDetailsArray(req.params.orgId)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.error("Failed to retrieve clients array");
-        console.error(err);
-        res.status(500).send(err);
-      });
+    // ss.getClientDetailsArray(req.params.orgId)
+    //   .then((result) => {
+    //     res.send(result);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Failed to retrieve clients array");
+    //     console.error(err);
+    //     res.status(500).send(err);
+    //   });
   } else if (req.query.requestType === "address") {
     // queries.getAddressDetailsById(req, res, id);
     // // return billing address street and suburb for 1 record by id (this can probably be retrieved from appData in localStorage on client)
@@ -42,17 +42,17 @@ router.get("/", (req, res) => {
     //     res.status(500).send(err);
     //   });
   } else if (req.query.requestType === "keys") {
-    getData.getKeysFromDb(req.params.orgId, "client", req, res);
+    getKeysFromDb(req.params.orgId, "client", req, res);
     // return object with arrays of field labels and names from db column headers (in sheet currently)
-    let client = new Client(req.params.orgId, 1, false);
-    getData
-      .getKeys(client, req, res)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+    // let client = new Client(req.params.orgId, 1, false);
+    // getData
+    //   .getKeys(client, req, res)
+    //   .then((result) => {
+    //     res.send(result);
+    //   })
+    //   .catch((err) => {
+    //     res.status(500).send(err);
+    //   });
   }
 });
 
