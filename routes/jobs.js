@@ -17,28 +17,8 @@ const router = express.Router({
 router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
     queries.getJobDetails(req, res);
-    // getData
-    //   .getJobDetailsArray(req)
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((err) => {
-    //     console.error("Failed to retrieve job details array");
-    //     console.error(err);
-    //     res.status(500).send(err);
-    //   });
   } else if (req.query.requestType === "keys") {
     getData.getKeysFromDb(req.params.orgId, "job", req, res);
-    // let job = new Job(req.params.orgId, 1, false);
-    // getData
-    //   .getKeys(job, req, res)
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     res.status(500).send(err);
-    //   });
   }
 });
 
@@ -69,9 +49,7 @@ router.post("/", (req, res) => {
 });
 
 // show
-router.get("/:id", (req, res) => {
-  getData.crud(res, new Job(req.params.orgId, req.params.id, false), "view");
-});
+router.get("/:id", getData.getJobById);
 
 // update
 router.put("/:id", (req, res) => {
