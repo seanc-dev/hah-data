@@ -45,7 +45,21 @@ module.exports = {
       );
     } catch (err) {
       console.error(err);
+      return err;
     }
-    return results.rows.map((row) => row.staffmembername);
+    return result.rows.map((row) => row.staffmembername);
+  },
+  getOrgId: async (orgShortName) => {
+    let result;
+    try {
+      result = await pool.query(
+        "select id from organisation where shortname = $1",
+        [orgShortName]
+      );
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+    return result.rows[0].id;
   },
 };
