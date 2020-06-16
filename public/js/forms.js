@@ -358,8 +358,8 @@ const forms = {
 
     // pull out and transform form data
     let formData = form.serializeArray().reduce(function (obj, val) {
-      if (!val.value) return obj;
       obj[val.name] = val.value;
+      if (!val.value) obj[val.name] = null;
       return obj;
     }, {});
 
