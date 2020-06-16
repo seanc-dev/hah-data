@@ -18,59 +18,13 @@ const router = express.Router({
 router.get("/", (req, res) => {
   if (req.query.requestType === "detailsArray") {
     queries.getClientDetails(req, res);
-    // return array of objects for all records in org. Objects contain clientId, accountName, bililngAddressStreet, billingAddressSuburb
-    // ss.getClientDetailsArray(req.params.orgId)
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((err) => {
-    //     console.error("Failed to retrieve clients array");
-    //     console.error(err);
-    //     res.status(500).send(err);
-    //   });
-  } else if (req.query.requestType === "address") {
-    // queries.getAddressDetailsById(req, res, id);
-    // // return billing address street and suburb for 1 record by id (this can probably be retrieved from appData in localStorage on client)
-    // getData
-    //   .getAddressString(req)
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((err) => {
-    //     console.error("Failed to retrieve clients address");
-    //     console.error(err);
-    //     res.status(500).send(err);
-    //   });
   } else if (req.query.requestType === "keys") {
     getKeysFromDb(req.params.orgId, "client", req, res);
-    // return object with arrays of field labels and names from db column headers (in sheet currently)
-    // let client = new Client(req.params.orgId, 1, false);
-    // getData
-    //   .getKeys(client, req, res)
-    //   .then((result) => {
-    //     res.send(result);
-    //   })
-    //   .catch((err) => {
-    //     res.status(500).send(err);
-    //   });
   }
 });
 
 // create route
 router.post("/", (req, res) => {
-  // 1. search all client records for pre-existing accountName
-  // 2. insert new record in client sheet
-  // 3. return inserted data
-
-  //   let location =
-  //     req.body.billingAddressStreet +
-  //     " " +
-  //     req.body.billingAddressSuburb +
-  //     " " +
-  //     req.body.billingAddressCity +
-  //     " " +
-  //     req.body.billingAddressPostcode;
-
   ss.getClientDetailsArray(req.params.orgId)
     .then((result) => {
       // test for account name similarity
@@ -94,23 +48,7 @@ router.post("/", (req, res) => {
       );
     })
     .then((result) => {
-      //   geocodeAddress(location)
-      //     .then(function (result) {
-      //       req.body.billingAddressLatitude = result[0].latitude;
-      //       req.body.billingAddressLongitude = result[0].longitude;
-      //       req.body.billingAddressFormatted = result[0].formattedAddress;
-      //       req.body.billingAddressGPID = result[0].extra.googlePlaceId;
-
-      //       getData.crud(
-      //         res,
-      //         new Client(req.params.orgId, false, req.body),
-      //         "new"
-      //       );
-      //     })
-      //     .catch((err) => {
-      //       console.error("Failed to geocode Client's Billing Address");
-      //       console.error(err);
-
+      console.log(req.body);
       getData.crud(res, new Client(req.params.orgId, false, req.body), "new");
       // });
     })
