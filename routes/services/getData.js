@@ -1,7 +1,8 @@
 const lib = require("../../lib/library.js"),
   ss = require("../../lib/spreadsheet.js"),
   mapping = require("../../lib/mapping.js"),
-  queries = require("./queries/index");
+  queries = require("./queries/index"),
+  jobQueries = require("./queries/job");
 
 module.exports = {
   crud: function (res, inst, requestType) {
@@ -36,24 +37,6 @@ module.exports = {
       });
   },
 
-  // dataObjInit: async function(inst, requestType, routeName) {
-  // 	console.log(
-  // 		`dataObjInit instance dim = ${inst.dimension}, requestType = ${requestType}`,
-  // 	);
-
-  // 	return new Promise((resolve, reject) => {
-  // 		try {
-  // 			resolve(inst.init(requestType));
-  // 		} catch (err) {
-  // 			console.error(
-  // 				`Error in ${inst.dimension} ${requestType} crud service: Failed to initiate instance`,
-  // 			);
-  // 			console.error(err);
-  // 			reject(err);
-  // 		}
-  // 	});
-  // },
-
   getAddressString: async function (req) {
     return await ss.getAddressDetailsString(
       req.params.orgId,
@@ -65,42 +48,16 @@ module.exports = {
     return await ss.getClientDetailsArray(req.params.orgId);
   },
 
+  getJobById: (req, res) => {
+    jobQueries
+      .getJobById(req)
+      .then(res.json)
+      .catch((err) => res.status(500).send(err));
+  },
+
   getJobDetailsArray: async function (req) {
     return await ss.getJobDetailsArray(req.params.orgId);
   },
-
-  // getKeys: async function (dataObjInst, req, res) {
-  //   let initResult;
-  //   try {
-  //     // call Dataobject.init to return data row
-  //     initResult = await dataObjInst.init("view");
-  //   } catch (err) {
-  //     console.error(
-  //       "Failed to retrieve db record in " +
-  //         dataObjInst.dimension +
-  //         "s index route: keys"
-  //     );
-  //     console.error(err);
-  //     return err;
-  //   }
-
-  //   // get keys for client record (fieldnames)
-  //   let keysArr = Object.keys(initResult);
-  //   let fieldLabels = [];
-
-  //   // map in labels from fieldnames and send to client
-  //   for (i = 0; i < keysArr.length; i++) {
-  //     fieldLabels[i] = lib.getFieldLabelFromName(
-  //       mapping[req.params.orgId][dataObjInst.dimension],
-  //       keysArr[i]
-  //     );
-  //   }
-
-  //   return {
-  //     fieldLabels: fieldLabels,
-  //     fieldNames: keysArr,
-  //   };
-  // },
 
   getKeysFromDb: (orgShortName, dim, req, res) => {
     queries
@@ -126,11 +83,27 @@ module.exports = {
             )
           ),
         };
-        res.send(obj);
+        res.json(obj);
       })
       .catch((err) => {
         console.error(err);
         res.status(500).send(err);
       });
+  },
+  getOrgDetailsByShortName: async (orgShortName) => {
+    let resultArr;
+    try {
+      resultArr = await Promise.all([
+        queries.getOrgId(orgShortName),
+        queries.getStaffNames(orgShortName),
+      ]);
+      return {
+        organisationId: resultArr[0],
+        staffNames: resultArr[1],
+      };
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
   },
 };
