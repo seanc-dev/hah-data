@@ -1,4 +1,5 @@
 const { pool } = require("./../../../lib/db_config");
+const queries = require("./index");
 
 module.exports = {
   getJobDetails: (req, res) => {
@@ -10,7 +11,7 @@ module.exports = {
           console.error(error);
           res.status(500).send(error);
         }
-        console.log("getClientDetails result.length: " + result.rows.length);
+        console.log("getJobDetails result.length: " + result.rows.length);
         let arr = result.rows.map((obj) => {
           return {
             clientId: obj.clientid,
@@ -23,5 +24,25 @@ module.exports = {
         res.send(arr);
       }
     );
+  },
+  getJobById: async (req) => {
+    let { id, orgId } = req.params;
+    let staffNames = await queries.getStaffNames(orgId);
+    let queryStr =
+      "select * from (select * from job where id = $1) as j inner join (SELECT * FROM crosstab('SELECT sjh.jobid, s.staffmembername as name, sjh.hoursworked FROM staff_job_hours as sjh inner join (select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = ''$2'') as s on sjh.staffid = s.id where sjh.jobid = $1 ORDER  BY 1', $$VALUES ('" +
+      staffNames.join("'), ('") +
+      "')$$) AS ct (jobid int, " +
+      staffNames.join(" numeric(5,2), ") +
+      " numeric(5,2))) as h on j.id = h.jobid;";
+    let jobDetail;
+
+    // retrieve concatenated job and staff details
+    try {
+      jobDetail = await pool.query(queryStr, [id, orgId]);
+      return jobDetail;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
   },
 };
