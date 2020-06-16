@@ -20,7 +20,6 @@ router.get("/:orgShortName", function (req, res) {
           orgShortName[0].toUpperCase() + orgShortName.slice(1),
       });
     } else {
-      console.log("orgshortname/data=true route");
       getData
         .getOrgDetailsByShortName(orgShortName)
         .then(({ organisationId, staffNames }) => {
@@ -32,7 +31,6 @@ router.get("/:orgShortName", function (req, res) {
             organisationId,
             staffNames,
           };
-          console.log(data);
           res.send(data);
         })
         .catch((err) => {
