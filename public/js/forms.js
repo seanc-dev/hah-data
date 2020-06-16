@@ -358,6 +358,7 @@ const forms = {
 
     // pull out and transform form data
     let formData = form.serializeArray().reduce(function (obj, val) {
+      if (!val.value) return obj;
       obj[val.name] = val.value;
       return obj;
     }, {});
@@ -402,6 +403,7 @@ const forms = {
           let val = form.find("#" + dim + "Details-" + arr[i]).val();
           if (isFinite(val)) val = Number(val);
           if (arr[i] === "dateInvoiceSent") {
+            console.log("dateInvoiceSent val: ", val);
             let dt = new Date(val),
               dt0 = new Date("1899-12-30");
             val = (dt.getTime() - dt0.getTime()) / (1000 * 60 * 60 * 24);
