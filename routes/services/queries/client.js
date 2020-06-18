@@ -38,7 +38,9 @@ module.exports = {
         client.release();
       }
     };
-    dbWork(req, res).catch((e) => console.error(e.stack));
+    dbWork(req, res).catch((e) => {
+      throw e;
+    });
   },
   deleteClientById: async (req, res) => {
     const { id } = req.params;
@@ -75,54 +77,55 @@ module.exports = {
     );
   },
   getClientById: async (id, orgId) => {
-    const dbWork = async (id, orgId) => {
-      let clientDetailsObject;
-      const client = await pool.connect();
-      try {
-        const staffNames = await staffQueries.getStaffNames(orgId, client);
-        const jobDetails = await client.query(
-          clientQueries.getJobsByClientIdQuery(staffNames),
-          [id]
-        );
-        const clientDetails = await client.query(
-          "select * from client where id = $1",
-          [id]
-        );
-        // combine job details to client
-        const jobDetailsData = jobDetails.rows;
-        clientDetailsObject = {
-          ...clientDetails.rows[0],
-          countJobs: jobDetailsData.length,
-          sumJobValue: lib.sumKeyInObjectsArray(
-            jobDetailsData,
-            "amountinvoiced"
-          ),
-          sumJobCost: lib.sumKeyInObjectsArray(jobDetailsData, "totaljobcost"),
-          sumJobGrossProfit: lib.sumKeyInObjectsArray(
-            jobDetailsData,
-            "grossprofit"
-          ),
-          sumJobHours: lib.sumKeyInObjectsArray(
-            jobDetailsData,
-            "totalhoursworked"
-          ),
-          mostRecentJobInvoicedDateUTC: lib.getMaxDateFromArrayOfObjects(
-            jobDetailsData,
-            "dateinvoicesentutc"
-          ),
-        };
-      } catch (err) {
-        throw err;
-      } finally {
-        client.release();
-      }
-      return clientDetailsObject;
-    };
-    return dbWork(id, orgId)
-      .then((r) => r)
-      .catch((e) => {
-        throw e;
+    let clientDetailsObject;
+    const client = await pool.connect();
+    try {
+      const staffNames = await staffQueries.getStaffNames(orgId, client);
+      // pull detail of all jobs for client
+      const jobDetails = await client.query(
+        clientQueries.getJobsByClientIdQuery(staffNames),
+        [id]
+      );
+      // pull client details
+      const clientResult = await client.query(
+        "select * from client where id = $1",
+        [id]
+      );
+      // map dbHeaders to fieldNames (to play nice with front-end)
+      const clientObj = clientResult.rows[0];
+      const mappedClientObj = {};
+      Object.keys(clientObj).forEach((key) => {
+        if (key !== "organisationid")
+          mappedClientObj[
+            lib.getObjectFromKey(orgId, "client", "dbHeader", key, "fieldName")
+          ] = clientObj[key];
       });
+      // concat job details to client
+      const jobDetailsData = jobDetails.rows;
+      clientDetailsObject = {
+        ...mappedClientObj,
+        countJobs: jobDetailsData.length,
+        sumJobValue: lib.sumKeyInObjectsArray(jobDetailsData, "amountinvoiced"),
+        sumJobCost: lib.sumKeyInObjectsArray(jobDetailsData, "totaljobcost"),
+        sumJobGrossProfit: lib.sumKeyInObjectsArray(
+          jobDetailsData,
+          "grossprofit"
+        ),
+        sumJobHours: lib.sumKeyInObjectsArray(
+          jobDetailsData,
+          "totalhoursworked"
+        ),
+        mostRecentJobInvoicedDate: lib.getMaxDateFromArrayOfObjects(
+          jobDetailsData,
+          "dateinvoicesentutc"
+        ),
+      };
+    } catch (err) {
+      throw err;
+    } finally {
+      client.release();
+    }
+    return clientDetailsObject;
   },
   updateClientById: (req, res) => {
     const { id } = req.params;

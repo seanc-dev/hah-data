@@ -1,4 +1,6 @@
 const { pool } = require("./../../../lib/db_config");
+
+const lib = require("./../../../lib/library");
 const { getStaffNames } = require("./staff");
 const queryBuilders = require("./queryBuilders/job");
 
@@ -19,7 +21,9 @@ module.exports = {
         client.release();
       }
     };
-    dbWork(req, res).catch((e) => console.error(e.stack));
+    dbWork(req, res).catch((e) => {
+      throw e;
+    });
   },
   getJobDetails: (req, res) => {
     pool.query(
@@ -45,14 +49,21 @@ module.exports = {
     );
   },
   getJobById: async (id, orgId) => {
-    let staffNames, jobDetail;
+    let staffNames, jobResult;
     try {
       staffNames = await getStaffNames(orgId);
       // build mega long query string (can find original in queries/getJobById.pgsql)
       let queryStr = queryBuilders.getJobById(staffNames);
       // execute mega long query string
-      jobDetail = await pool.query(queryStr, [id]);
-      return jobDetail.rows[0];
+      jobResult = await pool.query(queryStr, [id]);
+      const jobObj = jobResult.rows[0];
+      const mappedJobObj = {};
+      Object.keys(jobObj).forEach((key) => {
+        mappedJobObj[
+          lib.getObjectFromKey(orgId, "job", "dbHeader", key, "fieldName")
+        ] = jobObj[key];
+      });
+      return mappedJobObj;
     } catch (err) {
       console.error(`Couldn't retrieve job details for job with id ${id}`);
       throw err;
