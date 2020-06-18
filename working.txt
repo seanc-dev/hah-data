@@ -1,0 +1,18 @@
+Bits and pieces
+1. Change error handling for DB calls in routes/services/queries to be logging, not throwing.
+2. set up a process to do this regularly into google sheets for each of the tables too. 
+    Cheap and easy dr.
+3. Remove createddatetime from client post call
+4. Remove records duplicated across single orgs in client
+
+Remaining: 
+1. Job create and update route functions (v similar queries)
+3. Process to push data to sheets (this doesn't have to be awaited).
+    a. Just use the getClientById and getJobById queries (take out the id where clause) to
+        get the data & map to google api headers.
+    b. Use the google sheets api package to send data to sheet. This process can be used for
+        the DB backup as well.
+4. Tidy up bits and pieces.
+
+WIP:
+It goooood.
