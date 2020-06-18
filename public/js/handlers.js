@@ -272,10 +272,12 @@ const handlers = {
             keys.forEach((key) => {
               if (
                 moment(data[key], "YYYY-MM-DDTHH:mm:ss.SSSSZ", true).isValid()
-              )
-                data[key] = moment(
-                  data[key].tz("Pacific/Auckland").format("D/M/YYYY")
-                );
+              ) {
+                data[key] = moment
+                  .utc(data[key])
+                  .tz("Pacific/Auckland")
+                  .format("D/M/YYYY");
+              }
               $bodyEl.find('[name="' + key + '"]').val(data[key]);
               $contentEl.find(".status-message .alert").alert("close");
             });
