@@ -2,7 +2,9 @@ const lib = require("../../lib/library.js"),
   ss = require("../../lib/spreadsheet.js"),
   mapping = require("../../lib/mapping.js"),
   queries = require("./queries/index"),
-  jobQueries = require("./queries/job");
+  jobQueries = require("./queries/job"),
+  clientQueries = require("./queries/client"),
+  { getStaffNames } = require("./queries/staff");
 
 module.exports = {
   crud: function (res, inst, requestType) {
@@ -37,24 +39,6 @@ module.exports = {
       });
   },
 
-  getAddressString: async function (req) {
-    return await ss.getAddressDetailsString(
-      req.params.orgId,
-      req.query.clientId
-    );
-  },
-
-  getClientDetailsArray: async function (req) {
-    return await ss.getClientDetailsArray(req.params.orgId);
-  },
-
-  getJobById: (req, res) => {
-    jobQueries
-      .getJobById(req)
-      .then(res.json)
-      .catch((err) => res.status(500).send(err));
-  },
-
   getJobDetailsArray: async function (req) {
     return await ss.getJobDetailsArray(req.params.orgId);
   },
@@ -63,6 +47,15 @@ module.exports = {
     queries
       .getColumnHeaders(dim.toLowerCase(), orgShortName)
       .then((result) => {
+        let fieldNames = result.map((columnName) => {
+          return lib.getObjectFromKey(
+            orgShortName,
+            dim,
+            "dbHeader",
+            columnName,
+            "fieldName"
+          );
+        });
         let obj = {
           fieldLabels: result.map((columnName) =>
             lib.getObjectFromKey(
@@ -73,15 +66,7 @@ module.exports = {
               "sheetHeaderName"
             )
           ),
-          fieldNames: result.map((columnName) =>
-            lib.getObjectFromKey(
-              orgShortName,
-              dim,
-              "dbHeader",
-              columnName,
-              "fieldName"
-            )
-          ),
+          fieldNames,
         };
         res.json(obj);
       })
@@ -95,7 +80,7 @@ module.exports = {
     try {
       resultArr = await Promise.all([
         queries.getOrgId(orgShortName),
-        queries.getStaffNames(orgShortName),
+        getStaffNames(orgShortName),
       ]);
       return {
         organisationId: resultArr[0],
@@ -105,5 +90,27 @@ module.exports = {
       console.error(err);
       return err;
     }
+  },
+  getJobById: (req, res) => {
+    jobQueries
+      .getJobById(req.params.id, req.params.orgId)
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((err) => {
+        console.error(err.stack);
+        res.status(500).send(err);
+      });
+  },
+  getClientById: (req, res) => {
+    clientQueries
+      .getClientById(req.params.id, req.params.orgId)
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((err) => {
+        console.error(err.stack);
+        res.status(500).send(err);
+      });
   },
 };
