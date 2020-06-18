@@ -46,22 +46,13 @@ module.exports = {
   getKeysFromDb: (orgShortName, dim, req, res) => {
     queries
       .getColumnHeaders(dim.toLowerCase(), orgShortName)
-      .then((result) => {
-        let fieldNames = result.map((columnName) => {
-          return lib.getObjectFromKey(
-            orgShortName,
-            dim,
-            "dbHeader",
-            columnName,
-            "fieldName"
-          );
-        });
+      .then((fieldNames) => {
         let obj = {
-          fieldLabels: result.map((columnName) =>
+          fieldLabels: fieldNames.map((columnName) =>
             lib.getObjectFromKey(
               orgShortName,
               dim,
-              "dbHeader",
+              "fieldName",
               columnName,
               "sheetHeaderName"
             )
