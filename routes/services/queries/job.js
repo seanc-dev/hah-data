@@ -1,7 +1,26 @@
 const { pool } = require("./../../../lib/db_config");
-const queries = require("./index");
+const { getStaffNames } = require("./staff");
+const queryBuilders = require("./queryBuilders/job");
 
 module.exports = {
+  createJob: async (req, res) => {
+    const dbWork = async (req, res) => {
+      const client = await pool.connect();
+      try {
+        await client.query("begin");
+        const result = await client.query("", []);
+        await client.query("commit");
+        res.json(result.rows[0]);
+      } catch (err) {
+        client.query("rollback");
+        res.status(500).send(err);
+        throw err;
+      } finally {
+        client.release();
+      }
+    };
+    dbWork(req, res).catch((e) => console.error(e.stack));
+  },
   getJobDetails: (req, res) => {
     pool.query(
       "SELECT c.id as clientId, j.id as jobId, c.accountname, j.dateinvoicesentutc, j.amountinvoiced FROM job as j inner join (select id, accountname, organisationid from client) as c on j.clientid = c.id inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
@@ -25,31 +44,18 @@ module.exports = {
       }
     );
   },
-  getJobById: async (req, res) => {
-    let { id, orgId } = req.params;
-    let staffNames;
+  getJobById: async (id, orgId) => {
+    let staffNames, jobDetail;
     try {
-      staffNames = await queries.getStaffNames(orgId);
+      staffNames = await getStaffNames(orgId);
+      // build mega long query string (can find original in queries/getJobById.pgsql)
+      let queryStr = queryBuilders.getJobById(staffNames);
+      // execute mega long query string
+      jobDetail = await pool.query(queryStr, [id]);
+      return jobDetail.rows[0];
     } catch (err) {
-      console.error(err);
-      res
-        .status(500)
-        .send(new Error("Could not retrieve staff details from database"));
-    }
-    // construct query string with staff names added to crosstab
-    let queryStr =
-      "select * from (select * from job where id = $1) as j inner join (SELECT * FROM crosstab('SELECT sjh.jobid, s.staffmembername as name, sjh.hoursworked FROM staff_job_hours as sjh inner join (select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = ''$2'') as s on sjh.staffid = s.id where sjh.jobid = $1 ORDER  BY 1', $$VALUES ('" +
-      staffNames.join("'), ('") +
-      "')$$) AS ct (jobid int, " +
-      staffNames.join(" numeric(5,2), ") +
-      " numeric(5,2))) as h on j.id = h.jobid;";
-    let jobDetail;
-    try {
-      jobDetail = await pool.query(queryStr, [id, orgId]);
-      res.json(jobDetail);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send(jobDetail);
+      console.error(`Couldn't retrieve job details for job with id ${id}`);
+      throw err;
     }
   },
 };
