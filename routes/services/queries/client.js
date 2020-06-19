@@ -6,41 +6,46 @@ const clientQueries = require("./queryBuilders/client");
 
 module.exports = {
   createClient: async (req, res) => {
-    const dbWork = async (req, res) => {
-      const client = await pool.connect();
-      try {
-        await client.query("begin");
-        const result = await client.query(
-          "insert into client (accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) returning id",
-          [
-            req.body["accountName"],
-            req.body["mainContactFirstName"],
-            req.body["mainContactLastName"],
-            req.body["mainContactEmail"],
-            req.body["mainContactMobile"],
-            req.body["mainContactLandLine"],
-            req.body["businessName"],
-            req.body["billingAddressStreet"],
-            req.body["billingAddressSuburb"],
-            req.body["territory"],
-            req.body["customerDemographic"],
-            req.body["estimatedCustomerIncome"],
-            req.body["acquisitionChannel"],
-          ]
-        );
-        await client.query("commit");
-        res.json(result.rows[0]);
-      } catch (err) {
-        client.query("rollback");
-        res.status(500).send(err);
-        throw err;
-      } finally {
-        client.release();
-      }
-    };
-    dbWork(req, res).catch((e) => {
-      throw e;
-    });
+    // replace empty strings with string null values for insert
+    const body = {};
+    Object.keys(req.body).forEach(
+      (key) => (body[key] = req.body[key] ? req.body[key] : "NULL")
+    );
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      const orgId = await client.query(
+        "select id from organisation where shortname = $1",
+        [req.params.orgId]
+      );
+      const result = await client.query(
+        "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) returning id",
+        [
+          orgId,
+          body["accountName"],
+          body["mainContactFirstName"],
+          body["mainContactLastName"],
+          body["mainContactEmail"],
+          body["mainContactMobile"],
+          body["mainContactLandLine"],
+          body["businessName"],
+          body["billingAddressStreet"],
+          body["billingAddressSuburb"],
+          body["territory"],
+          body["customerDemographic"],
+          body["estimatedCustomerIncome"],
+          body["acquisitionChannel"],
+        ]
+      );
+      await client.query("commit");
+      res.json(result.rows[0]);
+    } catch (err) {
+      client.query("rollback");
+      res.status(500).send(err);
+      throw err;
+    } finally {
+      client.release();
+    }
   },
   deleteClientById: async (req, res) => {
     const { id } = req.params;
