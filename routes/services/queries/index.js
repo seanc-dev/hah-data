@@ -6,8 +6,8 @@ module.exports = {
   getColumnHeaders: async (tableName, orgShortName) => {
     const queryStr =
       tableName === "client"
-        ? "select max(c.id) as id from client as c inner join organisation as o on c.organisationid = o.id where o.shortname = $1"
-        : "select max(j.id) as id from job as j inner join client as c on j.clientid = c.id inner join organisation as o on c.organisationid = o.id where o.shortname = $1";
+        ? "select min(c.id) as id from client as c inner join organisation as o on c.organisationid = o.id where o.shortname = $1"
+        : "select min(j.id) as id from job as j inner join client as c on j.clientid = c.id inner join organisation as o on c.organisationid = o.id where o.shortname = $1";
     try {
       const {
         rows: [{ id }],
