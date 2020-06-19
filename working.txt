@@ -4,9 +4,10 @@ Bits and pieces
     Cheap and easy dr.
 3. Remove createddatetime from client post call
 4. Remove records duplicated across single orgs in client
+5. Add unique constraint to staff table (name)
 
 Remaining: 
-1. Job create and update route functions (v similar queries)
+1. Job create route function degugging.
 3. Process to push data to sheets (this doesn't have to be awaited).
     a. Just use the getClientById and getJobById queries (take out the id where clause) to
         get the data & map to google api headers.
@@ -15,4 +16,5 @@ Remaining:
 4. Tidy up bits and pieces.
 
 WIP:
-It goooood.
+1. createJob still failing on staff_job_hours insert, with no error message :/
+    a. Best approach might be to extract the values from debugger and attempt a manual insert in sql..
