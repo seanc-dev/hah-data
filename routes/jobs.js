@@ -21,15 +21,13 @@ router.get("/", (req, res) => {
 });
 
 // create route
-router.post("/", (req, res) => {});
+router.post("/", queries.createJob);
 
 // show
 router.get("/:id", getData.getJobById);
 
 // update
-router.put("/:id", (req, res) => {
-  getData.crud(res, new Job(req.params.orgId, req.params.id, req.body), "edit");
-});
+router.put("/:id", queries.updateJobById);
 
 // destroy
 router.delete("/:id", (req, res) => {
