@@ -1,7 +1,3 @@
-const moment = require("moment-timezone");
-
-moment.tz.setDefault("Pacific/Auckland");
-
 const { pool } = require("./../../../lib/db_config");
 const lib = require("./../../../lib/library");
 const { getStaffNames } = require("./staff");
@@ -11,21 +7,7 @@ module.exports = {
   createJob: async (req, res) => {
     // replace empty strings with string null values for insert
     const { orgId } = req.params;
-    const body = {};
-    const keys = Object.keys(req.body);
-    // remove empty values from insert string (otherwise timestamptz field rejects nulls)
-    // (unless you cast them, but I cbf)
-    keys.forEach((key) => {
-      let val = req.body[key];
-      // convert and reformat date values from nzt
-      if (
-        moment(val, "YYYY-MM-DDTHH:mm:ssZ", true).isValid() ||
-        moment(val, "D/M/YYYY", true).isValid() ||
-        moment(val, "YYYY-MM-DD", true).isValid()
-      )
-        val = moment(val).tz("UTC").format("YYYY-MM-DDTHH:mm:ssZ");
-      if (req.body[key]) body[key] = val;
-    });
+    const body = lib.prepareDataForDbInsert(req.body);
     // extract staffNames from body for staff_job_hours insert
     const staffNames = lib.getStaffNamesFromJobPost(body);
     // connect node-postgres client
@@ -63,23 +45,49 @@ module.exports = {
         [orgId]
       );
       const staffIdArray = staffResult.rows;
-      // loop through staffNames, find variables, construct staff_job_hours insert, and execute it
-      staffNames.forEach((name) => {
+      // loop through staffNames, find variables, construct staff_job_hours insert and parameters array
+      let jobHoursQueryStr =
+        "insert into staff_job_hours (jobid, staffid, hoursworked) values ";
+      let parametersArray = [];
+      staffNames.forEach((name, idx) => {
+        const idxMultiple = idx * 3;
         const staffId = staffIdArray.find(
           ({ staffmembername }) =>
             staffmembername.toLowerCase() === name.toLowerCase()
         ).id;
         const hoursWorked = body[`hoursWorked${lib.capitaliseWords(name)}`];
-        client.query(
-          "insert into staff_job_hours (jobid, staffid, hoursworked) values ($1, $2, $3)",
-          id,
-          staffId,
-          hoursWorked
-        );
+        jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
+          3 + idxMultiple
+        })${idx !== staffNames.length - 1 ? ", " : ""}`;
+        parametersArray[0 + idxMultiple] = id;
+        parametersArray[1 + idxMultiple] = staffId;
+        parametersArray[2 + idxMultiple] = hoursWorked;
       });
+      await client.query(jobHoursQueryStr, parametersArray);
       await client.query("commit");
       // return jobid of successful insert
       res.json({ id });
+      // Fire off async insert into google sheets for job record - must do this here as we require (and don't
+      // return) the id for the newly created record
+      getData.crud(new Job(orgId, id, body), "new");
+    } catch (err) {
+      client.query("rollback");
+      res.status(500).send(err);
+      throw err;
+    } finally {
+      client.release();
+    }
+  },
+  deleteJobById: async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      await client.query("delete from staff_job_hours where jobid = $1", [id]);
+      await client.query("delete from job where id = $1", [id]);
+      await client.query("commit");
+      res.json(result.rows[0]);
+      console.log(`Job record with id ${id} successfully deleted`);
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);
@@ -134,10 +142,11 @@ module.exports = {
     }
   },
   updateJobById: async (req, res) => {
+    const { orgId } = req.params;
+    const body = lib.prepareDataForDbInsert(req.body);
     const client = await pool.connect();
     try {
       await client.query("begin");
-      const { body } = req;
       const result = await client.query(
         "update job as j set worklocationstreetaddress = $2, worklocationsuburb = $3, primaryjobtype = $4, secondaryjobtype = $5, indoorsoutdoors = $6, datejobenquiryutc = $7, datejobquotedutc = $8, dateworkcommencedutc = $9, dateinvoicesentutc = $10, amountinvoiced = $11, costmaterials = $12, costsubcontractor = $13, costtipfees = $14, costother = $15, worksatisfaction = $16 where j.id = $1 returning id",
         [
@@ -160,7 +169,11 @@ module.exports = {
         ]
       );
       await client.query("commit");
-      res.json(result.rows[0]);
+      const { id } = result.rows[0];
+      res.json({ id });
+      // Fire off async insert into google sheets for job record - must do this here as we require (and don't
+      // return) the id for the newly created record
+      getData.crud(new Job(orgId, id, body), "edit");
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);

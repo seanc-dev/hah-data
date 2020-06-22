@@ -3,25 +3,24 @@ const { pool } = require("./../../../lib/db_config");
 const lib = require("./../../../lib/library");
 const staffQueries = require("./staff");
 const clientQueries = require("./queryBuilders/client");
+const { crud } = require("../getData");
+const { Client } = require("pg");
 
 module.exports = {
   createClient: async (req, res) => {
-    // replace empty strings with string null values for insert
-    const body = {};
-    Object.keys(req.body).forEach(
-      (key) => (body[key] = req.body[key] ? req.body[key] : "NULL")
-    );
+    const body = lib.prepareDataForDbInsert(req.body);
+    if (body.mainContactFirstName.toLowerCase() === "test") body.test = 1;
     const client = await pool.connect();
     try {
       await client.query("begin");
-      const orgId = await client.query(
+      const orgIdResult = await client.query(
         "select id from organisation where shortname = $1",
         [req.params.orgId]
       );
       const result = await client.query(
-        "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) returning id",
+        "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel, test) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
         [
-          orgId,
+          orgIdResult.rows[0].id,
           body["accountName"],
           body["mainContactFirstName"],
           body["mainContactLastName"],
@@ -35,10 +34,13 @@ module.exports = {
           body["customerDemographic"],
           body["estimatedCustomerIncome"],
           body["acquisitionChannel"],
+          body["test"],
         ]
       );
       await client.query("commit");
-      res.json(result.rows[0]);
+      const { id } = result.rows[0];
+      res.json({ id });
+      getData.crud(new Client(orgId, id, body), "new");
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);
@@ -49,14 +51,23 @@ module.exports = {
   },
   deleteClientById: async (req, res) => {
     const { id } = req.params;
-    let result;
+    const client = await pool.connect();
     try {
-      result = await pool.query("delete from client where id = $1", [id]);
-      console.log(result);
-      res.send(`Client record with id ${id} successfully deleted.`);
+      await client.query("begin");
+      await client.query(
+        "delete from staff_job_hours as sjh inner join job as j where jobid = $1",
+        [id]
+      );
+      await client.query("delete from job where id = $1", [id]);
+      await client.query("commit");
+      res.json(result.rows[0]);
+      console.log(`Job record with id ${id} successfully deleted`);
     } catch (err) {
-      console.error(err);
+      client.query("rollback");
       res.status(500).send(err);
+      throw err;
+    } finally {
+      client.release();
     }
   },
   getClientDetails: (req, res) => {
@@ -134,37 +145,30 @@ module.exports = {
   },
   updateClientById: (req, res) => {
     const { id } = req.params;
+    const body = lib.prepareDataForDbInsert(req.body);
     try {
       pool.query(
-        "update client set accountname = $1, maincontactfirstname = $2, maincontactlastname = $3, maincontactemail = $4, maincontactmobile = $5, maincontactlandline = $6, businessname = $7, billingaddressstreet = $8, billingaddresssuburb = $9, territory = $10, customerdemographic = $11, estimatedcustomerincome = $12, acquisitionchannel = $13 where id = $14",
+        "update client set maincontactfirstname = $1, maincontactlastname = $2, maincontactemail = $3, maincontactmobile = $4, maincontactlandline = $5, businessname = $6, billingaddressstreet = $7, billingaddresssuburb = $8, territory = $9, customerdemographic = $10, estimatedcustomerincome = $11, acquisitionchannel = $12 where id = $13",
         [
-          req.body["accountName"],
-          req.body["mainContactFirstName"],
-          req.body["mainContactLastName"],
-          req.body["mainContactEmail"],
-          req.body["mainContactMobile"],
-          req.body["mainContactLandLine"],
-          req.body["businessName"],
-          req.body["billingAddressStreet"],
-          req.body["billingAddressSuburb"],
-          req.body["territory"],
-          req.body["customerDemographic"],
-          req.body["estimatedCustomerIncome"],
-          req.body["acquisitionChannel"],
+          body["mainContactFirstName"],
+          body["mainContactLastName"],
+          body["mainContactEmail"],
+          body["mainContactMobile"],
+          body["mainContactLandLine"],
+          body["businessName"],
+          body["billingAddressStreet"],
+          body["billingAddressSuburb"],
+          body["territory"],
+          body["customerDemographic"],
+          body["estimatedCustomerIncome"],
+          body["acquisitionChannel"],
           id,
         ]
       );
-      res.send(`${accountName} client record successfully updated`);
+      res.send(`Client record with id ${id} successfully updated`);
     } catch (err) {
       console.error(err);
       res.status(500).send(err);
     }
   },
 };
-
-//  , Count(j.id)             as countjobs
-//  , Sum(j.amountinvoiced)   as sumjobvalue
-//  , Sum(j.totaljobcost)     as sumjobcost
-//  , Sum(j.grossprofit)      as sumjobgrossprofit
-//  , Sum(totalhoursworked)   as sumjobhours
-//  , Max(dateinvoicesentutc) as mostrecentjobinvoiceddateutc
