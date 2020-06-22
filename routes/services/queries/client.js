@@ -151,6 +151,8 @@ module.exports = {
       console.error(err);
       res.status(500).send(err);
     }
+    const Client = require("../../../lib/classes/client");
+    const getData = require("../getData");
     getData.crud(new Client(orgId, id, body), "edit");
   },
   deleteClientById: async (req, res) => {

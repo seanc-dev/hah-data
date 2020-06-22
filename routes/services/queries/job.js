@@ -1,9 +1,9 @@
+const queryBuilders = require("./queryBuilders/job"),
+  staffQueries = require("./staff"),
+  Job = require("../../../lib/classes/job"),
+  lib = require("./../../../lib/library");
+
 const { pool } = require("./../../../lib/db_config");
-const lib = require("./../../../lib/library");
-const { getStaffNames } = require("./staff");
-const queryBuilders = require("./queryBuilders/job");
-const getData = require("../getData");
-const Job = require("../../../lib/classes/job");
 
 module.exports = {
   createJob: async (req, res) => {
@@ -80,6 +80,7 @@ module.exports = {
     }
     // Fire off async insert into google sheets for job record - must do this here as we require (and don't
     // return) the id for the newly created record
+    const getData = require("../getData");
     getData.crud(new Job(orgId, id, body), "new");
   },
   deleteJobById: async (req, res) => {
@@ -126,7 +127,7 @@ module.exports = {
   getJobById: async (id, orgId) => {
     let staffNames, jobResult;
     try {
-      staffNames = await getStaffNames(orgId);
+      staffNames = await staffQueries.getStaffNames(orgId);
       // build mega long query string (can find original in queries/getJobById.pgsql)
       let queryStr = queryBuilders.getJobById(staffNames);
       // execute mega long query string
@@ -184,6 +185,7 @@ module.exports = {
     }
     // Fire off async insert into google sheets for job record - must do this here as we require (and don't
     // return) the id for the newly created record
+    const getData = require("../getData");
     getData.crud(new Job(orgId, id, body), "edit");
   },
 };

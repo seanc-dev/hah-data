@@ -1,7 +1,6 @@
 const express = require("express");
 
 const Job = require("../lib/classes/job.js"),
-  geocode = require("./services/geocode.js"),
   getData = require("./services/getData.js"),
   queries = require("./services/queries/job");
 
