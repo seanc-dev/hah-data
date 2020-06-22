@@ -350,22 +350,24 @@ const forms = {
   submitFormFlow: async function (form, formName, statusDiv) {
     lib.initSpinner();
 
-    let formAction = form
+    const formAction = form
       .closest(".form-content")
       .find(".form-type-select")
       .val()
       .toLowerCase();
 
     // pull out and transform form data
-    let formData = form.serializeArray().reduce(function (obj, val) {
+    const formData = form.serializeArray().reduce(function (obj, val) {
       obj[val.name] = val.value;
       if (!val.value) obj[val.name] = null;
       return obj;
     }, {});
 
+    let newId;
+
     if (formAction === "new") {
       try {
-        await axios.post(
+        let result = await axios.post(
           "/" +
             document.appData.businessName +
             "/" +
@@ -373,31 +375,28 @@ const forms = {
             "s",
           formData
         );
+        newId = result.data.id;
       } catch (err) {
         registerSubmitError(err);
       }
-
       if (formName === "Client")
-        appendNewObj("client", [
-          "accountName",
-          "billingAddressStreet",
-          "billingAddressSuburb",
-        ]);
+        appendNewObj(
+          "client",
+          ["accountName", "billingAddressStreet", "billingAddressSuburb"],
+          newId
+        );
       if (formName === "Job")
-        appendNewObj("job", [
-          "clientId",
-          "accountName",
-          "dateInvoiceSent",
-          "amountInvoiced",
-        ]);
+        appendNewObj(
+          "job",
+          ["clientId", "accountName", "dateInvoiceSent", "amountInvoiced"],
+          newId
+        );
 
-      function appendNewObj(dim, arr) {
+      function appendNewObj(dim, arr, id) {
         let obj = {};
-
         // build object of values (id and arr vals)
-        obj[dim + "Id"] =
-          document.appData[dim + "Detail"].slice(-1)[0][dim + "Id"] + 1;
-
+        // add dimension id from returned id value
+        obj[dim + "Id"] = id;
         // loop through array of field names, update values, add them to object
         for (let i = 0; i < arr.length; i++) {
           let val = form.find("#" + dim + "Details-" + arr[i]).val();
@@ -410,7 +409,6 @@ const forms = {
           }
           obj[arr[i]] = val;
         }
-
         // push into relevant appData array
         document.appData[dim + "Detail"].push(obj);
 
