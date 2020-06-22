@@ -30,12 +30,6 @@ router.get("/:id", getData.getJobById);
 router.put("/:id", queries.updateJobById);
 
 // destroy
-router.delete("/:id", (req, res) => {
-  getData.crud(
-    res,
-    new Job(req.params.orgId, req.params.id, req.body),
-    "delete"
-  );
-});
+router.delete("/:id", queries.deleteJobById);
 
 module.exports = router;

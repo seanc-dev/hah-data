@@ -20,7 +20,6 @@ module.exports = {
       throw err;
     }
   },
-
   getOrgId: async (orgShortName) => {
     let result;
     try {
