@@ -1,13 +1,14 @@
 const { pool } = require("./../../../lib/db_config");
-
 const lib = require("./../../../lib/library");
 const staffQueries = require("./staff");
 const clientQueries = require("./queryBuilders/client");
-const { crud } = require("../getData");
-const { Client } = require("pg");
+const getData = require("../getData");
+const Client = require("../../../lib/classes/client");
 
 module.exports = {
   createClient: async (req, res) => {
+    const { orgId } = req.params;
+    let id;
     const body = lib.prepareDataForDbInsert(req.body);
     if (body.mainContactFirstName.toLowerCase() === "test") body.test = 1;
     const client = await pool.connect();
@@ -15,7 +16,7 @@ module.exports = {
       await client.query("begin");
       const orgIdResult = await client.query(
         "select id from organisation where shortname = $1",
-        [req.params.orgId]
+        [orgId]
       );
       const result = await client.query(
         "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel, test) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
@@ -38,9 +39,8 @@ module.exports = {
         ]
       );
       await client.query("commit");
-      const { id } = result.rows[0];
+      id = result.rows[0].id;
       res.json({ id });
-      getData.crud(new Client(orgId, id, body), "new");
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);
@@ -48,6 +48,7 @@ module.exports = {
     } finally {
       client.release();
     }
+    getData.crud(new Client(orgId, id, body), "new");
   },
   deleteClientById: async (req, res) => {
     const { id } = req.params;
@@ -144,7 +145,7 @@ module.exports = {
     return clientDetailsObject;
   },
   updateClientById: (req, res) => {
-    const { id } = req.params;
+    const { id, orgId } = req.params;
     const body = lib.prepareDataForDbInsert(req.body);
     try {
       pool.query(
@@ -170,5 +171,6 @@ module.exports = {
       console.error(err);
       res.status(500).send(err);
     }
+    getData.crud(new Client(orgId, id, body), "edit");
   },
 };

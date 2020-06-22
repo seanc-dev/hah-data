@@ -2,6 +2,8 @@ const { pool } = require("./../../../lib/db_config");
 const lib = require("./../../../lib/library");
 const { getStaffNames } = require("./staff");
 const queryBuilders = require("./queryBuilders/job");
+const getData = require("../getData");
+const Job = require("../../../lib/classes/job");
 
 module.exports = {
   createJob: async (req, res) => {
@@ -10,6 +12,8 @@ module.exports = {
     const body = lib.prepareDataForDbInsert(req.body);
     // extract staffNames from body for staff_job_hours insert
     const staffNames = lib.getStaffNamesFromJobPost(body);
+    // create id var outside of block
+    let id;
     // connect node-postgres client
     const client = await pool.connect();
     try {
@@ -36,7 +40,7 @@ module.exports = {
           body["workSatisfaction"],
         ]
       );
-      const { id } = result.rows[0];
+      id = result.rows[0].id;
       // pull back staff names & ids (staff_job_hours requires staffId insert)
       // could to a joined select insert but that's a little inconvenient with
       // with multiple rows
@@ -67,9 +71,6 @@ module.exports = {
       await client.query("commit");
       // return jobid of successful insert
       res.json({ id });
-      // Fire off async insert into google sheets for job record - must do this here as we require (and don't
-      // return) the id for the newly created record
-      getData.crud(new Job(orgId, id, body), "new");
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);
@@ -77,6 +78,9 @@ module.exports = {
     } finally {
       client.release();
     }
+    // Fire off async insert into google sheets for job record - must do this here as we require (and don't
+    // return) the id for the newly created record
+    getData.crud(new Job(orgId, id, body), "new");
   },
   deleteJobById: async (req, res) => {
     const { id } = req.params;
@@ -142,7 +146,8 @@ module.exports = {
     }
   },
   updateJobById: async (req, res) => {
-    const { orgId } = req.params;
+    const { orgId, id } = req.params;
+    // create id outside of block
     const body = lib.prepareDataForDbInsert(req.body);
     const client = await pool.connect();
     try {
@@ -150,7 +155,7 @@ module.exports = {
       const result = await client.query(
         "update job as j set worklocationstreetaddress = $2, worklocationsuburb = $3, primaryjobtype = $4, secondaryjobtype = $5, indoorsoutdoors = $6, datejobenquiryutc = $7, datejobquotedutc = $8, dateworkcommencedutc = $9, dateinvoicesentutc = $10, amountinvoiced = $11, costmaterials = $12, costsubcontractor = $13, costtipfees = $14, costother = $15, worksatisfaction = $16 where j.id = $1 returning id",
         [
-          body["id"],
+          id,
           body["workLocationStreetAddress"],
           body["workLocationSuburb"],
           body["primaryJobType"],
@@ -169,11 +174,7 @@ module.exports = {
         ]
       );
       await client.query("commit");
-      const { id } = result.rows[0];
       res.json({ id });
-      // Fire off async insert into google sheets for job record - must do this here as we require (and don't
-      // return) the id for the newly created record
-      getData.crud(new Job(orgId, id, body), "edit");
     } catch (err) {
       client.query("rollback");
       res.status(500).send(err);
@@ -181,5 +182,8 @@ module.exports = {
     } finally {
       client.release();
     }
+    // Fire off async insert into google sheets for job record - must do this here as we require (and don't
+    // return) the id for the newly created record
+    getData.crud(new Job(orgId, id, body), "edit");
   },
 };

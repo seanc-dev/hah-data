@@ -1,13 +1,11 @@
 const lib = require("../../lib/library.js"),
-  ss = require("../../lib/spreadsheet.js"),
-  mapping = require("../../lib/mapping.js"),
   queries = require("./queries/index"),
   jobQueries = require("./queries/job"),
   clientQueries = require("./queries/client"),
-  { getStaffNames } = require("./queries/staff");
+  staffQueries = require("./queries/staff");
 
 module.exports = {
-  crud: function (res, inst, requestType) {
+  crud: function (inst, requestType) {
     // initialise instance with requested action
     let init = new Promise((resolve, reject) => {
       try {
@@ -28,21 +26,18 @@ module.exports = {
             inst.dimension
           } record with id ${result[`${inst.dimension.toLowerCase()}Id`]}`
         );
-        res.send(result);
-        if (inst.dimension === "job" && requestType !== "view") {
+
+        if (
+          inst.dimension === "job" &&
+          (requestType === "new" || requestType === "edit")
+        ) {
           inst.initClientUpdate.bind(inst)();
         }
       })
       .catch((err) => {
         console.error(err);
-        res.sendStatus(500).send(err);
       });
   },
-
-  getJobDetailsArray: async function (req) {
-    return await ss.getJobDetailsArray(req.params.orgId);
-  },
-
   getKeysFromDb: (orgShortName, dim, req, res) => {
     queries
       .getColumnHeaders(dim.toLowerCase(), orgShortName)
@@ -71,7 +66,7 @@ module.exports = {
     try {
       resultArr = await Promise.all([
         queries.getOrgId(orgShortName),
-        getStaffNames(orgShortName),
+        staffQueries.getStaffNames(orgShortName),
       ]);
       return {
         organisationId: resultArr[0],
@@ -83,8 +78,9 @@ module.exports = {
     }
   },
   getJobById: (req, res) => {
+    const { id, orgId } = req.params;
     jobQueries
-      .getJobById(req.params.id, req.params.orgId)
+      .getJobById(id, orgId)
       .then((result) => {
         res.send(result);
       })
@@ -94,8 +90,9 @@ module.exports = {
       });
   },
   getClientById: (req, res) => {
+    const { id, orgId } = req.params;
     clientQueries
-      .getClientById(req.params.id, req.params.orgId)
+      .getClientById(id, orgId)
       .then((result) => {
         res.send(result);
       })

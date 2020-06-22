@@ -1,8 +1,6 @@
 const express = require("express");
 
-const ss = require("../lib/spreadsheet.js"),
-  formOptions = require("../lib/form-options.js"),
-  queries = require("./services/queries/index");
+const formOptions = require("../lib/form-options.js");
 const getData = require("./services/getData.js");
 
 const router = express.Router({
