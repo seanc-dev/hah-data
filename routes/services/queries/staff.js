@@ -1,4 +1,5 @@
-const { pool } = require("./../../../lib/db_config");
+const { pool } = require("../../../lib/db_config");
+const { getStaffRatesByJobId } = require("./queryBuilders/staff");
 
 module.exports = {
   getStaffNames: async (orgShortName, client) => {
@@ -14,5 +15,15 @@ module.exports = {
       throw err;
     }
     return result.rows.map((row) => row.staffmembername);
+  },
+  getStaffRatesByJobId: async (orgId, jobId) => {
+    let ratesResult;
+    let staffNames = this.getStaffNames(orgId);
+    try {
+      ratesResult = await pool.query(getStaffRatesByJobId(staffNames), [jobId]);
+      return ratesResult.rows[0];
+    } catch (err) {
+      throw err;
+    }
   },
 };
