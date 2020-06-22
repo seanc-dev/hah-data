@@ -1,9 +1,8 @@
+const clientQueries = require("./queryBuilders/client"),
+  staffQueries = require("./staff"),
+  lib = require("./../../../lib/library");
+
 const { pool } = require("./../../../lib/db_config");
-const lib = require("./../../../lib/library");
-const staffQueries = require("./staff");
-const clientQueries = require("./queryBuilders/client");
-const getData = require("../getData");
-const Client = require("../../../lib/classes/client");
 
 module.exports = {
   createClient: async (req, res) => {
@@ -11,14 +10,14 @@ module.exports = {
     let id;
     const body = lib.prepareDataForDbInsert(req.body);
     if (body.mainContactFirstName.toLowerCase() === "test") body.test = 1;
-    const client = await pool.connect();
+    const pgClient = await pool.connect();
     try {
-      await client.query("begin");
-      const orgIdResult = await client.query(
+      await pgClient.query("begin");
+      const orgIdResult = await pgClient.query(
         "select id from organisation where shortname = $1",
         [orgId]
       );
-      const result = await client.query(
+      const result = await pgClient.query(
         "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel, test) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
         [
           orgIdResult.rows[0].id,
@@ -38,38 +37,19 @@ module.exports = {
           body["test"],
         ]
       );
-      await client.query("commit");
+      await pgClient.query("commit");
       id = result.rows[0].id;
       res.json({ id });
     } catch (err) {
-      client.query("rollback");
+      pgClient.query("rollback");
       res.status(500).send(err);
       throw err;
     } finally {
-      client.release();
+      pgClient.release();
     }
+    const Client = require("../../../lib/classes/client");
+    const getData = require("../getData");
     getData.crud(new Client(orgId, id, body), "new");
-  },
-  deleteClientById: async (req, res) => {
-    const { id } = req.params;
-    const client = await pool.connect();
-    try {
-      await client.query("begin");
-      await client.query(
-        "delete from staff_job_hours as sjh inner join job as j where jobid = $1",
-        [id]
-      );
-      await client.query("delete from job where id = $1", [id]);
-      await client.query("commit");
-      res.json(result.rows[0]);
-      console.log(`Job record with id ${id} successfully deleted`);
-    } catch (err) {
-      client.query("rollback");
-      res.status(500).send(err);
-      throw err;
-    } finally {
-      client.release();
-    }
   },
   getClientDetails: (req, res) => {
     pool.query(
@@ -172,5 +152,26 @@ module.exports = {
       res.status(500).send(err);
     }
     getData.crud(new Client(orgId, id, body), "edit");
+  },
+  deleteClientById: async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      await client.query(
+        "delete from staff_job_hours as sjh inner join job as j where jobid = $1",
+        [id]
+      );
+      await client.query("delete from job where id = $1", [id]);
+      await client.query("commit");
+      res.json(result.rows[0]);
+      console.log(`Job record with id ${id} successfully deleted`);
+    } catch (err) {
+      client.query("rollback");
+      res.status(500).send(err);
+      throw err;
+    } finally {
+      client.release();
+    }
   },
 };
