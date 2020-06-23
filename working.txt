@@ -7,12 +7,10 @@ Bits and pieces
 5. Add unique constraint to staff table (name)
 
 Remaining: 
-1. Job create route function degugging.
+1. Update client delete route
+2. Test job delete route
 3. Process to push data to sheets (this doesn't have to be awaited).
-    a. Just use the getClientById and getJobById queries (take out the id where clause) to
-        get the data & map to google api headers.
-    b. Use the google sheets api package to send data to sheet. This process can be used for
-        the DB backup as well.
+    a. Use the getData.crud and DataObject.init("new") situation
 4. Tidy up bits and pieces.
 
 WIP:
