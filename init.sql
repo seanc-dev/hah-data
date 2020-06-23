@@ -1,15 +1,12 @@
-CREATE TABLE IF NOT EXISTS organisation (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, tradingName text NOT NULL, legalName text NOT NULL, shortName text NOT NULL);
-CREATE TABLE IF NOT EXISTS client (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, organisationId integer REFERENCES organisation (id), accountName text NOT NULL, mainContactFirstName text NULL, mainContactLastName text NULL, mainContactEmail text NULL, mainContactLandline text NULL, mainContactMobile text NULL, businessName text NULL, billingAddressStreet text NULL, billingAddressSuburb text NULL, territory text NULL, customerDemographic text NULL, estimatedCustomerIncome text NULL, acquisitionChannel text NULL, countJobs integer NOT NULL, sumJobValue numeric(10,4) NOT NULL, sumJobCost numeric(10,4) NOT NULL, sumJobGrossProfit numeric(10,4) NOT NULL, sumJobHours numeric(10,4) NOT NULL, accountNameFriendly text NULL, mostRecentJobInvoicedDate timestamp with time zone NULL, test numeric(1,0) NULL);
-CREATE TABLE IF NOT EXISTS job (id serial PRIMARY KEY, clientId int REFERENCES client (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, workLocationStreetAddress text NULL, workLocationSuburb text NULL, primaryJobType text NOT NULL, secondaryJobType text NULL, indoorsOutdoors text NULL, dateJobEnquiry timestamp with time zone NULL, dateJobQuoted timestamp with time zone NULL, dateWorkCommenced timestamp with time zone NULL, dateInvoiceSent timestamp with time zone NOT NULL, amountInvoiced numeric(10,4) NOT NULL, costMaterials numeric(10,4) NULL, costStaff numeric(10,4) NOT NULL, costSubcontractor numeric(10,4) NULL, costTipFees numeric(10,4) NULL, costOther numeric(10,4) NULL, totalHoursWorked int NOT NULL, hourlyRateInvoiced numeric(10,4) NOT NULL, totalJobCost numeric(10,4) NOT NULL, grossProfit numeric(10,4) NOT NULL, grossProfitPercentage numeric(8,6) NOT NULL, staffGrossProfitPercentage numeric(8,6) NOT NULL, grossProfitPerHourWorked numeric(10,4) NOT NULL, workSatisfaction int NULL, );
-CREATE TABLE IF NOT EXISTS staff (id serial PRIMARY KEY, organisationId integer REFERENCES organisation (id) NOT NULL, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, staffMemberName text NOT NULL, staffMemberStartDate timestamp with time zone NULLcurrentlyEmployed numeric(1,0) NOT NULL);
-CREATE TABLE IF NOT EXISTS staff_rate_history (id serial PRIMARY KEY, staffId integer REFERENCES staff (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, hourlyRateEffectiveDate TIMESTAMP WITH TIME ZONE NOT NULL, hourlyRateExpiryDate TIMESTAMP WITH TIME ZONE NULL, hourlyRate NUMERIC(5,2) NOT NULL, );
-CREATE TABLE IF NOT EXISTS staff_job_hours (createdDateTimeUTC timestamp with time zone not null default current_timestamp, id SERIAL PRIMARY KEY, jobId INT REFERENCES job (id), staffId INT REFERENCES staff (id), hoursWorked numeric(6,2) NOT NULL);
+CREATE DATABASE hah_data_production;
 
+CREATE TABLE IF NOT EXISTS organisation (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, tradingName text NOT NULL, legalName text NOT NULL, shortName text NOT NULL);
 -- organisation insert
 INSERT INTO organisation (trading_name, legal_name, short_name) VALUES
 ('Hire a Hubby Kapiti', 'DNS Developments Ltd.', 'Kapiti'),
 ('Hire a Hubby Wellington', 'Hubby Wellington Ltd.', 'Wellington');
 
+CREATE TABLE IF NOT EXISTS staff (id serial PRIMARY KEY, organisationId integer REFERENCES organisation (id) NOT NULL, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, staffMemberName text NOT NULL, staffMemberStartDate timestamp with time zone NULL, currentlyEmployed numeric(1,0) NOT NULL);
 -- staff insert
 insert into staff (id, organisationId, staffMemberName, staffMemberStartDate) values
 (1, 1, 'Dave', '2002-10-08T00:00:0.000Z'),
@@ -28,10 +25,11 @@ insert into staff (id, organisationId, staffMemberName, staffMemberStartDate) va
 (14, 2, 'Ian McGinty', '2020-06-03T00:00:0.000Z');
 
 update staff 
-set staffMemberStartDate = (staffMemberStartDate at time zone 'UTC') at time zone 'NZ'
+set staffMemberStartDate = (staffMemberStartDate at time zone 'UTC') at time zone 'NZ';
 
+CREATE TABLE IF NOT EXISTS staff_rate_history (id serial PRIMARY KEY, staffId integer REFERENCES staff (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, hourlyRateEffectiveDate TIMESTAMP WITH TIME ZONE NOT NULL, hourlyRateExpiryDate TIMESTAMP WITH TIME ZONE NULL, hourlyRate NUMERIC(5,2) NOT NULL, );
 -- staff_rate_history insert
-insert into staffRateHistory (id, staffId, hourlyRateEffectiveDate, hourlyRateExpiryDate, hourlyRate) values
+insert into staff_rate_history (id, staffId, hourlyRateEffectiveDate, hourlyRateExpiryDate, hourlyRate) values
 (1, 2, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 26),
 (2, 3, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 24),
 (3, 4, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 24),
@@ -49,7 +47,11 @@ insert into staffRateHistory (id, staffId, hourlyRateEffectiveDate, hourlyRateEx
 (15, 13, '2020-02-27T00:00:0.000Z', null::timestamp with time zone, 28),
 (16, 14, '2020-06-03T00:00:0.000Z', null::timestamp with time zone, 28);
 
+update staff_rate_history 
+set hourlyRateEffectiveDate = (hourlyRateEffectiveDate at time zone 'UTC') at time zone 'NZ'
+    , hourlyRateExpiryDate = (hourlyRateExpiryDate at time zone 'UTC') at time zone 'NZ';
 
+CREATE TABLE IF NOT EXISTS client (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, organisationId integer REFERENCES organisation (id), accountName text NOT NULL, mainContactFirstName text NULL, mainContactLastName text NULL, mainContactEmail text NULL, mainContactLandline text NULL, mainContactMobile text NULL, businessName text NULL, billingAddressStreet text NULL, billingAddressSuburb text NULL, territory text NULL, customerDemographic text NULL, estimatedCustomerIncome text NULL, acquisitionChannel text NULL, countJobs integer NOT NULL, sumJobValue numeric(10,4) NOT NULL, sumJobCost numeric(10,4) NOT NULL, sumJobGrossProfit numeric(10,4) NOT NULL, sumJobHours numeric(10,4) NOT NULL, accountNameFriendly text NULL, mostRecentJobInvoicedDate timestamp with time zone NULL, test numeric(1,0) NULL);
 -- client insert
 INSERT INTO client (organisationId, createdDateTimeutc, id, accountName, mainContactFirstName, mainContactLastName, mainContactEmail, mainContactLandline, mainContactMobile, businessName, billingAddressStreet, billingAddressSuburb, territory, customerDemographic, estimatedCustomerIncome, acquisitionChannel, countJobs, sumJobValue, sumJobCost, sumJobGrossProfit, sumJobHours, accountNameFriendly, mostRecentJobInvoicedDate, test) VALUES
 (1, '2017-09-06T15:03:20.717Z', 1, $$O'Raghallaigh, Feargus & T Stancombe$$, 'Feargus', $$O'Raghallaigh$$, 'f.oraghallaigh@gmail.com', NULL, '2040526558', NULL, '5A Sunny Glen', 'Waikanae', 'Waikanae', 'Active Retiree', 'Pension', 'Word of Mouth', 1, 1963.74, 890.54, 1073.2, 27.5, 'ORaghallaigh, Feargus & T Stancombe', NULL, NULL),
@@ -1390,6 +1392,11 @@ insert into client (organisationId, createdDateTimeutc, id, accountName, mainCon
 (2, '2020-05-28T11:41:53.000Z', 1333, 'Tucker, Anne', 'Anne', 'Tucker', 'anne_g_tucker@yahoo.com', NULL, '278628149', NULL, '367A Karori Road', 'Karori', 'Northwest Wellington', 'Baby Boomer (50-65 ish)', '$90,001+', 'Online Referral (HAH National - BAU)', 1, 375, 129, 246, 3, 'Tucker, Anne', NULL, NULL),
 (2, '2020-05-28T11:49:36.000Z', 1334, 'Humphreys, Laura', 'Laura', 'Humphreys', 'laura@liber8c.com', NULL, '21667785', NULL, '16 Matai Road', 'Hataitai', 'South Wellington', 'Baby Boomer (50-65 ish)', '$90,001+', 'Online Referral (HAH National - BAU)', 1, 929.47, 379, 550.47, 9.25, 'Humphreys, Laura', NULL, NULL),
 (2, '2020-06-03T15:14:3.000Z', 1335, 'Testy Mctestface Ltd.', 'Testy', 'McTestface', NULL, NULL, NULL, 'Testy McTestface Ltd.', '2 Testacea Lane', 'Papamoa Beach', 'Northwest Wellington', 'Active Retiree', 'Pension', 'Referral from Partner Business', 6, 7200, 1847, 2153, 83, 'Testy Mctestface Ltd.', NULL, 1);
+
+update client
+set createddateutc = (createddateutc at time zone 'UTC') at time zone 'NZ';
+
+CREATE TABLE IF NOT EXISTS job (id serial PRIMARY KEY, clientId int REFERENCES client (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, workLocationStreetAddress text NULL, workLocationSuburb text NULL, primaryJobType text NOT NULL, secondaryJobType text NULL, indoorsOutdoors text NULL, dateJobEnquiryutc timestamp with time zone NULL, dateJobQuotedutc timestamp with time zone NULL, dateWorkCommencedutc timestamp with time zone NULL, dateInvoiceSentutc timestamp with time zone NOT NULL, amountInvoiced numeric(10,4) NOT NULL, costMaterials numeric(10,4) NULL, costStaff numeric(10,4) NOT NULL, costSubcontractor numeric(10,4) NULL, costTipFees numeric(10,4) NULL, costOther numeric(10,4) NULL, totalHoursWorked int NOT NULL, hourlyRateInvoiced numeric(10,4) NOT NULL, totalJobCost numeric(10,4) NOT NULL, grossProfit numeric(10,4) NOT NULL, grossProfitPercentage numeric(8,6) NOT NULL, staffGrossProfitPercentage numeric(8,6) NOT NULL, grossProfitPerHourWorked numeric(10,4) NOT NULL, workSatisfaction int NULL);
 
 -- job kapiti insert
 insert into job (id, clientId, createdDateTimeutc, workLocationStreetAddress, workLocationSuburb, primaryJobType, secondaryJobType, indoorsOutdoors, dateJobEnquiryutc, dateJobQuotedutc, dateWorkCommencedutc, dateInvoiceSentutc, amountInvoiced, costMaterials, costStaff, costSubcontractor, costTipFees, costOther, totalHoursWorked, hourlyRateInvoiced, totaljobcost, grossProfit, grossProfitPercentage, staffGrossProfitPercentage, grossProfitPerHourWorked, workSatisfaction) values
@@ -3972,6 +3979,15 @@ insert into job (id, clientId, createdDateTimeutc, workLocationStreetAddress, wo
 (2574, 1334, '2020-05-28T11:50:53.000Z', NULL, NULL, 'Painting', NULL, 'Outdoors', '2020-02-26T00:00:0.000Z', '2020-03-04T00:00:0.000Z', '2020-05-04T00:00:0.000Z', '2020-05-04T00:00:0.000Z', 929.47, 120, 259, NULL, NULL, NULL, 9.25, 87.5103, 379.00, 550.47, 0.592241, 0.680038, 59.5103, 5),
 (2575, 1024, '2020-06-09T10:32:33.000Z', NULL, NULL, 'Maintenance', NULL, 'Indoors', '2019-01-14T00:00:0.000Z', '2019-01-14T00:00:0.000Z', '2019-02-05T00:00:0.000Z', '2019-02-08T00:00:0.000Z', 430, NULL, 150, NULL, NULL, NULL, 5, 86.0000, 150.00, 280, 0.651163, 0.651163, 56.0000, 5),
 (2576, 1120, '2020-06-09T10:37:51.000Z', NULL, NULL, 'Other Carpentry', NULL, 'Outdoors', '2019-03-29T00:00:0.000Z', '2019-04-05T00:00:0.000Z', '2019-04-11T00:00:0.000Z', '2019-05-08T00:00:0.000Z', 2976.3, 483.5, 885, NULL, NULL, NULL, 29.5, 84.5017, 1368.50, 1607.8, 0.540201, 0.644978, 54.5017, 5);
+
+update job
+set createddateutc = (createddateutc at time zone 'UTC') at time zone 'NZ'
+    , datejobquotedutc = (datejobquotedutc at time zone 'UTC') at time zone 'NZ'
+    , dateJobEnquiryutc = (dateJobEnquiryutc at time zone 'UTC') at time zone 'NZ'
+    , dateWorkCommencedutc = (dateWorkCommencedutc at time zone 'UTC') at time zone 'NZ'
+    , dateInvoiceSentutc = (dateInvoiceSentutc at time zone 'UTC') at time zone 'NZ';
+
+CREATE TABLE IF NOT EXISTS staff_job_hours (createdDateTimeUTC timestamp with time zone not null default current_timestamp, id SERIAL PRIMARY KEY, jobId INT REFERENCES job (id), staffId INT REFERENCES staff (id), hoursWorked numeric(6,2) NOT NULL);
 
 -- staff_job_hours kapiti insert
 insert into staff_job_hours (jobId, staffId, hoursWorked) values
