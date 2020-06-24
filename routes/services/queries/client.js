@@ -1,12 +1,12 @@
 const clientQueries = require("./queryBuilders/client"),
   staffQueries = require("./staff"),
-  queries = require("./index"),
   lib = require("./../../../lib/library");
 
 const { pool } = require("./../../../lib/db_config");
 
 module.exports = {
   createClient: async (req, res) => {
+    const queries = require("./index");
     const { orgId } = req.params;
     let id;
     const body = lib.prepareDataForDbInsert(req.body);
@@ -24,7 +24,7 @@ module.exports = {
           body["mainContactLastName"],
           body["mainContactEmail"],
           body["mainContactMobile"],
-          body["mainContactLandLine"],
+          body["mainContactLandline"],
           body["businessName"],
           body["billingAddressStreet"],
           body["billingAddressSuburb"],

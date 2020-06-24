@@ -7,7 +7,7 @@ module.exports = {
       if (idx < staffNamesTrim.length - 1) queryStr += ", ";
     });
     queryStr +=
-      " select j.id, j.clientid, j.createddatetimeutc, j.worklocationstreetaddress, j.worklocationsuburb, j.primaryjobtype, j.secondaryjobtype, j.indoorsoutdoors, j.datejobenquiryutc, j.datejobquotedutc, j.dateworkcommencedutc, j.dateinvoicesentutc, j.worksatisfaction, j.amountinvoiced, j.costmaterials, j.costsubcontractor, j.costtipfees, j.costother, round((gp.grossprofit / j.amountinvoiced), 8) as grossprofitpercentage, round((gp.grossprofit / (gp.grossprofit + gp.coststaff)), 8) as staffgrossprofitpercentage, round((gp.grossprofit / gp.totalhoursworked), 4) as grossprofitperhourworked, round((((j.amountinvoiced - (gp.grossprofit - gp.coststaff))) / gp.totalhoursworked), 4) as hourlyrateinvoiced, gp.coststaff, gp.totalhoursworked, gp.totaljobcost";
+      " select j.id, j.clientid, j.createddatetimeutc, j.worklocationstreetaddress, j.worklocationsuburb, j.primaryjobtype, j.secondaryjobtype, j.indoorsoutdoors, j.datejobenquiryutc, j.datejobquotedutc, j.dateworkcommencedutc, j.dateinvoicesentutc, j.worksatisfaction, j.amountinvoiced, gp.grossprofit, j.costmaterials, j.costsubcontractor, j.costtipfees, j.costother, round((gp.grossprofit / j.amountinvoiced), 8) as grossprofitpercentage, round((gp.grossprofit / (gp.grossprofit + gp.coststaff)), 8) as staffgrossprofitpercentage, round((gp.grossprofit / gp.totalhoursworked), 4) as grossprofitperhourworked, round((((j.amountinvoiced - (gp.grossprofit - gp.coststaff))) / gp.totalhoursworked), 4) as hourlyrateinvoiced, gp.coststaff, gp.totalhoursworked, gp.totaljobcost";
     staffNamesTrim.forEach(
       (name) => (queryStr += `, hoursworked${name}, hourlyrate${name}`)
     );

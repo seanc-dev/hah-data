@@ -55,5 +55,5 @@ process.on("unhandledRejection", (err) => {
 });
 
 app.listen(process.env.PORT, process.env.IP, () =>
-  console.log("HAH-Kapiti-Forms running on port " + process.env.PORT)
+  console.log("hah-data running on port " + process.env.PORT)
 );

@@ -57,9 +57,10 @@ module.exports = {
         const idxMultiple = idx * 3;
         const staffId = staffIdArray.find(
           ({ staffmembername }) =>
-            staffmembername.toLowerCase() === name.toLowerCase()
+            staffmembername.replace(" ", "").toLowerCase() ===
+            name.replace(" ", "").toLowerCase()
         ).id;
-        const hoursWorked = body[`hoursWorked${lib.capitaliseWords(name)}`];
+        const hoursWorked = body[`hoursWorked${name}`];
         jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
           3 + idxMultiple
         })${idx !== staffNames.length - 1 ? ", " : ""}`;
