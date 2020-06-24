@@ -1,10 +1,9 @@
 Bits and pieces
 1. Change error handling for DB calls in routes/services/queries to be logging, not throwing.
-2. set up a process to do this regularly into google sheets for each of the tables too. 
-    Cheap and easy dr.
+2. Set up a process to regularly drop tables into google sheets.
+    => Cheap and easy dr.
 3. Remove createddatetime from client post call
-4. Remove records duplicated across single orgs in client
-5. Add unique constraint to staff table (name)
+4. Add unique constraint to staff table (name)
 
 Remaining: 
 1. Update client delete route
@@ -12,20 +11,3 @@ Remaining:
 4. Tidy up bits and pieces.
 
 WIP:
-1. createJob still failing on staff_job_hours insert, with no error message :/
-    a. Best approach might be to extract the values from debugger and attempt a manual insert in sql..
-
-most recent errors:ERROR:  duplicate key value violates unique constraint "client_organisationid_accountname_billingaddressstreet_bill_key"
-DETAIL:  Key (organisationid, accountname, billingaddressstreet, billingaddresssuburb)=(1, Margrett, Simon, 18 Sweetman Avenue, Paraparaumu Beach) already exists.
-ALTER SEQUENCE
-UPDATE 0
-CREATE TABLE
-ERROR:  column "datejobenquiry" of relation "job" does not exist
-LINE 1: ...rimaryJobType, secondaryJobType, indoorsOutdoors, dateJobEnq...
-                                                             ^
-ALTER SEQUENCE
-UPDATE 0
-CREATE TABLE
-ERROR:  insert or update on table "staff_job_hours" violates foreign key constraint "staff_job_hours_jobid_fkey"
-DETAIL:  Key (jobid)=(1) is not present in table "job".
-Seans-Air-361:hah_data Sean$ 
