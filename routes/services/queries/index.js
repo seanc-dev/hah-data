@@ -20,10 +20,11 @@ module.exports = {
       throw err;
     }
   },
-  getOrgId: async (orgShortName) => {
+  getOrgId: async (orgShortName, client) => {
+    if (!client) client = pool;
     let result;
     try {
-      result = await pool.query(
+      result = await client.query(
         "select id from organisation where shortname = $1",
         [orgShortName]
       );

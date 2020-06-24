@@ -134,12 +134,14 @@ from    job as j
                 from    job as j
                         inner join  (
                         select  j.id as jobid
-                                , (case when dave.jobid is not null then dave.hourlyrate * shp.hoursworkeddave else 0 end
+                                , (
+                                        case when dave.jobid is not null then dave.hourlyrate * shp.hoursworkeddave else 0 end
                                     + case when westy.jobid is not null then westy.hourlyrate * shp.hoursworkedwesty else 0 end
                                     + case when pete.jobid is not null then pete.hourlyrate * shp.hoursworkedpete else 0 end
                                     + case when boof.jobid is not null then boof.hourlyrate * shp.hoursworkedboof else 0 end
                                     + case when chris.jobid is not null then chris.hourlyrate * shp.hoursworkedchris else 0 end
-                                    + case when zachary.jobid is not null then zachary.hourlyrate * shp.hoursworkedzachary else 0 end) as coststaff
+                                    + case when zachary.jobid is not null then zachary.hourlyrate * shp.hoursworkedzachary else 0 end
+                                    ) as coststaff
                                 , sumhours.totalhoursworked
                                 , shp.hoursworkeddave
                                 , case when dave.jobid is not null then dave.hourlyrate end as hourlyratedave

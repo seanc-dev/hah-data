@@ -1,5 +1,6 @@
 const clientQueries = require("./queryBuilders/client"),
   staffQueries = require("./staff"),
+  queries = require("./index"),
   lib = require("./../../../lib/library");
 
 const { pool } = require("./../../../lib/db_config");
@@ -13,14 +14,11 @@ module.exports = {
     const pgClient = await pool.connect();
     try {
       await pgClient.query("begin");
-      const orgIdResult = await pgClient.query(
-        "select id from organisation where shortname = $1",
-        [orgId]
-      );
+      const orgIdResult = await queries.getOrgId(orgId, pgClient);
       const result = await pgClient.query(
         "insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel, test) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
         [
-          orgIdResult.rows[0].id,
+          orgIdResult,
           body["accountName"],
           body["mainContactFirstName"],
           body["mainContactLastName"],
