@@ -51,27 +51,28 @@ module.exports = {
     const getData = require("../getData");
     getData.crud(new Client(orgId, id, body), "new");
   },
-  getClientDetails: (req, res) => {
-    pool.query(
-      "SELECT c.id, accountname, billingaddressstreet, billingaddresssuburb FROM client as c inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
-      [req.params.orgId],
-      (error, results) => {
-        if (error) {
-          console.error(error);
-          res.status(500).send(error);
-        }
-        console.log("getClientDetails results.length: " + results.rows.length);
-        let arr = results.rows.map((obj) => {
-          return {
-            clientId: obj.id,
-            accountName: obj.accountname,
-            billingAddressStreet: obj.billingaddressstreet,
-            billingAddressSuburb: obj.billingaddresssuburb,
-          };
-        });
-        res.json(arr);
-      }
-    );
+  getClientDetails: async (req, res) => {
+    try {
+      let results = await pool.query(
+        "SELECT c.id, accountname, billingaddressstreet, billingaddresssuburb FROM client as c inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
+        [req.params.orgId]
+      );
+      console.log("getClientDetails results");
+      console.log(results);
+      console.log("getClientDetails results.length: " + results.rows.length);
+      let arr = results.rows.map((obj) => {
+        return {
+          clientId: obj.id,
+          accountName: obj.accountname,
+          billingAddressStreet: obj.billingaddressstreet,
+          billingAddressSuburb: obj.billingaddresssuburb,
+        };
+      });
+      res.json(arr);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send(err);
+    }
   },
   getClientById: async (id, orgId) => {
     let clientDetailsObject;
