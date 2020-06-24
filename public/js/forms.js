@@ -358,6 +358,10 @@ const forms = {
 
     // pull out and transform form data
     const formData = form.serializeArray().reduce(function (obj, val) {
+      if (val.name === "dateInvoiceSent") console.log(moment(val.value));
+      if (moment(val.value, "YYYY-MM-DD", true).isValid()) {
+        val.value = moment(val.value).format("YYYY-MM-DDTHH:mm:ss.SSSSZ");
+      }
       obj[val.name] = val.value;
       if (!val.value) obj[val.name] = null;
       return obj;
@@ -402,10 +406,7 @@ const forms = {
           let val = form.find("#" + dim + "Details-" + arr[i]).val();
           if (isFinite(val)) val = Number(val);
           if (arr[i] === "dateInvoiceSent") {
-            console.log("dateInvoiceSent val: ", val);
-            let dt = new Date(val),
-              dt0 = new Date("1899-12-30");
-            val = (dt.getTime() - dt0.getTime()) / (1000 * 60 * 60 * 24);
+            val = moment(val).format("D/M/YYYY");
           }
           obj[arr[i]] = val;
         }
