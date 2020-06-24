@@ -992,7 +992,6 @@ INSERT INTO client (organisationId, createdDateTimeutc, id, accountName, mainCon
 (1, '2019-08-19T10:40:14.000Z', 934, 'Herriot, Julia', 'Julia', 'Herriot', 'daisiesdogcare@gmail.com', '211788155', NULL, NULL, '79A Eatwell Avenue', 'Paraparaumu Beach', 'Raumati', 'Baby Boomer (50-65 ish)', '$70,001 - $90,000', 'Word of Mouth', NULL),
 (1, '2019-08-19T10:44:32.000Z', 935, 'White, Russell', 'Russell', 'White', 'rvwhitenz@xtra.co.nz', NULL, '210403416', NULL, '49B Olive Terrace', 'Paraparaumu Beach', 'Raumati', 'Baby Boomer (50-65 ish)', '$70,001 - $90,000', 'Word of Mouth', NULL),
 (1, '2019-08-19T10:54:19.000Z', 936, 'Margrett, Simon', 'Simon', 'Margrett', 'simon.margrett@gmail.com', NULL, '21440338', NULL, '18 Sweetman Avenue', 'Paraparaumu Beach', 'Raumati', 'Professional Couple', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
-(1, '2019-08-19T10:59:49.000Z', 937, 'Margrett, Simon', 'Simon', 'Margrett', 'simon.margrett@gmail.com', NULL, '21440338', NULL, '18 Sweetman Avenue', 'Paraparaumu Beach', 'Raumati', 'Professional Couple', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
 (1, '2019-08-23T16:03:15.000Z', 938, 'Test, Test', 'TEST', 'TEST', NULL, NULL, NULL, NULL, '12 Island View Terrace', 'Waikanae Beach', 'Waikanae', 'Active Retiree', '$70,001 - $90,000', 'Print Campaign (HAH Kapiti)', 1),
 (1, '2019-09-04T14:15:23.000Z', 939, 'Evans, Lynley', 'Lynley', 'Evans', 'lynleyevans@gmail.com', NULL, '21490629', NULL, '23A Ruru Road', 'Otaihanga', 'Raumati', 'Baby Boomer (50-65 ish)', '$70,001 - $90,000', NULL, NULL),
 (1, '2019-09-04T14:51:33.000Z', 940, 'Mcdonald, Phillipa', 'Phillipa', 'Mcdonald', 'pakmcd01@gmail.com', '44724071', '274531908', NULL, '1 Ngapotiki Street', 'Paraparaumu Beach', 'Raumati', 'Active Retiree', 'Pension', NULL, NULL),
@@ -1291,7 +1290,6 @@ INSERT INTO client (organisationId, createdDateTimeutc, id, accountName, mainCon
 (2, '2019-10-22T10:08:7.000Z', 1233, 'Grantham, Coralee', 'Coralee', 'Grantham', 'coraleeg@xtra.co.nz', NULL, '274346687', NULL, '50 Staithes Drive North', 'Whitby', 'Northwest Wellington', 'Baby Boomer (50-65 ish)', '$50,001 - $70,000', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-10-22T10:37:1.000Z', 1234, 'Ferriso, Anne', 'Anne', 'Ferriso', 'johnsonville@tritonhearing.co.nz', '447707777', NULL, 'Triton Hearing Johnsonville', '120 Johnsonville Road', 'Johnsonville', 'Northwest Wellington', 'Other Business', '$90,001+', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-10-22T10:44:31.000Z', 1235, 'Thorpe, Susan', 'Susan', 'Thorpe', 'susanthorpe@xtra.co.nz', '42365499', NULL, NULL, '61 Tireti Road', 'Titahi Bay', 'Northwest Wellington', 'Professional Single', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
-(2, '2019-11-07T10:40:47.000Z', 1236, 'Stanley, Matt & Ange', 'Stanley', 'Matt', 'mattange@icloud.com', NULL, '212884470', NULL, '17B Postgate Drive', 'Whitby', 'Northwest Wellington', 'Private Landlord', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-07T10:42:15.000Z', 1237, 'Heritage Lifecare', 'Amanda', 'Barfoot', 'amanda.barfoot@hll.org.nz', NULL, '223015634', 'Heritage Lifecare', '16 Johnsonville Road', 'Johnsonville', 'Northwest Wellington', 'Other Business', '$90,001+', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-07T10:43:47.000Z', 1238, 'Tamati, Mickey', 'Mickey', 'Tamati', NULL, '42358878', NULL, NULL, '289 Warspite Avenue', 'Waitangirua', 'Northwest Wellington', 'Active Retiree', 'Pension', 'Print Advertising (HAH Kapi Mana)', NULL),
 (2, '2019-11-07T10:44:49.000Z', 1239, 'Brewin, Stephen', 'Stephen', 'Brewin', NULL, '42357071', NULL, NULL, '69 Beauzami Crescent', 'Ascot Park', 'Northwest Wellington', 'Old Retiree', 'Pension', 'Word of Mouth', NULL),
@@ -1299,8 +1297,6 @@ INSERT INTO client (organisationId, createdDateTimeutc, id, accountName, mainCon
 (2, '2019-11-07T10:50:27.000Z', 1241, 'Foster, Ann', 'Ann', 'Foster', 'anniefoster@xtra.co.nz', NULL, '274456966', NULL, '6 Azimuth Place', 'Whitby', 'Northwest Wellington', 'Professional Single', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-07T10:52:51.000Z', 1242, 'Mary Potter Hospice', 'Monique', 'Byres', 'monique.byres@marypotter.org.nz', NULL, '274906774', 'Mary Potter Hospice', '3 McMillan Court', 'Newlands', 'Northwest Wellington', 'Other Business', '$90,001+', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-07T10:54:22.000Z', 1243, 'Mana Montessori Preschool', 'Nicola', 'Dickie', 'mana.montessori@xtra.co.nz', '42341489', NULL, 'Mana Montessori Preschool', '1 Albatross Close', 'Whitby', 'Northwest Wellington', 'Other Business', '$90,001+', 'Online Referral (HAH National - BAU)', NULL),
-(2, '2019-11-07T11:33:28.000Z', 1244, 'Foster, Ann', 'Ann', 'Foster', 'anniefoster@xtra.co.nz', NULL, '274456966', NULL, '6 Azimuth Place', 'Whitby', 'Northwest Wellington', 'Professional Single', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
-(2, '2019-11-07T11:39:8.000Z', 1245, 'Stanley, Matt & Ange', 'Matt', 'Stanley', 'mattange@icloud.com', NULL, '212884470', NULL, '17B Postgate Drive', 'Whitby', 'Northwest Wellington', 'Private Landlord', '$90,001+', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-07T11:59:58.000Z', 1246, 'Athena Bathrooms & Clearlite Bathrooms', 'Derek', 'Blakey', 'derekb@clearlite.co.nz', '94439579', NULL, 'Athena Bathrooms & Clearlite Bathrooms', '58 Hillside Road', 'Wairau Valley', 'Northwest Wellington', 'Other Business', '$90,001+', 'Word of Mouth', NULL),
 (2, '2019-11-07T15:54:38.000Z', 1247, 'Cassidy, Mark', 'Mark', 'Cassidy', 'mark.cassidy1953@gmail.com', NULL, '21877557', NULL, '154 Endeavour Drive', 'Whitby', 'Northwest Wellington', 'Professional Single', '$70,001 - $90,000', 'Online Referral (HAH National - BAU)', NULL),
 (2, '2019-11-13T15:08:7.000Z', 1248, 'Black, Hillary & Monty', 'Hillary', 'Black', 'nursecelery@gmail.com', '42358175', '272824470', NULL, '81 Leeward Drive', 'Whitby', 'Northwest Wellington', 'Professional Couple', '$90,001+', 'Word of Mouth', NULL),
@@ -1397,9 +1393,9 @@ alter sequence client_id_seq restart with 1336;
 update client
 set createdDateTimeUTC = (createdDateTimeUTC at time zone 'UTC') at time zone 'NZ';
 
-CREATE TABLE job (id serial PRIMARY KEY, clientId int REFERENCES client (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, workLocationStreetAddress text NULL, workLocationSuburb text NULL, primaryJobType text NOT NULL, secondaryJobType text NULL, indoorsOutdoors text NULL, dateJobEnquiryUTC timestamp with time zone NULL, dateJobQuotedUTC timestamp with time zone NULL, dateWorkCommencedUTC timestamp with time zone NULL, dateInvoiceSentUTC timestamp with time zone NOT NULL, amountInvoiced numeric(10,4) NOT NULL, costMaterials numeric(10,4) NULL, costStaff numeric(10,4) NOT NULL, costSubcontractor numeric(10,4) NULL, costTipFees numeric(10,4) NULL, costOther numeric(10,4) NULL, workSatisfaction int NULL);
+CREATE TABLE job (id serial PRIMARY KEY, clientId int REFERENCES client (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, workLocationStreetAddress text NULL, workLocationSuburb text NULL, primaryJobType text NOT NULL, secondaryJobType text NULL, indoorsOutdoors text NULL, dateJobEnquiryUTC timestamp with time zone NULL, dateJobQuotedUTC timestamp with time zone NULL, dateWorkCommencedUTC timestamp with time zone NULL, dateInvoiceSentUTC timestamp with time zone NOT NULL, amountInvoiced numeric(10,4) NOT NULL, costMaterials numeric(10,4) NULL, costSubcontractor numeric(10,4) NULL, costTipFees numeric(10,4) NULL, costOther numeric(10,4) NULL, workSatisfaction int NULL);
 
-insert into job (id, clientId, createdDateTimeutc, workLocationStreetAddress, workLocationSuburb, primaryJobType, secondaryJobType, indoorsOutdoors, dateJobEnquiry, dateJobQuoted, dateWorkCommenced, dateInvoiceSent, amountInvoiced, costMaterials, costSubcontractor, costTipFees, costOther, workSatisfaction) values
+insert into job (id, clientId, createdDateTimeUTC, workLocationStreetAddress, workLocationSuburb, primaryJobType, secondaryJobType, indoorsOutdoors, dateJobEnquiryUTC, dateJobQuotedUTC, dateWorkCommencedUTC, dateInvoiceSentUTC, amountInvoiced, costMaterials, costSubcontractor, costTipFees, costOther, workSatisfaction) values
 (1, 521, '2018-03-25T20:33:54.613Z', NULL, NULL, 'Painting', NULL, 'Outdoor', '2014-12-17T00:00:0.000Z', NULL, NULL, '2015-02-02T00:00:0.000Z', 1991.3, 355.22, 270, NULL, NULL, NULL),
 (2, 299, '2018-03-25T20:33:54.613Z', '4 Waikare', NULL, 'Maintenance', NULL, NULL, '2015-03-19T00:00:0.000Z', NULL, NULL, '2015-03-31T00:00:0.000Z', 397.5, 5, NULL, NULL, NULL, NULL),
 (3, 581, '2018-03-25T20:33:54.613Z', NULL, NULL, 'Fencing', NULL, 'Outdoor', '2015-02-20T00:00:0.000Z', NULL, NULL, '2015-04-01T00:00:0.000Z', 497.21, 74.31, NULL, NULL, NULL, NULL),
@@ -5794,7 +5790,7 @@ insert into staff_job_hours (jobId, staffId, hoursWorked) values
 (1234, 4, 1.25),
 (1239, 4, 2),
 (1243, 4, 10.25),
-(1244, 4, 1),
+(1241, 4, 1),
 (1245, 4, 6.5),
 (1246, 4, 19.5),
 (1252, 4, 3.5),
@@ -6846,7 +6842,7 @@ insert into staff_job_hours (jobId, staffId, hoursWorked) values
 (1241, 3, 8.25),
 (1242, 3, 6.5),
 (1243, 3, 10.5),
-(1244, 3, 5.75),
+(1241, 3, 5.75),
 (1245, 3, 6.5),
 (1246, 3, 5.5),
 (1248, 3, 1.5),
@@ -7776,7 +7772,7 @@ insert into staff_job_hours (jobId, staffId, hoursWorked) values
 (1241, 5, 5),
 (1242, 5, 6.75),
 (1243, 5, 12.5),
-(1244, 5, 4),
+(1241, 5, 4),
 (1250, 5, 20.5),
 (1252, 5, 4.75),
 (1254, 5, 7.75),
