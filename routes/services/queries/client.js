@@ -57,9 +57,6 @@ module.exports = {
         "SELECT c.id, accountname, billingaddressstreet, billingaddresssuburb FROM client as c inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
         [req.params.orgId]
       );
-      console.log("getClientDetails results");
-      console.log(results);
-      console.log("getClientDetails results.length: " + results.rows.length);
       let arr = results.rows.map((obj) => {
         return {
           clientId: obj.id,

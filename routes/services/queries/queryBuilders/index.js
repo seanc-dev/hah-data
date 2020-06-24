@@ -26,7 +26,7 @@ module.exports = {
       (name) =>
         (queryStr += `left outer join ${name} on  j.id = ${name}.jobid and shp.hoursworked${name} is not null `)
     );
-    queryStr += `is not null ) as staff on j.id = staff.jobid ) tjc on j.id = tjc.jobid ) gp on j.id = gp.jobid where j.${
+    queryStr += `) as staff on j.id = staff.jobid ) tjc on j.id = tjc.jobid ) gp on j.id = gp.jobid where j.${
       client ? "client" : ""
     }id = $1`;
     return queryStr;

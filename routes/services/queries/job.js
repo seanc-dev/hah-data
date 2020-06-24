@@ -110,9 +110,6 @@ module.exports = {
           console.error(error);
           res.status(500).send(error);
         }
-        console.log("getJobDetails result:");
-        console.log(result);
-        console.log("getJobDetails result.length: " + result.rows.length);
         let arr = result.rows.map((obj) => {
           return {
             clientId: obj.clientid,
