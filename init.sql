@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS organisation (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, tradingName text NOT NULL, legalName text NOT NULL UNIQUE, shortName text NOT NULL UNIQUE);
-CREATE TABLE IF NOT EXISTS staff (id serial PRIMARY KEY, organisationId integer REFERENCES organisation (id) NOT NULL, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, staffMemberName text NOT NULL unique, staffMemberStartDate timestamp with time zone NULL, currentlyEmployed numeric(1,0) NOT NULL);
+CREATE TABLE IF NOT EXISTS staff (id serial PRIMARY KEY, organisationId integer REFERENCES organisation (id) NOT NULL, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, staffMemberName text NOT NULL unique, staffmemberstartdateutc timestamp with time zone NULL, currentlyEmployed numeric(1,0) NOT NULL);
 
 -- organisation insert
 INSERT INTO organisation (tradingname, legalname, shortname) VALUES
-('Hire a Hubby Kapiti', 'DNS Developments Ltd.', 'Kapiti'),
-('Hire a Hubby Wellington', 'Hubby Wellington Ltd.', 'Wellington');
+('Hire a Hubby Kapiti', 'DNS Developments Ltd.', 'kapiti'),
+('Hire a Hubby Wellington', 'Hubby Wellington Ltd.', 'wellington');
 
-insert into staff (id, organisationId, staffMemberName, staffMemberStartDate, currentlyEmployed) values
+insert into staff (id, organisationId, staffMemberName, staffMemberStartDateUTC, currentlyEmployed) values
 (1, 1, 'Dave', '2002-10-08T00:00:0.000Z', 1),
 (2, 1, 'Westy', '2010-03-15T09:55:35.000Z', 1),
 (3, 1, 'Boof', '2010-03-15T09:55:35.000Z', 1),
@@ -25,11 +25,11 @@ insert into staff (id, organisationId, staffMemberName, staffMemberStartDate, cu
 alter sequence staff_id_seq restart with 15;
 
 update staff 
-set staffMemberStartDate = (staffMemberStartDate at time zone 'UTC') at time zone 'NZ';
+set staffmemberstartdateutc = (staffmemberstartdateutc at time zone 'UTC') at time zone 'NZ';
 
-CREATE TABLE IF NOT EXISTS staff_rate_history (id serial PRIMARY KEY, staffId integer REFERENCES staff (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, hourlyRateEffectiveDate TIMESTAMP WITH TIME ZONE NOT NULL, hourlyRateExpiryDate TIMESTAMP WITH TIME ZONE NULL, hourlyRate NUMERIC(5,2) NOT NULL);
+CREATE TABLE IF NOT EXISTS staff_rate_history (id serial PRIMARY KEY, staffId integer REFERENCES staff (id), createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, hourlyRateEffectiveDateutc TIMESTAMP WITH TIME ZONE NOT NULL, hourlyRateExpiryDateutc TIMESTAMP WITH TIME ZONE NULL, hourlyRate NUMERIC(5,2) NOT NULL);
 
-insert into staff_rate_history (id, staffId, hourlyRateEffectiveDate, hourlyRateExpiryDate, hourlyRate) values
+insert into staff_rate_history (id, staffId, hourlyRateEffectiveDateutc, hourlyRateExpiryDateutc, hourlyRate) values
 (1, 2, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 26),
 (2, 3, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 24),
 (3, 4, '2010-03-15T00:00:0.000Z', null::timestamp with time zone, 24),
@@ -50,8 +50,8 @@ insert into staff_rate_history (id, staffId, hourlyRateEffectiveDate, hourlyRate
 alter sequence staff_rate_history_id_seq restart with 17;
 
 update staff_rate_history 
-set hourlyRateEffectiveDate = (hourlyRateEffectiveDate at time zone 'UTC') at time zone 'NZ'
-    , hourlyRateExpiryDate = (hourlyRateExpiryDate at time zone 'UTC') at time zone 'NZ';
+set hourlyRateEffectiveDateutc = (hourlyRateEffectiveDateutc at time zone 'UTC') at time zone 'NZ'
+    , hourlyRateExpiryDateutc = (hourlyRateExpiryDateutc at time zone 'UTC') at time zone 'NZ';
 
 CREATE TABLE Client (id serial PRIMARY KEY, createdDateTimeUTC timestamp with time zone NOT NULL default CURRENT_TIMESTAMP, organisationId integer REFERENCES organisation (id), accountName text NOT NULL, mainContactFirstName text NULL, mainContactLastName text NULL, mainContactEmail text NULL, mainContactLandline text NULL, mainContactMobile text NULL, businessName text NULL, billingAddressStreet text NULL, billingAddressSuburb text NULL, territory text NULL, customerDemographic text NULL, estimatedCustomerIncome text NULL, acquisitionChannel text NULL, test numeric(1,0) NULL, unique (organisationid, accountname, billingAddressStreet, billingAddressSuburb));
 
