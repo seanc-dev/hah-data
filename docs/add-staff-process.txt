@@ -1,7 +1,10 @@
+/*** Unsure whether this first step is still necessary ***/
 1.  Add new staff member to lib/staff.js
   a.  Add name to [orgId].staffNames
   b.  Add new field entry for staffMemberNameHours
   c.  Add new field entry for staffMemberNameHourlyRate
+
+1.  Insert new record into staff table.
 2.  Add new field mappings to lib/mapping.js
 3.  Add new field to form
   a.  Open lib/form-options.js
