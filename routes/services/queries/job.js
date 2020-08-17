@@ -54,12 +54,15 @@ module.exports = {
         "insert into staff_job_hours (jobid, staffid, hoursworked) values ";
       let parametersArray = [];
       staffNames.forEach((name, idx) => {
+        console.log(`LOG: name: ${name}`);
         const idxMultiple = idx * 3;
-        const staffId = staffIdArray.find(
-          ({ staffmembername }) =>
-            staffmembername.replace(" ", "").toLowerCase() ===
-            name.replace(" ", "").toLowerCase()
-        ).id;
+        console.log("LOG: staffIdArray follows");
+        console.log(staffIdArray);
+        const staffId = staffIdArray.find(({ staffmembername }) => {
+          console.log(`LOG: staffmembername: ${staffmembername}`);
+          staffmembername.replace(" ", "").toLowerCase() ===
+            name.replace(" ", "").toLowerCase();
+        }).id;
         const hoursWorked = body[`hoursWorked${name}`];
         jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
           3 + idxMultiple
