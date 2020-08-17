@@ -2,12 +2,11 @@ Bits and pieces
 1. Change error handling for DB calls in routes/services/queries to be logging, not throwing.
 2. Set up a process to regularly drop tables into google sheets.
     => Cheap and easy dr.
-3. Remove createddatetime from client post call
-4. Add unique constraint to staff table (name)
-
-Remaining: 
-1. Update client delete route
-2. Test job delete route
-4. Tidy up bits and pieces.
 
 WIP:
+- client sheet update is failing because it's so fucking ugly. 
+- current error is that getRowObject is not pulling through (client object not retrieved 
+    from sheet). No idea why this is happening, but I've set some breakpoints in the dataobject
+    file so as to identify it. Just need to run in debugger mode.
+- p.s. also removed the logging in queries/job.js without re-testing it lol.
+- glfh

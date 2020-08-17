@@ -26,7 +26,7 @@ module.exports = {
       " from job as j inner join (SELECT * FROM crosstab('SELECT sjh.jobid, s.staffmembername as name, sjh.hoursworked FROM staff_job_hours as sjh inner join (select id, staffmembername from staff) as s on sjh.staffid = s.id ORDER  BY 1', $$VALUES ('" +
       staffNames.join("'), ('") +
       "')$$) AS ct (jobid int, hoursWorked" +
-      staffNamesTrim.join(" numeric(5,2), hoursWorked") +
+      staffNamesTrim.join(" numeric(6,2), hoursWorked") +
       " numeric(5,2))) as shp on j.id = shp.jobid inner join (select jobid, sum(hoursworked) as totalHoursWorked from staff_job_hours group by  jobid) as sumhours on  j.id = sumhours.jobid ";
     staffNamesTrim.forEach(
       (name) =>
