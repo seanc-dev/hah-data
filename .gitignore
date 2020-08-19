@@ -2,3 +2,4 @@
 node_modules/
 secret/
 lib/seed_db/
+access-details.md
