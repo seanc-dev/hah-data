@@ -4,9 +4,9 @@
   b.  Add new field entry for staffMemberNameHours
   c.  Add new field entry for staffMemberNameHourlyRate
 
-1.  Insert new record into staff table
-  - lib/staffInsert.sql
-  - make sure you add to both dev and prod
+1.  Database updates (lib/staffInsert.sql - make sure to update local and prod)
+  a. staff table
+  b. staff_hourly_rates table
 2.  Add new field mappings to lib/mapping.js
 3.  Add new field to form
   a.  Open lib/form-options.js
