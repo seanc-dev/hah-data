@@ -38,6 +38,7 @@
     "moment-timezone": "^0.5.31",
     "node-geocoder": "^3.23.0",
     "node-postgres": "^0.6.0",
+    "node-forge": ">=0.10.0",
     "pg": "^8.2.1",
     "spin.js": "^4.0.0"
   },
