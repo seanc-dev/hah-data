@@ -28,6 +28,9 @@ router.get("/:id", getData.getJobById);
 // update
 router.put("/:id", queries.updateJobById);
 
+// clean data in sheets
+// router.put("/:id/clean", queries.cleanJobById);
+
 // destroy
 router.delete("/:id", queries.deleteJobById);
 
