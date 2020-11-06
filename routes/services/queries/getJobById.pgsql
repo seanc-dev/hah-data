@@ -1,4 +1,5 @@
 -- job get query with all computed columns and staff details
+-- note this is ONLY for the kapiti business, and ONLY if no never staff members exist than Zachary.
 
 with dave as  (
   select  jobid
@@ -172,7 +173,7 @@ from    job as j
                                       ORDER  BY 1'
 
                                     , $$VALUES ('Dave'), ('Westy'), ('Pete'), ('Boof'), ('Chris'), ('Zachary')$$
-                                      ) AS ct (jobid int, hoursWorkedDave numeric(5,2), hoursWorkedWesty numeric(5,2), hoursWorkedPete numeric(5,2), hoursWorkedBoof numeric(5,2), hoursWorkedChris numeric(5,2), hoursWorkedZachary numeric(5,2)
+                                      ) AS ct (jobid int, hoursWorkedDave numeric(6,2), hoursWorkedWesty numeric(6,2), hoursWorkedPete numeric(6,2), hoursWorkedBoof numeric(6,2), hoursWorkedChris numeric(6,2), hoursWorkedZachary numeric(6,2)
                                     )
                                 ) as shp
                                     on  j.id = shp.jobid
@@ -207,4 +208,4 @@ from    job as j
             on  j.id = tjc.jobid
         ) gp
     on  j.id = gp.jobid
-where   j.id = 324
+order by j.id;
