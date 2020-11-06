@@ -10,3 +10,7 @@ WIP:
     file so as to identify it. Just need to run in debugger mode.
 - p.s. also removed the logging in queries/job.js without re-testing it lol.
 - glfh
+
+
+Staff member update 28/10/2020:
+- Completed 1 a/b/c. 
