@@ -4,9 +4,9 @@
   b.  Add new field entry for staffMemberNameHours
   c.  Add new field entry for staffMemberNameHourlyRate
 
-1.  Insert new record into staff table
-  - lib/staffInsert.sql
-  - make sure you add to both dev and prod
+1.  Database updates (lib/staffInsert.sql - make sure to update local and prod)
+  a. staff table
+  b. staff_hourly_rates table
 2.  Add new field mappings to lib/mapping.js
 3.  Add new field to form
   a.  Open lib/form-options.js
@@ -17,7 +17,7 @@
   a.  In test spreadsheet job details sheet, add fields for hours and hourly rate of new staff member.
   b.  In staff rates tab, enter new record for staff member hourly rate.
 5. Repeat 4. for production sheet
-6. Update hourly rate.
+6. Update hourly rate. -- IS THIS STILL NECESSARY??
   a.  Open google form for relevant org's staff members' hourly rates and add new question.
   b.  Either impute entry yourself, or request that client does so.
 7.  Test!
