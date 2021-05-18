@@ -84,6 +84,7 @@ module.exports = {
     const getData = require("../getData");
     getData.crud(new Job(orgId, id, body), "new");
   },
+
   deleteJobById: async (req, res) => {
     const { id } = req.params;
     const client = await pool.connect();
@@ -102,6 +103,7 @@ module.exports = {
       client.release();
     }
   },
+
   getJobDetails: (req, res) => {
     pool.query(
       "SELECT c.id as clientId, j.id as jobId, c.accountname, j.dateinvoicesentutc, j.amountinvoiced FROM job as j inner join (select id, accountname, organisationid from client) as c on j.clientid = c.id inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
@@ -124,6 +126,7 @@ module.exports = {
       }
     );
   },
+
   getJobById: async (id, orgId) => {
     let staffNames, jobResult;
     try {
@@ -146,6 +149,7 @@ module.exports = {
       throw err;
     }
   },
+
   updateJobById: async (req, res) => {
     const { orgId, id } = req.params;
     // create id outside of block
