@@ -1,8 +1,9 @@
 const lib = require("../../lib/library.js"),
   queries = require("./queries/index"),
   jobQueries = require("./queries/job"),
+  staffQueries = require("./queries/staff"),
   clientQueries = require("./queries/client"),
-  staffQueries = require("./queries/staff");
+  { getTerritories } = require("./queries/territories");
 
 module.exports = {
   crud: function (inst, requestType) {
@@ -67,10 +68,13 @@ module.exports = {
       resultArr = await Promise.all([
         queries.getOrgId(orgShortName),
         staffQueries.getStaffNames(orgShortName),
+        getTerritories(orgShortName),
       ]);
+
       return {
         organisationId: resultArr[0],
         staffNames: resultArr[1],
+        territories: resultArr[2].rows.map((row) => row.territoryname),
       };
     } catch (err) {
       console.error(err);
