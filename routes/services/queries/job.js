@@ -73,6 +73,7 @@ module.exports = {
       // return jobid of successful insert
       res.json({ id });
     } catch (err) {
+      console.log(`Error in job create query`);
       client.query("rollback");
       res.status(500).send(err);
       throw err;

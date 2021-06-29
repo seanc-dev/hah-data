@@ -7,18 +7,21 @@ module.exports = {
       const territories = await pool.query(queryStr);
       return territories;
     } catch (err) {
-      return console.error(err);
+      console.error("Error in territories.getTerritories");
+      console.error(err);
+      return err;
     }
   },
 
   getAreaByTerritoryName: async (territoryName) => {
-    const queryStr = `select t.territoryname, case when t.ownedbyorganisationid is null then 'Other' else a.areaname end as area from territory t inner join area a on  t.areaid = a.id`;
-    let data;
+    const queryStr = `select t.territoryname, case when t.ownedbyorganisationid is null then 'Other' else a.areaname end as area from territory t inner join area a on  t.areaid = a.id where t.territoryname = $1`;
     try {
-      data = await pool.query(queryStr);
+      const data = await pool.query(queryStr, [territoryName]);
+      return data;
     } catch (err) {
-      return console.error(err);
+      console.error("Error in territories.getAreaByTerritoryName");
+      console.error(err);
+      return err;
     }
-    return data;
   },
 };

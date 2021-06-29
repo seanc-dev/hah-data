@@ -2,23 +2,23 @@ const { pool } = require("../../../lib/db_config");
 const { getStaffRatesByJobId } = require("./queryBuilders/staff");
 
 module.exports = {
-  getStaffNames: async (orgShortName, client) => {
+  getStaffNames: async function (orgShortName, client) {
     if (!client) client = pool;
-    let result;
     try {
-      result = await client.query(
-        "select distinct staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1",
+      const result = await client.query(
+        "select distinct staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 and s.currentlyemployed = 1",
         [orgShortName]
       );
+      return result.rows.map((row) => row.staffmembername);
     } catch (err) {
-      console.error(err.stack);
       throw err;
     }
-    return result.rows.map((row) => row.staffmembername);
   },
-  getStaffRatesByJobId: async (orgId, jobId) => {
+
+  getStaffRatesByJobId: async function (orgId, jobId) {
     let ratesResult;
-    let staffNames = this.getStaffNames(orgId);
+    let staffNames = await this.getStaffNames(orgId);
+    console.log(staffNames);
     try {
       ratesResult = await pool.query(getStaffRatesByJobId(staffNames), [jobId]);
       return ratesResult.rows[0];
