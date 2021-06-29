@@ -1,0 +1,41 @@
+Requirements
+
+I. DB Prep work
+    X1. Create area table
+    X2. Create territory table
+
+II. Update existing data -- N.B. ONLY DO WHEN READY TO COMPLETE CHANGEOVER
+    1. In spreadsheets
+        a. Get mapping of suburbs to territories
+        b. Add 'area' column in spreadsheets and cut existing data into it
+            - Master client sheet
+            - Dashboard Data
+            - HAH Data Report Data
+        c. Apply new values to pre-existing territory column
+    2. In dev db
+        a. Write a script to
+            i.    overwrite data in 'territory' with mapped territories from 'suburb'
+            ii.     execute script in dev db and ensure worked adequately
+    3. In prod db when ready to make production changeover: run script developed with dev db
+    
+III. Update form
+    X1. Update the datalist options as sent through in the initAppData call in public/js/library.js (pulled into the route
+        return through lib/form-options.js)
+
+IV. Update sheets integration
+    1. Update Client class to compute 'area' from 'territory'
+        - Built query, need to test it in live client call (check whether read call will trigger compute columns)
+    2. Update field mapping used by sheets integration to include 'area' field
+
+
+Functionality:
+1. Area field working
+2. Existing data updated
+**3. New API working
+4. New territories showing in forms
+5. Territory correctly populating in sheets
+
+API update:
+-- Test Create and Update
+1. Create is failing silently once running createDBObj
+2. Update is working
