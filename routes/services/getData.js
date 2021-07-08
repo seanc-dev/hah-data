@@ -64,10 +64,12 @@ module.exports = {
         getTerritories(orgShortName),
       ]);
 
+      const territories = resultArr[2].rows.map((row) => row.territoryname);
+
       return {
         organisationId: resultArr[0],
         staffNames: resultArr[1],
-        territories: resultArr[2].rows.map((row) => row.territoryname),
+        territories,
       };
     } catch (err) {
       console.error(err);
