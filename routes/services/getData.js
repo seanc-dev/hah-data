@@ -1,42 +1,36 @@
 const lib = require("../../lib/library.js"),
   queries = require("./queries/index"),
   jobQueries = require("./queries/job"),
+  staffQueries = require("./queries/staff"),
   clientQueries = require("./queries/client"),
-  staffQueries = require("./queries/staff");
+  { getTerritories } = require("./queries/territories");
 
 module.exports = {
-  crud: function (inst, requestType) {
+  crud: async function (inst, requestType) {
     // initialise instance with requested action
-    let init = new Promise((resolve, reject) => {
-      try {
-        resolve(inst.init(requestType));
-      } catch (err) {
-        console.error(
-          `Error in ${inst.dimension} ${requestType} crud service: Failed to initiate instance`
-        );
-        console.error(err);
-        reject(err);
+    try {
+      const result = await inst.init(requestType);
+      console.log(
+        `Successful ${requestType} init for ${inst.dimension} record with id ${
+          result[`${inst.dimension.toLowerCase()}Id`]
+        }`
+      );
+    } catch (err) {
+      console.error(
+        `Error in ${inst.dimension} ${requestType} getData.crud: Failed to initiate instance`
+      );
+      console.error(err);
+    }
+    try {
+      // if job added, edited, or removed, update computed fields on relevant client record
+      if (inst.dimension === "job" && requestType !== "view") {
+        inst.initClientUpdate.bind(inst)();
       }
-    });
-
-    init
-      .then((result) => {
-        console.log(
-          `Successful ${requestType} init for ${
-            inst.dimension
-          } record with id ${result[`${inst.dimension.toLowerCase()}Id`]}`
-        );
-
-        if (
-          inst.dimension === "job" &&
-          (requestType === "new" || requestType === "edit")
-        ) {
-          inst.initClientUpdate.bind(inst)();
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    } catch (err) {
+      console.error(
+        `Failed to initiate client update on job record ${requestType}`
+      );
+    }
   },
   getKeysFromDb: (orgShortName, dim, req, res) => {
     queries
@@ -67,10 +61,15 @@ module.exports = {
       resultArr = await Promise.all([
         queries.getOrgId(orgShortName),
         staffQueries.getStaffNames(orgShortName),
+        getTerritories(orgShortName),
       ]);
+
+      const territories = resultArr[2].rows.map((row) => row.territoryname);
+
       return {
         organisationId: resultArr[0],
         staffNames: resultArr[1],
+        territories,
       };
     } catch (err) {
       console.error(err);

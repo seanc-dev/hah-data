@@ -2,28 +2,69 @@ const { pool } = require("../../../lib/db_config");
 const { getStaffRatesByJobId } = require("./queryBuilders/staff");
 
 module.exports = {
-  getStaffNames: async (orgShortName, client) => {
+  getStaffNames: async function (orgShortName, client) {
     if (!client) client = pool;
-    let result;
     try {
-      result = await client.query(
-        "select distinct staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1",
+      const result = await client.query(
+        "select distinct staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 and s.currentlyemployed = 1",
         [orgShortName]
       );
+      return result.rows.map((row) => row.staffmembername);
     } catch (err) {
-      console.error(err.stack);
       throw err;
     }
-    return result.rows.map((row) => row.staffmembername);
   },
-  getStaffRatesByJobId: async (orgId, jobId) => {
+
+  getStaffRatesByJobId: async function (orgId, jobId) {
     let ratesResult;
-    let staffNames = this.getStaffNames(orgId);
+    let staffNames = await this.getStaffNames(orgId);
+    console.log(staffNames);
     try {
       ratesResult = await pool.query(getStaffRatesByJobId(staffNames), [jobId]);
       return ratesResult.rows[0];
     } catch (err) {
       throw err;
+    }
+  },
+
+  getStaffIdArray: async (orgId, client) => {
+    if (!client) client = pool;
+    const staffResult = await client.query(
+      "select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 and currentlyemployed = 1 and staffmemberstartdateutc <= CURRENT_DATE",
+      [orgId]
+    );
+    const staffIdArray = staffResult.rows;
+    return staffIdArray;
+  },
+
+  insertStaffJobHours: async (staffNames, staffIdArray, id, body, client) => {
+    if (!client) client = pool;
+
+    let jobHoursQueryStr =
+      "insert into staff_job_hours (jobid, staffid, hoursworked) values ";
+    const parametersArray = [];
+
+    staffNames.forEach((name, idx) => {
+      const idxMultiple = idx * 3;
+      console.log("queries/job/createJob staffIdArray");
+      console.log(staffIdArray);
+      const staffId = staffIdArray.find(
+        ({ staffmembername }) =>
+          staffmembername.replace(" ", "").toLowerCase() ===
+          name.replace(" ", "").toLowerCase()
+      ).id;
+      const hoursWorked = body[`hoursWorked${name}`];
+      jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
+        3 + idxMultiple
+      })${idx !== staffNames.length - 1 ? ", " : ""}`;
+      parametersArray[0 + idxMultiple] = id;
+      parametersArray[1 + idxMultiple] = staffId;
+      parametersArray[2 + idxMultiple] = hoursWorked;
+    });
+    try {
+      return await client.query(jobHoursQueryStr, parametersArray);
+    } catch (err) {
+      console.error(err);
     }
   },
 };

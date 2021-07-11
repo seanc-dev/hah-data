@@ -3,3 +3,9 @@ node_modules/
 secret/
 lib/seed_db/
 access-details.md
+init.sql
+client_insert.pgsql
+job_insert.pgsql
+staff_insert.pgsql
+staff_job_hours_insert.pgsql
+staff_rate_history_insert.pgsql

@@ -1,11 +1,9 @@
 const express = require("express");
-
-const formOptions = require("../lib/form-options.js");
-const getData = require("./services/getData.js");
-
 const router = express.Router({
   mergeParams: true,
 });
+const getData = require("./services/getData.js");
+const formOptions = require("../lib/form-options.js");
 
 // show form
 router.get("/:orgShortName", function (req, res) {
@@ -20,9 +18,23 @@ router.get("/:orgShortName", function (req, res) {
     } else {
       getData
         .getOrgDetailsByShortName(orgShortName)
-        .then(({ organisationId, staffNames }) => {
-          let data = {
-            formOptions: formOptions[orgShortName],
+        .then(({ organisationId, staffNames, territories }) => {
+          console.log(territories);
+          const data = {
+            formOptions: {
+              ...formOptions[orgShortName],
+              clientDetails: {
+                ...formOptions[orgShortName].clientDetails,
+                fields: {
+                  ...formOptions[orgShortName].clientDetails.fields,
+                  cd_territory: {
+                    ...formOptions[orgShortName].clientDetails.fields
+                      .cd_territory,
+                    values: ["", ...territories],
+                  },
+                },
+              },
+            },
             businessName: orgShortName,
             businessNameDisplay:
               orgShortName[0].toUpperCase() + orgShortName.slice(1),

@@ -1,0 +1,17 @@
+                             List of databases
+   Name    |  Owner   | Encoding | Collate | Ctype |   Access privileges    
+-----------+----------+----------+---------+-------+------------------------
+ Sean      | Sean     | UTF8     | C       | C     | 
+ hah_data  | api_user | UTF8     | C       | C     | =Tc/api_user          +
+           |          |          |         |       | api_user=CTc/api_user +
+           |          |          |         |       | secondary=CTc/api_user
+ postgres  | Sean     | UTF8     | C       | C     | 
+ sandbox   | Sean     | UTF8     | C       | C     | =Tc/Sean              +
+           |          |          |         |       | Sean=CTc/Sean         +
+           |          |          |         |       | secondary=CTc/Sean
+ template0 | Sean     | UTF8     | C       | C     | =c/Sean               +
+           |          |          |         |       | Sean=CTc/Sean
+ template1 | Sean     | UTF8     | C       | C     | =c/Sean               +
+           |          |          |         |       | Sean=CTc/Sean
+(6 rows)
+

@@ -42,37 +42,20 @@ module.exports = {
       );
       id = result.rows[0].id;
       // pull back staff names & ids (staff_job_hours requires staffId insert)
-      // could to a joined select insert but that's a little inconvenient with
-      // with multiple rows
-      const staffResult = await client.query(
-        "select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1",
-        [orgId]
-      );
-      const staffIdArray = staffResult.rows;
+      const staffIdArray = await staffQueries.getStaffIdArray(orgId, client);
       // loop through staffNames, find variables, construct staff_job_hours insert and parameters array
-      let jobHoursQueryStr =
-        "insert into staff_job_hours (jobid, staffid, hoursworked) values ";
-      let parametersArray = [];
-      staffNames.forEach((name, idx) => {
-        const idxMultiple = idx * 3;
-        const staffId = staffIdArray.find(
-          ({ staffmembername }) =>
-            staffmembername.replace(" ", "").toLowerCase() ===
-            name.replace(" ", "").toLowerCase()
-        ).id;
-        const hoursWorked = body[`hoursWorked${name}`];
-        jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
-          3 + idxMultiple
-        })${idx !== staffNames.length - 1 ? ", " : ""}`;
-        parametersArray[0 + idxMultiple] = id;
-        parametersArray[1 + idxMultiple] = staffId;
-        parametersArray[2 + idxMultiple] = hoursWorked;
-      });
-      await client.query(jobHoursQueryStr, parametersArray);
+      await staffQueries.insertStaffJobHours(
+        staffNames,
+        staffIdArray,
+        id,
+        body,
+        client
+      );
       await client.query("commit");
       // return jobid of successful insert
       res.json({ id });
     } catch (err) {
+      console.log(`Error in job create query`);
       client.query("rollback");
       res.status(500).send(err);
       throw err;
@@ -84,6 +67,7 @@ module.exports = {
     const getData = require("../getData");
     getData.crud(new Job(orgId, id, body), "new");
   },
+
   deleteJobById: async (req, res) => {
     const { id } = req.params;
     const client = await pool.connect();
@@ -102,6 +86,7 @@ module.exports = {
       client.release();
     }
   },
+
   getJobDetails: (req, res) => {
     pool.query(
       "SELECT c.id as clientId, j.id as jobId, c.accountname, j.dateinvoicesentutc, j.amountinvoiced FROM job as j inner join (select id, accountname, organisationid from client) as c on j.clientid = c.id inner join organisation as o on c.organisationid = o.id where o.shortname = $1",
@@ -124,6 +109,7 @@ module.exports = {
       }
     );
   },
+
   getJobById: async (id, orgId) => {
     let staffNames, jobResult;
     try {
@@ -132,6 +118,7 @@ module.exports = {
       let queryStr = queryBuilders.getJobById(staffNames);
       // execute mega long query string
       jobResult = await pool.query(queryStr, [id]);
+
       const jobObj = jobResult.rows[0];
       const mappedJobObj = {};
       const keys = Object.keys(jobObj);
@@ -146,6 +133,7 @@ module.exports = {
       throw err;
     }
   },
+
   updateJobById: async (req, res) => {
     const { orgId, id } = req.params;
     // create id outside of block
