@@ -30,7 +30,7 @@ module.exports = {
   getStaffIdArray: async (orgId, client) => {
     if (!client) client = pool;
     const staffResult = await client.query(
-      "select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 and currentlyemployed = 1 and staffmemberstartdateutc <= CURRENT_DATE",
+      "select s.id, s.staffmembername from staff as s inner join organisation as o on s.organisationid = o.id where o.shortname = $1 and currentlyemployed = 1",
       [orgId]
     );
     const staffIdArray = staffResult.rows;
@@ -46,13 +46,13 @@ module.exports = {
 
     staffNames.forEach((name, idx) => {
       const idxMultiple = idx * 3;
-      console.log("queries/job/createJob staffIdArray");
-      console.log(staffIdArray);
-      const staffId = staffIdArray.find(
+      const staffObj = staffIdArray.find(
         ({ staffmembername }) =>
           staffmembername.replace(" ", "").toLowerCase() ===
           name.replace(" ", "").toLowerCase()
-      ).id;
+      );
+      if (!staffObj) return;
+      const staffId = staffObj.id;
       const hoursWorked = body[`hoursWorked${name}`];
       jobHoursQueryStr += `($${1 + idxMultiple}, $${2 + idxMultiple}, $${
         3 + idxMultiple
