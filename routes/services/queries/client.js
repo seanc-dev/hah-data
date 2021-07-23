@@ -1,12 +1,12 @@
 const clientQueries = require("./queryBuilders/client"),
+  lib = require("./../../../lib/library"),
   staffQueries = require("./staff"),
-  lib = require("./../../../lib/library");
+  queries = require("./index");
 
 const { pool } = require("./../../../lib/db_config");
 
 module.exports = {
   createClient: async (req, res) => {
-    const queries = require("./index");
     const { orgId } = req.params;
     let id;
     const body = lib.prepareDataForDbInsert(req.body);
