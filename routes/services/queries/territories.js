@@ -14,7 +14,7 @@ module.exports = {
   },
 
   getAreaByTerritoryName: async (territoryName) => {
-    const queryStr = `select t.territoryname, case when t.ownedbyorganisationid is null then 'Other' else a.areaname end as area from territory t inner join area a on  t.areaid = a.id where t.territoryname = $1`;
+    const queryStr = `select a.areaname from territory t inner join area a on t.areaid = a.id where t.territoryname = $1`;
     try {
       const data = await pool.query(queryStr, [territoryName]);
       return data;
