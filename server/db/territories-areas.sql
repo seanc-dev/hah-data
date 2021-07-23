@@ -43,3 +43,7 @@ CREATE TABLE IF NOT EXISTS area (
 insert into area values (1, 'Northwest Wellington');
 insert into area values (2, 'South Wellington');
 insert into area values (3, 'Hutt Valley');
+
+
+select * from territory t
+inner join area a on t.areaid = a.id
