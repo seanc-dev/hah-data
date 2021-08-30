@@ -19,7 +19,6 @@ router.get("/:orgShortName", function (req, res) {
       getData
         .getOrgDetailsByShortName(orgShortName)
         .then(({ organisationId, staffNames, territories }) => {
-          console.log(territories);
           const data = {
             formOptions: {
               ...formOptions[orgShortName],

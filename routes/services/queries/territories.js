@@ -1,10 +1,10 @@
 const { pool } = require("../../../lib/db_config");
 
 module.exports = {
-  getTerritories: async (businessShortName) => {
-    const queryStr = `select t.territoryname from territory t`;
+  getTerritories: async (orgShortName) => {
+    const queryStr = `select t.territoryname from territory t inner join organisation o on t.ownedbyorganisationid = o.id where o.shortname = $1`;
     try {
-      const territories = await pool.query(queryStr);
+      const territories = await pool.query(queryStr, [orgShortName]);
       return territories;
     } catch (err) {
       console.error("Error in territories.getTerritories");

@@ -1,7 +1,3 @@
-// import {
-//     Spinner
-// } from 'spin.js';
-
 const lib = {
   appendOptionNode: function (parent, value) {
     let option = document.createElement("option");
@@ -22,7 +18,7 @@ const lib = {
   initialiseAppData: async function () {
     let resultArr;
     try {
-      console.log(document.appData.businessName);
+      // console.log(document.appData.businessName);
       resultArr = await Promise.all([
         // this retrieves the data required to construct the forms
         axios.get("/" + document.appData.businessName + "/?data=true"),
