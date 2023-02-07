@@ -1,3 +1,7 @@
-const   fs = require("fs");
+const fs = require("fs");
 
-fs.writeFileSync("./" + process.env.GOOGLE_CREDENTIALS_LOCATION, process.env.GOOGLE_CONFIG);
+console.log(process.env.GOOGLE_CONFIG);
+fs.writeFileSync(
+	"./" + process.env.GOOGLE_CREDENTIALS_LOCATION ?? "secret/client_secret.json",
+	process.env.GOOGLE_CONFIG
+);
