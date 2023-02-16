@@ -1,6 +1,7 @@
 import express from "express";
 
 import getData from "./services/getData.js";
+import { getNewFormObject } from "../lib/library";
 import formOptions from "../lib/form-options.js";
 
 const router = express.Router({
@@ -23,7 +24,7 @@ router.get("/:orgShortName", function (req, res) {
 				.then(({ organisationId, staffNames, territories }) => {
 					const data = {
 						formOptions: {
-							...formOptions[orgShortName],
+							...getNewFormObject(formOptions[orgShortName]),
 							clientDetails: {
 								...formOptions[orgShortName].clientDetails,
 								fields: {
