@@ -1,7 +1,9 @@
-const { getJobById } = require("./index");
+import queries from "./index.js";
 
-module.exports = {
-  getJobById: (staffNames) => {
-    return getJobById(staffNames);
-  },
+const { getJobById } = queries;
+
+export default {
+	getJobById: (staffNames) => {
+		return getJobById(staffNames);
+	},
 };

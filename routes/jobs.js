@@ -1,22 +1,19 @@
-const express = require("express");
+import express from "express";
 
-const Job = require("../lib/classes/job.js"),
-  getData = require("./services/getData.js"),
-  queries = require("./services/queries/job");
-
-const config = require("../lib/config.js");
+import getData from "./services/getData.js";
+import queries from "./services/queries/job.js";
 
 const router = express.Router({
-  mergeParams: true,
+	mergeParams: true,
 });
 
 // index route
 router.get("/", (req, res) => {
-  if (req.query.requestType === "detailsArray") {
-    queries.getJobDetails(req, res);
-  } else if (req.query.requestType === "keys") {
-    getData.getKeysFromDb(req.params.orgId, "job", req, res);
-  }
+	if (req.query.requestType === "detailsArray") {
+		queries.getJobDetails(req, res);
+	} else if (req.query.requestType === "keys") {
+		getData.getKeysFromDb(req.params.orgId, "job", req, res);
+	}
 });
 
 // create route
@@ -34,4 +31,4 @@ router.put("/:id", queries.updateJobById);
 // destroy
 router.delete("/:id", queries.deleteJobById);
 
-module.exports = router;
+export default router;
