@@ -1,48 +1,49 @@
 {
-  "name": "hah-kapiti-forms",
-  "version": "1.0.0",
-  "description": "",
-  "engines": {
-    "node": "10.14.1",
-    "npm": "6.9.0"
-  },
-  "main": "app.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "node preinstall.js",
-    "start": "node app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/seanc-dev/HAHK-forms.git"
-  },
-  "author": "SeanC",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/seanc-dev/HAHK-forms/issues"
-  },
-  "homepage": "https://github.com/seanc-dev/HAHK-forms#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "dayjs": "^1.8.28",
-    "dotenv": "^8.0.0",
-    "ejs": "^2.6.1",
-    "express": "^4.17.1",
-    "google-spreadsheet": "^3.1.15",
-    "locus": "^2.0.4",
-    "moment-timezone": "^0.5.31",
-    "node-forge": ">=0.10.0",
-    "node-geocoder": "^3.23.0",
-    "node-postgres": "^0.6.0",
-    "pg": "^8.2.1",
-    "spin.js": "^4.0.0"
-  },
-  "devDependencies": {
-    "eslint": "^8.34.0",
-    "lodash": ">=4.17.21"
-  }
+	"name": "hah-kapiti-forms",
+	"version": "1.0.0",
+	"description": "",
+	"engines": {
+		"node": "10.14.1",
+		"npm": "6.9.0"
+	},
+	"main": "app.js",
+	"directories": {
+		"lib": "lib"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"preinstall": "node preinstall.js",
+		"start": "node app.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/seanc-dev/HAHK-forms.git"
+	},
+	"author": "SeanC",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/seanc-dev/HAHK-forms/issues"
+	},
+	"homepage": "https://github.com/seanc-dev/HAHK-forms#readme",
+	"dependencies": {
+		"body-parser": "^1.19.0",
+		"cors": "^2.8.5",
+		"dayjs": "^1.8.28",
+		"dotenv": "^8.0.0",
+		"ejs": "^2.6.1",
+		"express": "^4.17.1",
+		"google-spreadsheet": "^3.1.15",
+		"locus": "^2.0.4",
+		"moment-timezone": "^0.5.31",
+		"node-forge": ">=0.10.0",
+		"node-geocoder": "^3.23.0",
+		"node-postgres": "^0.6.0",
+		"pg": "^8.2.1",
+		"spin.js": "^4.0.0"
+	},
+	"devDependencies": {
+		"eslint": "^8.34.0",
+		"lodash": ">=4.17.21"
+	},
+	"type": "module"
 }
