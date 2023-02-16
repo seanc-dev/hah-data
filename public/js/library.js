@@ -1,5 +1,3 @@
-import validationFunctions from "./validation-funcs";
-
 const lib = {
 	appendOptionNode: function (parent, value) {
 		let option = document.createElement("option");
@@ -54,12 +52,12 @@ const lib = {
 	},
 
 	getAccountNameValue: function () {
-		const accountTypeEl = $("#clientDetails-accountType"),
-			mainFirstEl = $("#clientDetails-mainContactFirstName"),
-			mainLastEl = $("#clientDetails-mainContactLastName"),
-			secondaryFirstEl = $("#clientDetails-secondaryContactFirstName"),
-			secondaryLastEl = $("#clientDetails-secondaryContactLastName"),
-			businessNameEl = $("#clientDetails-businessName");
+		const accountTypeEl = $("#clientDetails-accountType");
+		const mainFirstEl = $("#clientDetails-mainContactFirstName");
+		const mainLastEl = $("#clientDetails-mainContactLastName");
+		const secondaryFirstEl = $("#clientDetails-secondaryContactFirstName");
+		const secondaryLastEl = $("#clientDetails-secondaryContactLastName");
+		const businessNameEl = $("#clientDetails-businessName");
 
 		let accountTypeVal = this.capitaliseWords(accountTypeEl.val()),
 			businessNameVal = this.capitaliseWords(businessNameEl.val()),
