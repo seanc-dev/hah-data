@@ -1,8 +1,10 @@
 import express from "express";
 
 import getData from "./services/getData.js";
-import { getNewFormObject } from "../lib/library.js";
+import lib from "../lib/library.js";
 import formOptions from "../lib/form-options.js";
+
+const { getNewFormObject } = lib;
 
 const router = express.Router({
 	mergeParams: true,

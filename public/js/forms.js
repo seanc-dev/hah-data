@@ -1,7 +1,7 @@
 import lib from "./library.js";
 
 const forms = {
-	constructForms: (orgName, formName, data) => {
+	constructForm: (orgName, formName, data) => {
 		const constructClientOrJobForm = (orgName, formName, data) => {
 			const formEle = document.getElementById(formName + "Form");
 			const { restfulName, sections } = data;
