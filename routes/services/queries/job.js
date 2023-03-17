@@ -1,7 +1,12 @@
 import queryBuilders from "./queryBuilders/job.js";
-import staffQueries from "./staff.js";
 import Job from "../../../lib/classes/job.js";
-import lib from "./../../../lib/library.js";
+import staffQueries from "./staff.js";
+import {
+	getStaffNamesFromJobPost,
+	prepareDataForDbInsert,
+	getObjectFromKey,
+} from "./../../../lib/library.js";
+import getData from "../getData.js";
 
 import dbConfig from "./../../../lib/db_config.js";
 
@@ -11,9 +16,11 @@ export default {
 	createJob: async (req, res) => {
 		// replace empty strings with string null values for insert
 		const { orgId } = req.params;
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
+		console.log("jobQueries.createJob req.body");
+		console.log(body);
 		// extract staffNames from body for staff_job_hours insert
-		const staffNames = lib.getStaffNamesFromJobPost(body);
+		const staffNames = getStaffNamesFromJobPost(body);
 		// create id var outside of block
 		let id;
 		// connect node-postgres client
@@ -66,7 +73,7 @@ export default {
 		}
 		// Fire off async insert into google sheets for job record - must do this here as we require (and don't
 		// return) the id for the newly created record
-		const getData = require("../getData");
+
 		getData.crud(new Job(orgId, id, body), "new");
 	},
 
@@ -126,7 +133,7 @@ export default {
 			const keys = Object.keys(jobObj);
 			keys.forEach((key) => {
 				mappedJobObj[
-					lib.getObjectFromKey(orgId, "job", "dbHeader", key, "fieldName")
+					getObjectFromKey(orgId, "job", "dbHeader", key, "fieldName")
 				] = jobObj[key];
 			});
 			return mappedJobObj;
@@ -139,7 +146,7 @@ export default {
 	updateJobById: async (req, res) => {
 		const { orgId, id } = req.params;
 		// create id outside of block
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
 		const client = await pool.connect();
 		try {
 			await client.query("begin");
@@ -175,7 +182,6 @@ export default {
 		}
 		// Fire off async insert into google sheets for job record - must do this here as we require (and don't
 		// return) the id for the newly created record
-		const getData = require("../getData");
 		getData.crud(new Job(orgId, id, body), "edit");
 	},
 };

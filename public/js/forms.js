@@ -1,4 +1,11 @@
-import lib from "./library.js";
+import {
+	initSpinner,
+	endSpinner,
+	capitaliseWords,
+	nzdCurrencyFormat,
+	appendOptionNode,
+	revealStatusMessage,
+} from "./library.js";
 
 const forms = {
 	constructForm: (orgName, formName, data) => {
@@ -6,7 +13,8 @@ const forms = {
 			const formEle = document.getElementById(formName + "Form");
 			const { restfulName, sections } = data;
 
-			if (!formEle) return;
+			if (!formEle)
+				throw Error("no form element available in constructForm function");
 
 			// set form attributes
 			formEle.setAttribute("method", "POST");
@@ -37,7 +45,7 @@ const forms = {
 			formEle.appendChild(buttonsFieldset);
 		};
 
-		const constructSection = (formName, { sectionTitle, rowsArray }) => {
+		const constructSection = (formName, { sectionTitle, rows }) => {
 			const fieldsetEl = document.createElement("fieldset");
 			const legendEl = document.createElement("legend");
 			let legendText = document.createTextNode(sectionTitle);
@@ -46,8 +54,8 @@ const forms = {
 			fieldsetEl.appendChild(legendEl);
 			legendEl.appendChild(legendText);
 
-			for (let j = 0; j < rowsArray.length; j++) {
-				fieldsetEl.appendChild(constructRow(formName, rowsArray[j]));
+			for (let j = 0; j < rows.length; j++) {
+				fieldsetEl.appendChild(constructRow(formName, rows[j]));
 			}
 
 			return fieldsetEl;
@@ -105,8 +113,9 @@ const forms = {
 
 				innerEl.appendChild(inputEl);
 
-				if (fieldType === "datalist")
+				if (fieldType === "datalist") {
 					innerEl.appendChild(constructDataList(rowFieldData[k]));
+				}
 				if (fieldType === "hidden") innerEl.classList.add("d-none");
 
 				containerEl.appendChild(innerEl);
@@ -248,7 +257,7 @@ const forms = {
 				// create column to hold field label
 				let col = createEl("div", ["col-3", "form-view-text-sm"]);
 				col.appendChild(
-					document.createTextNode(lib.capitaliseWords(fieldLabels[i]) + ":")
+					document.createTextNode(capitaliseWords(fieldLabels[i]) + ":")
 				);
 				row.appendChild(col);
 
@@ -280,7 +289,7 @@ const forms = {
 		$accountNameDatalist.empty();
 
 		for (let i = 0; i < clientDetail.length; i++) {
-			let optionNode = lib.appendOptionNode(
+			let optionNode = appendOptionNode(
 				$accountNameDatalist[0],
 				clientDetail[i].accountName
 			);
@@ -307,9 +316,10 @@ const forms = {
 			document.appData.clientDetail[i].concat = concat;
 
 			// create new option node, append to record select datalist, and set data-key as clientId
-			lib
-				.appendOptionNode($clientDetailsDatalist[0], concat)
-				.setAttribute("data-key", clientDetail[i].clientId);
+			appendOptionNode($clientDetailsDatalist[0], concat).setAttribute(
+				"data-key",
+				clientDetail[i].clientId
+			);
 		}
 	},
 
@@ -333,19 +343,20 @@ const forms = {
 				", Date Invoice Sent: " +
 				formattedDate +
 				", Amount Invoiced: " +
-				lib.nzdCurrencyFormat(jobDetail[i].amountInvoiced);
+				nzdCurrencyFormat(jobDetail[i].amountInvoiced);
 
 			document.appData.jobDetail[i].concat = concat;
 
 			// create new option node, append to record select datalist, and set data-key as jobId
-			lib
-				.appendOptionNode($jobDetailDatalist[0], concat)
-				.setAttribute("data-key", jobDetail[i].jobId);
+			appendOptionNode($jobDetailDatalist[0], concat).setAttribute(
+				"data-key",
+				jobDetail[i].jobId
+			);
 		}
 	},
 
 	submitFormFlow: async function (form, formName, statusDiv) {
-		lib.initSpinner();
+		initSpinner();
 
 		const formAction = form
 			.closest(".form-content")
@@ -412,7 +423,7 @@ const forms = {
 
 				// if new client created, append new option node to datalist for job details account name field
 				if (dim === "client")
-					lib.appendOptionNode(
+					appendOptionNode(
 						document.getElementById("accountNameList"),
 						obj.accountName
 					);
@@ -470,7 +481,7 @@ const forms = {
 
 		function registerSubmitError(err) {
 			let v = formAction === "new" ? "created" : "updated";
-			lib.revealStatusMessage(
+			revealStatusMessage(
 				formName,
 				"danger",
 				"Error",
@@ -491,18 +502,13 @@ const forms = {
 				" record successfully " +
 				v +
 				".";
-		lib.revealStatusMessage(
-			form.attr("data-name"),
-			"success",
-			"Success",
-			message
-		);
+		revealStatusMessage(form.attr("data-name"), "success", "Success", message);
 
 		// clear form
 		form[0].reset();
 		if (formName === "Job") form.find("#jobDetails-billingAddress").val("");
 
-		lib.endSpinner();
+		endSpinner();
 	},
 
 	validateClientForm: function () {

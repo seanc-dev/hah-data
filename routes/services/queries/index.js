@@ -1,10 +1,8 @@
 import dbConfig from "./../../../lib/db_config.js";
-import jobQueries from "./job.js";
 import clientQueries from "./client.js";
+import jobQueries from "./job.js";
 
 const { pool } = dbConfig;
-const { getJobById } = jobQueries;
-const { getClientById } = clientQueries;
 
 export default {
 	getColumnHeaders: async (tableName, orgShortName) => {
@@ -16,7 +14,10 @@ export default {
 			const {
 				rows: [{ id }],
 			} = await pool.query(queryStr, [orgShortName]);
-			const fn = tableName === "client" ? getClientById : getJobById;
+			const fn =
+				tableName === "client"
+					? clientQueries.getClientById
+					: jobQueries.getJobById;
 			const data = await fn(id, orgShortName);
 			const keys = Object.keys(data);
 			return keys.filter((key) => key !== "organisationid");

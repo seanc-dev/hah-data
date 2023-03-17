@@ -1,10 +1,8 @@
 import express from "express";
 
 import getData from "./services/getData.js";
-import lib from "../lib/library.js";
+import { getNewFormObject } from "../lib/library.js";
 import formOptions from "../lib/form-options.js";
-
-const { getNewFormObject } = lib;
 
 const router = express.Router({
 	mergeParams: true,
@@ -23,27 +21,26 @@ router.get("/:orgShortName", function (req, res) {
 		} else {
 			getData
 				.getOrgDetailsByShortName(orgShortName)
-				.then(({ organisationId, staffNames, territories }) => {
+				.then(({ organisationId, staffNames }) => {
 					const data = {
 						formOptions: {
-							...getNewFormObject(formOptions[orgShortName]),
-							clientDetails: {
-								...formOptions[orgShortName].clientDetails,
-								fields: {
-									...formOptions[orgShortName].clientDetails.fields,
-									cd_territory: {
-										...formOptions[orgShortName].clientDetails.fields
-											.cd_territory,
-										values: ["", ...territories],
-									},
-								},
-							},
+							...getNewFormObject(formOptions[orgShortName], staffNames),
+							// clientDetails: {
+							// 	...formOptions[orgShortName].clientDetails,
+							// 	fields: {
+							// 		...formOptions[orgShortName].clientDetails.fields,
+							// 		cd_territory: {
+							// 			...formOptions[orgShortName].clientDetails.fields
+							// 				.cd_territory,
+							// 			values: ["", ...territories],
+							// 		},
+							// 	},
+							// },
 						},
 						businessName: orgShortName,
 						businessNameDisplay:
 							orgShortName[0].toUpperCase() + orgShortName.slice(1),
 						organisationId,
-						staffNames,
 					};
 					res.send(data);
 				})

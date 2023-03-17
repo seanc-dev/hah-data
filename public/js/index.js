@@ -1,6 +1,6 @@
-import forms from "./forms.js";
+import { initialiseAppData } from "./library.js";
 import handlers from "./handlers.js";
-import lib from "./library.js";
+import forms from "./forms.js";
 
 $(document).ready(function () {
 	function init() {
@@ -16,8 +16,7 @@ $(document).ready(function () {
 			businessName: orgName,
 		};
 
-		lib
-			.initialiseAppData()
+		initialiseAppData()
 			.then((result) => {
 				// build forms
 				buildForms();
@@ -35,8 +34,14 @@ $(document).ready(function () {
 
 		function buildForms() {
 			// form construction
-			forms.constructForm(orgName, "clientDetails");
-			forms.constructForm(orgName, "jobDetails");
+			console.log("formOptions");
+			console.log(document.appData.formOptions);
+			forms.constructForm(
+				orgName,
+				"clientDetails",
+				document.appData.formOptions
+			);
+			forms.constructForm(orgName, "jobDetails", document.appData.formOptions);
 			forms.setClientDetails();
 			forms.setJobDetails();
 			forms.setViewKeys();
@@ -54,63 +59,60 @@ $(document).ready(function () {
 			handlers.handleAccountTypeInput();
 			handlers.handleAlertHide();
 
-			// let clientData = {
-			//     accountType: 'Business',
-			//     accountName: 'Test Test Test Ltd.',
-			//     businessName: 'Test Test Test Ltd.',
-			//     mainContactFirstName: 'Coley',
-			//     mainContactLastName: 'Coley',
-			//     mainContactLandline: '',
-			//     mainContactMobile: '+64273493710',
-			//     mainContactEmail: 'seanco.dev@gmail.com',
-			//     billingAddressStreet: '11 Island View Terrace',
-			//     billingAddressSuburb: 'Cockle Bay',
-			//     billingAddressCity: 'Auckland',
-			//     billingAddressPostcode: '2014',
-			//     territory: 'South Wellington',
-			//     customerDemographic: 'Baby Boomer (50-65 ish)',
-			//     estimatedCustomerIncome: 'Pension',
-			//     acquisitionChannel: 'Word of Mouth',
-			// }
+			let clientData = {
+				accountType: "Business",
+				accountName: "Test Test Test Ltd.",
+				businessName: "Test Test Test Ltd.",
+				mainContactFirstName: "Coley",
+				mainContactLastName: "Coley",
+				mainContactLandline: "",
+				mainContactMobile: "+64273493710",
+				mainContactEmail: "seanco.dev@gmail.com",
+				billingAddressStreet: "11 Island View Terrace",
+				billingAddressSuburb: "Cockle Bay",
+				billingAddressCity: "Auckland",
+				billingAddressPostcode: "2014",
+				territory: "Raumati",
+				customerDemographic: "Baby Boomer (50-65 ish)",
+				estimatedCustomerIncome: "Pension",
+				acquisitionChannel: "WOM Client",
+			};
 
-			// let jobData = { accountName: 'Davia, Ido',
-			// workLocationStreetAddress: '56 Kiwi Crescent',
-			// workLocationSuburb: 'Tawa',
-			// workLocationCity: '',
-			// workLocationPostcode: '',
-			// primaryJobType: 'Maintenance',
-			// secondaryJobType: '',
-			// indoorsOutdoors: 'Indoors',
-			// createdDateTimeNZT: '17/12/2019 22:12:43',
-			// dateJobEnquiry: '',
-			// dateJobQuoted: '',
-			// dateWorkCommenced: '',
-			// dateInvoiceSent: '2019-12-03',
-			// amountInvoiced: '2',
-			// costMaterials: '',
-			// costSubcontractor: '',
-			// costTipFees: '',
-			// costOther: '',
-			// hoursWorkedDave: '',
-			// workSatisfaction: '5',
-			// clientId: '10' }
+			let jobData = {
+				accountName: "Davia, Ido",
+				workLocationStreetAddress: "56 Kiwi Crescent",
+				workLocationSuburb: "Tawa",
+				workLocationCity: "",
+				workLocationPostcode: "",
+				primaryJobType: "Maintenance",
+				secondaryJobType: "",
+				indoorsOutdoors: "Indoors",
+				dateJobEnquiry: "",
+				dateJobQuoted: "",
+				dateWorkCommenced: "",
+				dateInvoiceSent: "2019-12-03",
+				amountInvoiced: "2",
+				costMaterials: "",
+				costSubcontractor: "",
+				costTipFees: "",
+				costOther: "",
+				hoursWorkedDave: "",
+				workSatisfaction: "5",
+				clientId: "10",
+			};
 
-			// applyTestData('client', clientData);
-			// applyTestData('job', jobData);
+			applyTestData("client", clientData);
+			applyTestData("job", jobData);
 
-			// function applyTestData(dim, data){
+			function applyTestData(dim, data) {
+				for (let key in data) {
+					let el = document.getElementById(dim + "Details-" + key);
 
-			//     for (let key in data) {
+					el.value = data[key];
+				}
+			}
 
-			//         let el = document.getElementById(dim + 'Details-' + key);
-
-			//         el.value = data[key];
-
-			//     }
-
-			// }
-
-			// applyTestData();
+			applyTestData();
 		}
 	}
 

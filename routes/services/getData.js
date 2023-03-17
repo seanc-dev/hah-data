@@ -1,9 +1,9 @@
-import lib from "../../lib/library.js";
-import queries from "./queries/index.js";
-import jobQueries from "./queries/job.js";
-import staffQueries from "./queries/staff.js";
-import clientQueries from "./queries/client.js";
+import { getObjectFromKey } from "../../lib/library.js";
 import territoryQueries from "./queries/territories.js";
+import clientQueries from "./queries/client.js";
+import staffQueries from "./queries/staff.js";
+import jobQueries from "./queries/job.js";
+import queries from "./queries/index.js";
 
 const { getTerritories } = territoryQueries;
 
@@ -40,7 +40,7 @@ export default {
 			.then((fieldNames) => {
 				let obj = {
 					fieldLabels: fieldNames.map((columnName) =>
-						lib.getObjectFromKey(
+						getObjectFromKey(
 							orgShortName,
 							dim,
 							"fieldName",
