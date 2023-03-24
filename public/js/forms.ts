@@ -1,3 +1,4 @@
+import { FormName, NewFormsObject, OrgName } from "../../lib/form-field-logic/types.ts";
 import {
 	initSpinner,
 	endSpinner,
@@ -8,66 +9,79 @@ import {
 } from "./library.js";
 
 const forms = {
-	constructForm: (orgName, formName, data) => {
-		const constructClientOrJobForm = (orgName, formName, data) => {
+	export const constructForms = (
+		orgName: OrgName,
+		formName: FormName,
+		data: NewFormsObject
+	) => {
+		const constructClientOrJobForm = (
+			orgName: OrgName,
+			formName: Omit<FormName, "staff">,
+			data: NewFormDetail
+		) => {
 			const formEle = document.getElementById(formName + "Form");
 			const { restfulName, sections } = data;
-
-			if (!formEle)
-				throw Error("no form element available in constructForm function");
-
+	
+			if (!formEle) return;
+	
 			// set form attributes
 			formEle.setAttribute("method", "POST");
 			formEle.setAttribute("action", "/" + orgName + "/" + restfulName);
-
+	
 			// loop through sections and build them
 			sections.forEach((section) => {
 				formEle.appendChild(constructSection(formName, section));
 			});
-
+	
 			// create buttons fieldset
 			let buttonsFieldset = document.createElement("fieldset");
 			buttonsFieldset.classList.add("border-0");
 			buttonsFieldset.classList.add("d-flex");
 			let row = document.createElement("div");
 			addClasses(row, ["row", "justify-content-end"]);
-
+	
 			// append buttons to fieldset
 			// row.appendChild(constructButtonCol('Clear', 'button', ['btn-outline-secondary']));
 			row.appendChild(
 				constructButtonCol("Submit", "submit", ["btn-secondary", "form-submit"])
 			);
-
+	
 			// append row to buttons fieldset
 			buttonsFieldset.appendChild(row);
-
+	
 			// append button fieldset to form
 			formEle.appendChild(buttonsFieldset);
 		};
-
-		const constructSection = (formName, { sectionTitle, rows }) => {
+	
+		const constructSection = (
+			formName: Omit<FormName, "staff">,
+			{ sectionTitle, rows }: Section
+		) => {
 			const fieldsetEl = document.createElement("fieldset");
 			const legendEl = document.createElement("legend");
 			let legendText = document.createTextNode(sectionTitle);
-
+	
 			fieldsetEl.classList.add("form-group");
 			fieldsetEl.appendChild(legendEl);
 			legendEl.appendChild(legendText);
-
+	
 			for (let j = 0; j < rows.length; j++) {
 				fieldsetEl.appendChild(constructRow(formName, rows[j]));
 			}
-
+	
 			return fieldsetEl;
 		};
-
-		const constructRow = (formName, rowFieldData) => {
+	
+		const constructRow = (
+			formName: Omit<FormName, "staff">,
+			rowFieldData: NewField[]
+		) => {
 			// create container element
 			const containerEl = document.createElement("div");
-			let innerEl;
-
+			let innerEl: HTMLDivElement;
+	
 			containerEl.classList.add("row");
-
+	
 			// loop through array of fields to include in row
 			for (let k = 0; k < rowFieldData.length; k++) {
 				const {
@@ -79,11 +93,11 @@ const forms = {
 					properties: { isRequired, readOnly, excludeOnSubmit },
 				} = rowFieldData[k];
 				let uniqueName = formName + "-" + name;
-
+	
 				// create column element
 				innerEl = document.createElement("div");
 				innerEl.classList.add("col-6");
-
+	
 				// create label
 				let labelEl = document.createElement("label"),
 					labelText = isRequired ? label + " *" : label,
@@ -91,9 +105,9 @@ const forms = {
 				labelEl.appendChild(labelTextNode);
 				labelEl.setAttribute("for", uniqueName);
 				innerEl.appendChild(labelEl);
-
+	
 				// create input and add relevant classes and attributes
-				let type =
+				let type: FieldType =
 						fieldType === "select" || fieldType === "textarea"
 							? fieldType
 							: "input",
@@ -105,41 +119,42 @@ const forms = {
 				if (type === "input") inputEl.setAttribute("type", fieldType);
 				if (fieldType === "number") inputEl.setAttribute("step", "0.01");
 				if (isRequired) inputEl.required = true;
-				if (readOnly) inputEl.setAttribute("readonly", true);
-
-				if (fieldType === "datalist")
-					inputEl.setAttribute("list", name + "List");
-				if (fieldType === "select") addDatalistOptions(inputEl, values);
-
+				if (readOnly) inputEl.setAttribute("readonly", "true");
+	
+				if (fieldType === "datalist") inputEl.setAttribute("list", name + "List");
+				if (fieldType === "select") addDatalistOptions(inputEl as HTMLSelectElement, values);
+	
 				innerEl.appendChild(inputEl);
-
-				if (fieldType === "datalist") {
+	
+				if (fieldType === "datalist")
 					innerEl.appendChild(constructDataList(rowFieldData[k]));
-				}
 				if (fieldType === "hidden") innerEl.classList.add("d-none");
-
+	
 				containerEl.appendChild(innerEl);
 			}
-
+	
 			return containerEl;
 		};
-
-		const addClasses = (ele, classArr) => {
+	
+		const addClasses = (ele: HTMLElement, classArr: FormFieldClass) => {
 			for (let q = 0; q < classArr.length; q++) {
 				ele.classList.add(classArr[q]);
 			}
 			return ele;
 		};
-
-		const constructDataList = ({ name, values }) => {
+	
+		const constructDataList = ({ name, values }: NewField): Node => {
 			let dl = document.createElement("datalist");
-
+	
 			dl.setAttribute("id", name + "List");
-
-			return addDatalistOptions(dl, values);
+	
+			return addDatalistOptions(dl, values) as Node;
 		};
-
-		const addDatalistOptions = (housingEl, values) => {
+	
+		const addDatalistOptions = (
+			housingEl: HTMLDataListElement | HTMLSelectElement,
+			values: (string | number)[] | undefined
+		) => {
 			if (!values) return;
 			let option, text;
 			for (let l = 0; l < values.length; l++) {
@@ -151,22 +166,26 @@ const forms = {
 			}
 			return housingEl;
 		};
-
-		const constructButtonCol = (btnText, btnType, btnClassArr) => {
+	
+		const constructButtonCol = (
+			btnText: string,
+			btnType: string,
+			btnClassArr: string[]
+		) => {
 			let col = document.createElement("div"),
 				btn = document.createElement("button"),
 				classArr = ["btn", "d-inline", "btn-block"];
-
+	
 			addClasses(col, ["col-2", "p-0", "pl-3"]);
 			btnClassArr.forEach((classItem) => classArr.push(classItem));
 			addClasses(btn, classArr);
 			btn.setAttribute("type", btnType);
 			btn.appendChild(document.createTextNode(btnText));
 			col.appendChild(btn);
-
+	
 			return col;
 		};
-
+	
 		if (formName === "staff") {
 			// constructStaffForm(data["staff"]);
 		} else {
