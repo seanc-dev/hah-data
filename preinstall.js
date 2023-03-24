@@ -1,3 +1,10 @@
-const   fs = require("fs");
+import fs from "fs";
 
-fs.writeFileSync("./" + process.env.GOOGLE_CREDENTIALS_LOCATION, process.env.GOOGLE_CONFIG);
+import dotenv from "dotenv";
+
+dotenv.config();
+
+fs.writeFileSync(
+	"./" + process.env.GOOGLE_CREDENTIALS_LOCATION,
+	process.env.GOOGLE_CONFIG
+);
