@@ -1,4 +1,22 @@
-import { FormName, NewFormsObject, OrgName } from "../../lib/form-field-logic/types.ts";
+// import axios from "axios";
+import moment from "./moment";
+
+import {
+	FieldType,
+	FormFieldClass,
+	FormName,
+	NewField,
+	NewFormDetail,
+	NewFormsObject,
+	Section,
+} from "../../lib/form-field-logic/types.js";
+import {
+	AccountName,
+	ClientDetailConcat,
+	Dimension,
+	ExtendedDocument,
+	OrgShortName,
+} from "../types/types.js";
 import {
 	initSpinner,
 	endSpinner,
@@ -8,80 +26,81 @@ import {
 	revealStatusMessage,
 } from "./library.js";
 
+const eDocument = document as unknown as ExtendedDocument;
+
 const forms = {
-	export const constructForms = (
-		orgName: OrgName,
+	constructForms: (
+		orgName: OrgShortName,
 		formName: FormName,
 		data: NewFormsObject
 	) => {
 		const constructClientOrJobForm = (
-			orgName: OrgName,
+			orgName: OrgShortName,
 			formName: Omit<FormName, "staff">,
 			data: NewFormDetail
 		) => {
 			const formEle = document.getElementById(formName + "Form");
 			const { restfulName, sections } = data;
-	
+
 			if (!formEle) return;
-	
+
 			// set form attributes
 			formEle.setAttribute("method", "POST");
 			formEle.setAttribute("action", "/" + orgName + "/" + restfulName);
-	
+
 			// loop through sections and build them
 			sections.forEach((section) => {
 				formEle.appendChild(constructSection(formName, section));
 			});
-	
+
 			// create buttons fieldset
-			let buttonsFieldset = document.createElement("fieldset");
+			const buttonsFieldset = document.createElement("fieldset");
 			buttonsFieldset.classList.add("border-0");
 			buttonsFieldset.classList.add("d-flex");
-			let row = document.createElement("div");
+			const row = document.createElement("div");
 			addClasses(row, ["row", "justify-content-end"]);
-	
+
 			// append buttons to fieldset
 			// row.appendChild(constructButtonCol('Clear', 'button', ['btn-outline-secondary']));
 			row.appendChild(
 				constructButtonCol("Submit", "submit", ["btn-secondary", "form-submit"])
 			);
-	
+
 			// append row to buttons fieldset
 			buttonsFieldset.appendChild(row);
-	
+
 			// append button fieldset to form
 			formEle.appendChild(buttonsFieldset);
 		};
-	
+
 		const constructSection = (
 			formName: Omit<FormName, "staff">,
 			{ sectionTitle, rows }: Section
 		) => {
 			const fieldsetEl = document.createElement("fieldset");
 			const legendEl = document.createElement("legend");
-			let legendText = document.createTextNode(sectionTitle);
-	
+			const legendText = document.createTextNode(sectionTitle);
+
 			fieldsetEl.classList.add("form-group");
 			fieldsetEl.appendChild(legendEl);
 			legendEl.appendChild(legendText);
-	
+
 			for (let j = 0; j < rows.length; j++) {
 				fieldsetEl.appendChild(constructRow(formName, rows[j]));
 			}
-	
+
 			return fieldsetEl;
 		};
-	
+
 		const constructRow = (
 			formName: Omit<FormName, "staff">,
 			rowFieldData: NewField[]
 		) => {
 			// create container element
 			const containerEl = document.createElement("div");
-			let innerEl: HTMLDivElement;
-	
+
 			containerEl.classList.add("row");
-	
+
 			// loop through array of fields to include in row
 			for (let k = 0; k < rowFieldData.length; k++) {
 				const {
@@ -92,22 +111,22 @@ const forms = {
 					values,
 					properties: { isRequired, readOnly, excludeOnSubmit },
 				} = rowFieldData[k];
-				let uniqueName = formName + "-" + name;
-	
+				const uniqueName = formName + "-" + name;
+
 				// create column element
-				innerEl = document.createElement("div");
+				const innerEl = document.createElement("div");
 				innerEl.classList.add("col-6");
-	
+
 				// create label
-				let labelEl = document.createElement("label"),
-					labelText = isRequired ? label + " *" : label,
-					labelTextNode = document.createTextNode(labelText);
+				const labelEl = document.createElement("label");
+				const labelText = isRequired ? label + " *" : label;
+				const labelTextNode = document.createTextNode(labelText);
 				labelEl.appendChild(labelTextNode);
 				labelEl.setAttribute("for", uniqueName);
 				innerEl.appendChild(labelEl);
-	
+
 				// create input and add relevant classes and attributes
-				let type: FieldType =
+				const type: FieldType =
 						fieldType === "select" || fieldType === "textarea"
 							? fieldType
 							: "input",
@@ -120,72 +139,73 @@ const forms = {
 				if (fieldType === "number") inputEl.setAttribute("step", "0.01");
 				if (isRequired) inputEl.required = true;
 				if (readOnly) inputEl.setAttribute("readonly", "true");
-	
-				if (fieldType === "datalist") inputEl.setAttribute("list", name + "List");
-				if (fieldType === "select") addDatalistOptions(inputEl as HTMLSelectElement, values);
-	
+
+				if (fieldType === "datalist")
+					inputEl.setAttribute("list", name + "List");
+				if (fieldType === "select")
+					addDatalistOptions(inputEl as HTMLSelectElement, values);
+
 				innerEl.appendChild(inputEl);
-	
+
 				if (fieldType === "datalist")
 					innerEl.appendChild(constructDataList(rowFieldData[k]));
 				if (fieldType === "hidden") innerEl.classList.add("d-none");
-	
+
 				containerEl.appendChild(innerEl);
 			}
-	
+
 			return containerEl;
 		};
-	
+
 		const addClasses = (ele: HTMLElement, classArr: FormFieldClass) => {
 			for (let q = 0; q < classArr.length; q++) {
 				ele.classList.add(classArr[q]);
 			}
 			return ele;
 		};
-	
+
 		const constructDataList = ({ name, values }: NewField): Node => {
-			let dl = document.createElement("datalist");
-	
+			const dl = document.createElement("datalist");
+
 			dl.setAttribute("id", name + "List");
-	
+
 			return addDatalistOptions(dl, values) as Node;
 		};
-	
+
 		const addDatalistOptions = (
 			housingEl: HTMLDataListElement | HTMLSelectElement,
 			values: (string | number)[] | undefined
 		) => {
 			if (!values) return;
-			let option, text;
 			for (let l = 0; l < values.length; l++) {
-				option = document.createElement("option");
+				const option = document.createElement("option");
 				option.setAttribute("value", `${values[l]}`);
-				text = document.createTextNode(`${values[l]}`);
+				const text = document.createTextNode(`${values[l]}`);
 				option.appendChild(text);
 				housingEl.appendChild(option);
 			}
 			return housingEl;
 		};
-	
+
 		const constructButtonCol = (
 			btnText: string,
 			btnType: string,
 			btnClassArr: string[]
 		) => {
-			let col = document.createElement("div"),
-				btn = document.createElement("button"),
-				classArr = ["btn", "d-inline", "btn-block"];
-	
+			const col = document.createElement("div");
+			const btn = document.createElement("button");
+			const classArr = ["btn", "d-inline", "btn-block"];
+
 			addClasses(col, ["col-2", "p-0", "pl-3"]);
 			btnClassArr.forEach((classItem) => classArr.push(classItem));
 			addClasses(btn, classArr);
 			btn.setAttribute("type", btnType);
 			btn.appendChild(document.createTextNode(btnText));
 			col.appendChild(btn);
-	
+
 			return col;
 		};
-	
+
 		if (formName === "staff") {
 			// constructStaffForm(data["staff"]);
 		} else {
@@ -194,8 +214,8 @@ const forms = {
 	},
 
 	initAutocomplete: function () {
-		function initAddy(fields) {
-			let addyComplete = new AddyComplete(
+		const initAddy = (fields: { [key: string]: string }) => {
+			const addyComplete = new AddyComplete(
 				document.getElementById(fields.searchField)
 			);
 
@@ -206,7 +226,7 @@ const forms = {
 				city: document.getElementById(fields.city),
 				postcode: document.getElementById(fields.postcode),
 			};
-		}
+		};
 
 		initAddy({
 			searchField: "clientDetails-billingAddressStreet",
@@ -228,14 +248,14 @@ const forms = {
 		});
 	},
 
-	retrieveClientAddress: function (accountName) {
-		let clientObj = document.appData.clientDetail.find((val) => {
+	retrieveClientAddress: function (accountName: AccountName) {
+		const clientObj = eDocument.appData.clientDetail.find((val) => {
 			return val.accountName === accountName;
-		});
+		})!;
 
 		return axios.get(
 			"/" +
-				document.appData.businessName +
+				eDocument.appData.businessName +
 				"/clients?requestType=address&clientId=" +
 				(Number(clientObj.clientId) + 1)
 		);
@@ -245,12 +265,16 @@ const forms = {
 		doWork("client");
 		doWork("job");
 
-		async function doWork(dim) {
+		async function doWork(dim: Dimension) {
 			// retrieve keys for dimension's db record
 			let result;
 			try {
 				result = await axios.get(
-					"/" + document.appData.businessName + "/" + dim + "s?requestType=keys"
+					"/" +
+						eDocument.appData.businessName +
+						"/" +
+						dim +
+						"s?requestType=keys"
 				);
 			} catch (err) {
 				console.error(
@@ -263,35 +287,35 @@ const forms = {
 			console.log(result);
 
 			// define vars
-			let $viewFieldset = $("#" + dim + "ViewFormBody fieldset");
-			let fieldLabels = result.data.fieldLabels;
-			let fieldNames = result.data.fieldNames;
+			const $viewFieldset = $("#" + dim + "ViewFormBody fieldset");
+			const fieldLabels = result.data.fieldLabels;
+			const fieldNames = result.data.fieldNames;
 
 			// loop through keys and create element tree, then apply key to first el
 			for (let i = 0; i < fieldLabels.length; i++) {
 				// create row
-				let row = createEl("div", ["row"]);
+				const row = createEl("div", ["row"]);
 				$viewFieldset[0].appendChild(row);
 
 				// create column to hold field label
-				let col = createEl("div", ["col-3", "form-view-text-sm"]);
+				const col = createEl("div", ["col-3", "form-view-text-sm"]);
 				col.appendChild(
 					document.createTextNode(capitaliseWords(fieldLabels[i]) + ":")
 				);
 				row.appendChild(col);
 
 				// create column to hold value
-				let col2 = createEl("div", ["col-9", "form-view-text-lg"]);
+				const col2 = createEl("div", ["col-9", "form-view-text-lg"]);
 				row.appendChild(col2);
-				let input = createEl("input", ["form-control"]);
+				const input = createEl("input", ["form-control"]);
 				input.setAttribute("type", "text");
 				input.setAttribute("name", fieldNames[i]);
-				input.setAttribute("readonly", true);
+				input.setAttribute("readonly", "true");
 				col2.appendChild(input);
 			}
 
-			function createEl(elType, classes) {
-				let el = document.createElement(elType);
+			function createEl(elType: string, classes: string[]) {
+				const el = document.createElement(elType);
 				for (let i = 0; i < classes.length; i++) {
 					el.classList.add(classes[i]);
 				}
@@ -301,14 +325,14 @@ const forms = {
 	},
 
 	setClientDetails: function () {
-		let clientDetail = document.appData.clientDetail;
+		const clientDetail = eDocument.appData.clientDetail;
 
 		// set values in account name list
-		let $accountNameDatalist = $("#accountNameList");
+		const $accountNameDatalist = $("#accountNameList");
 		$accountNameDatalist.empty();
 
 		for (let i = 0; i < clientDetail.length; i++) {
-			let optionNode = appendOptionNode(
+			const optionNode = appendOptionNode(
 				$accountNameDatalist[0],
 				clientDetail[i].accountName
 			);
@@ -319,20 +343,14 @@ const forms = {
 
 		// set options in client select drop-down //
 		// find field and empty
-		let $clientDetailsDatalist = $("#clientDetailsList");
+		const $clientDetailsDatalist = $("#clientDetailsList");
 		$clientDetailsDatalist.empty();
 
 		// create datalist options
 		for (let i = 0; i < clientDetail.length; i++) {
-			let concat =
-				"Account: " +
-				clientDetail[i].accountName +
-				", Billing Address: " +
-				clientDetail[i].billingAddressStreet +
-				", " +
-				clientDetail[i].billingAddressSuburb;
+			const concat: ClientDetailConcat = `Account: ${clientDetail[i].accountName}, Billing Address: ${clientDetail[i].billingAddressStreet}, clientDetail[i].billingAddressSuburb`;
 
-			document.appData.clientDetail[i].concat = concat;
+			eDocument.appData.clientDetail[i].concat = concat;
 
 			// create new option node, append to record select datalist, and set data-key as clientId
 			appendOptionNode($clientDetailsDatalist[0], concat).setAttribute(
@@ -343,18 +361,18 @@ const forms = {
 	},
 
 	setJobDetails: function () {
-		let jobDetail = document.appData.jobDetail;
+		const jobDetail = eDocument.appData.jobDetail;
 
 		// find field and empty
-		let $jobDetailDatalist = $("#jobDetailsList");
+		const $jobDetailDatalist = $("#jobDetailsList");
 		$jobDetailDatalist.empty();
 
 		// create datalist options from
 		for (let i = 0; i < jobDetail.length; i++) {
-			let formattedDate = moment(jobDetail[i].dateInvoiceSent)
+			const formattedDate = moment(jobDetail[i].dateInvoiceSent)
 				.tz("Pacific/Auckland")
 				.format("D/M/YYYY");
-			document.appData.jobDetail[i].dateInvoiceSent = formattedDate;
+			eDocument.appData.jobDetail[i].dateInvoiceSent = formattedDate;
 
 			let concat =
 				"Account: " +
@@ -364,7 +382,7 @@ const forms = {
 				", Amount Invoiced: " +
 				nzdCurrencyFormat(jobDetail[i].amountInvoiced);
 
-			document.appData.jobDetail[i].concat = concat;
+			eDocument.appData.jobDetail[i].concat = concat;
 
 			// create new option node, append to record select datalist, and set data-key as jobId
 			appendOptionNode($jobDetailDatalist[0], concat).setAttribute(
@@ -374,17 +392,19 @@ const forms = {
 		}
 	},
 
-	submitFormFlow: async function (form, formName, statusDiv) {
+	submitFormFlow: async function (
+		form: JQuery<HTMLFormElement>,
+		formName: FormName
+	) {
 		initSpinner();
 
-		const formAction = form
+		const formAction = `${form
 			.closest(".form-content")
 			.find(".form-type-select")
-			.val()
-			.toLowerCase();
+			.val()}`.toLowerCase();
 
 		// pull out and transform form data
-		const formData = form.serializeArray().reduce(function (obj, val) {
+		const formData = form.serializeArray().reduce((obj, val) => {
 			if (val.name === "dateInvoiceSent") console.log(moment(val.value));
 			if (moment(val.value, "YYYY-MM-DD", true).isValid()) {
 				val.value = moment(val.value).format("YYYY-MM-DDTHH:mm:ss.SSSSZ");
@@ -392,7 +412,7 @@ const forms = {
 			obj[val.name] = val.value;
 			if (!val.value) obj[val.name] = null;
 			return obj;
-		}, {});
+		}, {} as { [key: string]: string | null });
 
 		let newId;
 
@@ -400,7 +420,7 @@ const forms = {
 			try {
 				let result = await axios.post(
 					"/" +
-						document.appData.businessName +
+						eDocument.appData.businessName +
 						"/" +
 						form[0].dataset.name +
 						"s",
@@ -410,35 +430,35 @@ const forms = {
 			} catch (err) {
 				registerSubmitError(err);
 			}
-			if (formName === "Client")
+			if (formName === "client")
 				appendNewObj(
 					"client",
 					["accountName", "billingAddressStreet", "billingAddressSuburb"],
 					newId
 				);
-			if (formName === "Job")
+			if (formName === "job")
 				appendNewObj(
 					"job",
 					["clientId", "accountName", "dateInvoiceSent", "amountInvoiced"],
 					newId
 				);
 
-			function appendNewObj(dim, arr, id) {
-				let obj = {};
+			function appendNewObj(dim: Dimension, arr: string[], id: number) {
+				let obj: { [key: string]: string | number } = {};
 				// build object of values (id and arr vals)
 				// add dimension id from returned id value
 				obj[dim + "Id"] = id;
 				// loop through array of field names, update values, add them to object
 				for (let i = 0; i < arr.length; i++) {
 					let val = form.find("#" + dim + "Details-" + arr[i]).val();
-					if (isFinite(val)) val = Number(val);
+					if (val && isNaN(Number(val))) val = Number(val);
 					if (arr[i] === "dateInvoiceSent") {
 						val = moment(val).format("D/M/YYYY");
 					}
 					obj[arr[i]] = val;
 				}
 				// push into relevant appData array
-				document.appData[dim + "Detail"].push(obj);
+				eDocument.appData[dim + "Detail"].push(obj);
 
 				// if new client created, append new option node to datalist for job details account name field
 				if (dim === "client")
@@ -451,7 +471,7 @@ const forms = {
 			try {
 				await axios.put(
 					"/" +
-						document.appData.businessName +
+						eDocument.appData.businessName +
 						"/" +
 						form[0].dataset.name +
 						"s/" +
@@ -478,10 +498,10 @@ const forms = {
 				]);
 
 			function updateObj(searchKey, updateDim, arr) {
-				// this function updates the data objects held in arrays in document.appData[* + Details]
+				// this function updates the data objects held in arrays in eDocument.appData[* + Details]
 
 				// 1. find objects in relevant appData array with search key
-				let objArr = document.appData[updateDim + "Detail"].filter((val) => {
+				let objArr = eDocument.appData[updateDim + "Detail"].filter((val) => {
 					return val[searchKey] == formData[searchKey];
 				});
 
@@ -560,8 +580,8 @@ const forms = {
 			accountName = $jobDetailsForm.find("#jobDetails-accountName").val(),
 			accountNameVals = [];
 
-		for (let i = 0; i < document.appData.clientDetail.length; i++) {
-			accountNameVals.push(document.appData.clientDetail[i].accountName);
+		for (let i = 0; i < eDocument.appData.clientDetail.length; i++) {
+			accountNameVals.push(eDocument.appData.clientDetail[i].accountName);
 		}
 		if (!accountNameVals.includes(accountName))
 			return "Please ensure Account Name is a valid option from the drop-down list. It must have already been created using the Client Details form.";
