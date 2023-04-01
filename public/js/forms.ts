@@ -9,14 +9,16 @@ import {
 	NewFormDetail,
 	NewFormsObject,
 	Section,
-} from "../../lib/form-field-logic/types.js";
+} from "../lib/form-field-logic/types.js";
 import {
 	AccountName,
 	ClientDetailConcat,
+	ClientDetailShort,
 	Dimension,
 	ExtendedDocument,
+	JobDetailShort,
 	OrgShortName,
-} from "../types/types.js";
+} from "./types/types.js";
 import {
 	initSpinner,
 	endSpinner,
@@ -25,6 +27,7 @@ import {
 	appendOptionNode,
 	revealStatusMessage,
 } from "./library.js";
+import { isDate } from "util/types";
 
 const eDocument = document as unknown as ExtendedDocument;
 
@@ -215,6 +218,7 @@ const forms = {
 
 	initAutocomplete: function () {
 		const initAddy = (fields: { [key: string]: string }) => {
+			// @ts-ignore
 			const addyComplete = new AddyComplete(
 				document.getElementById(fields.searchField)
 			);
@@ -249,10 +253,11 @@ const forms = {
 	},
 
 	retrieveClientAddress: function (accountName: AccountName) {
-		const clientObj = eDocument.appData.clientDetail.find((val) => {
+		const clientObj = eDocument.appData.clientDetail?.find((val) => {
 			return val.accountName === accountName;
 		})!;
 
+		// @ts-ignore
 		return axios.get(
 			"/" +
 				eDocument.appData.businessName +
@@ -269,6 +274,7 @@ const forms = {
 			// retrieve keys for dimension's db record
 			let result;
 			try {
+				// @ts-ignore
 				result = await axios.get(
 					"/" +
 						eDocument.appData.businessName +
@@ -331,13 +337,13 @@ const forms = {
 		const $accountNameDatalist = $("#accountNameList");
 		$accountNameDatalist.empty();
 
-		for (let i = 0; i < clientDetail.length; i++) {
+		for (let i = 0; i < clientDetail?.length; i++) {
 			const optionNode = appendOptionNode(
 				$accountNameDatalist[0],
-				clientDetail[i].accountName
+				`${clientDetail[i].accountName}`
 			);
 			optionNode.appendChild(
-				document.createTextNode(clientDetail[i].accountName)
+				document.createTextNode(`${clientDetail[i].accountName}`)
 			);
 		}
 
@@ -355,7 +361,7 @@ const forms = {
 			// create new option node, append to record select datalist, and set data-key as clientId
 			appendOptionNode($clientDetailsDatalist[0], concat).setAttribute(
 				"data-key",
-				clientDetail[i].clientId
+				`${clientDetail[i].clientId}`
 			);
 		}
 	},
@@ -380,14 +386,14 @@ const forms = {
 				", Date Invoice Sent: " +
 				formattedDate +
 				", Amount Invoiced: " +
-				nzdCurrencyFormat(jobDetail[i].amountInvoiced);
+				nzdCurrencyFormat(Number(jobDetail[i].amountInvoiced));
 
 			eDocument.appData.jobDetail[i].concat = concat;
 
 			// create new option node, append to record select datalist, and set data-key as jobId
 			appendOptionNode($jobDetailDatalist[0], concat).setAttribute(
 				"data-key",
-				jobDetail[i].jobId
+				`${jobDetail[i].jobId}`
 			);
 		}
 	},
@@ -418,6 +424,7 @@ const forms = {
 
 		if (formAction === "new") {
 			try {
+				// @ts-ignore
 				let result = await axios.post(
 					"/" +
 						eDocument.appData.businessName +
@@ -444,7 +451,7 @@ const forms = {
 				);
 
 			function appendNewObj(dim: Dimension, arr: string[], id: number) {
-				let obj: { [key: string]: string | number } = {};
+				const obj = {} as ClientDetailShort | JobDetailShort;
 				// build object of values (id and arr vals)
 				// add dimension id from returned id value
 				obj[dim + "Id"] = id;
@@ -455,20 +462,23 @@ const forms = {
 					if (arr[i] === "dateInvoiceSent") {
 						val = moment(val).format("D/M/YYYY");
 					}
+					if (!val) continue;
 					obj[arr[i]] = val;
 				}
 				// push into relevant appData array
-				eDocument.appData[dim + "Detail"].push(obj);
+				if (dim === "client") eDocument.appData.clientDetail.push(obj);
+				if (dim === "job") eDocument.appData.jobDetail.push(obj);
 
 				// if new client created, append new option node to datalist for job details account name field
 				if (dim === "client")
 					appendOptionNode(
-						document.getElementById("accountNameList"),
-						obj.accountName
+						document.getElementById("accountNameList")!,
+						obj.accountName as AccountName
 					);
 			}
 		} else if (formAction === "edit") {
 			try {
+				// @ts-ignore
 				await axios.put(
 					"/" +
 						eDocument.appData.businessName +
@@ -482,43 +492,46 @@ const forms = {
 				registerSubmitError(err);
 			}
 
-			if (formName === "Client") {
-				updateObj("clientId", "client", [
-					"accountName",
-					"billingAddressStreet",
-					"billingAddressSuburb",
-				]);
-				updateObj("clientId", "job", ["accountName"]);
-			}
-			if (formName === "Job")
-				updateObj("jobId", "job", [
-					"accountName",
-					"dateInvoiceSent",
-					"amountInvoiced",
-				]);
+			// if (formName === "client") {
+			// 	updateObj("clientId", "client", [
+			// 		"accountName",
+			// 		"billingAddressStreet",
+			// 		"billingAddressSuburb",
+			// 	]);
+			// 	updateObj("clientId", "job", ["accountName"]);
+			// }
+			// if (formName === "job")
+			// 	updateObj("jobId", "job", [
+			// 		"accountName",
+			// 		"dateInvoiceSent",
+			// 		"amountInvoiced",
+			// 	]);
 
-			function updateObj(searchKey, updateDim, arr) {
-				// this function updates the data objects held in arrays in eDocument.appData[* + Details]
+			// function updateObj(searchKey: string, updateDim: Dimension, arr) {
+			// 	// this function updates the data objects held in arrays in eDocument.appData[* + Details]
 
-				// 1. find objects in relevant appData array with search key
-				let objArr = eDocument.appData[updateDim + "Detail"].filter((val) => {
-					return val[searchKey] == formData[searchKey];
-				});
+			// 	// 1. find objects in relevant appData array with search key
+			// 	const dimObj = updateDim === 'client' ? eDocument.appData.clientDetail : updateDim === 'job' ? eDocument.appData.jobDetail : undefined
+			// 	let objArr = dimObj?.filter((val) => {
+			// 		return val[searchKey] == formData[searchKey];
+			// 	});
 
-				// 2. loop through array of objects
-				objArr.forEach((obj) => {
-					// a. update values
-					arr.reduce((acc, val) => {
-						acc[val] = formData[val];
-						return acc;
-					}, obj);
-				});
+			// 	if (!objArr) return
 
-				return objArr;
-			}
+			// 	// 2. loop through array of objects
+			// 	objArr.forEach((obj) => {
+			// 		// a. update values
+			// 		arr.reduce((acc, val) => {
+			// 			acc[val] = formData[val];
+			// 			return acc;
+			// 		}, obj);
+			// 	});
+
+			// 	return objArr;
+			// }
 		}
 
-		function registerSubmitError(err) {
+		function registerSubmitError(err: any) {
 			let v = formAction === "new" ? "created" : "updated";
 			revealStatusMessage(
 				formName,
@@ -541,11 +554,11 @@ const forms = {
 				" record successfully " +
 				v +
 				".";
-		revealStatusMessage(form.attr("data-name"), "success", "Success", message);
+		revealStatusMessage(formName, "success", "Success", message);
 
 		// clear form
 		form[0].reset();
-		if (formName === "Job") form.find("#jobDetails-billingAddress").val("");
+		if (formName === "job") form.find("#jobDetails-billingAddress").val("");
 
 		endSpinner();
 	},
@@ -583,11 +596,11 @@ const forms = {
 		for (let i = 0; i < eDocument.appData.clientDetail.length; i++) {
 			accountNameVals.push(eDocument.appData.clientDetail[i].accountName);
 		}
-		if (!accountNameVals.includes(accountName))
+		if (accountName && !accountNameVals.includes(accountName))
 			return "Please ensure Account Name is a valid option from the drop-down list. It must have already been created using the Client Details form.";
 
 		// check if dates entered
-		let $dateFields = $jobDetailsForm.find('input[type="date"]'),
+		const $dateFields = $jobDetailsForm.find('input[type="date"]'),
 			cd = new Date(),
 			tenYearsBack = new Date(
 				cd.getFullYear() - 10,
@@ -596,20 +609,20 @@ const forms = {
 			);
 
 		for (let i = 0; i < $dateFields.length; i++) {
-			let dateVal = new Date($($dateFields[i]).val());
+			const $dateVal = $($dateFields[i]).val();
+			if (!$dateVal || Array.isArray($dateVal)) continue;
+			const dateObj = new Date($dateVal);
 
-			if (
-				dateVal !== "Invalid Date" &&
-				(dateVal > cd || dateVal < tenYearsBack)
-			)
+			if (isDate(dateObj) && (dateObj > cd || dateObj < tenYearsBack))
 				return "Please ensure all entered dates are in the past within the last 10 years.";
 		}
 
 		// check to ensure at least 1 hour of work has been entered
 		let sum = 0;
-		$jobDetailsForm
-			.find(".staff-hours")
-			.each((i, field) => (sum += $(field).val()));
+		$jobDetailsForm.find(".staff-hours").each((i, staffField) => {
+			const value = $(staffField).val();
+			if (value && !Array.isArray(value)) sum += Number(value);
+		});
 
 		if (sum == 0)
 			return "Please ensure the total of hours entered for this job is greater than zero.";

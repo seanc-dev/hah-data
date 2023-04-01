@@ -1,3 +1,12 @@
+import axios, { AxiosResponse } from "axios";
+import moment from "./moment";
+
+import { FormName } from "../../lib/form-field-logic/types.js";
+import {
+	ClientDetailShort,
+	ExtendedDocument,
+	JobDetailShort,
+} from "../types/types.js";
 import forms from "./forms.js";
 import {
 	initSpinner,
@@ -22,11 +31,10 @@ const handlers = {
 			.find(".account-name")
 			.on("input", function (e) {
 				if (
-					$(this)
+					`${$(this)
 						.closest(".form-content")
 						.find(".form-type-select")
-						.val()
-						.toLowerCase() === "new"
+						.val()}`.toLowerCase() === "new"
 				) {
 					let value = getAccountNameValue(),
 						reg = /\b(\w*undefined\w*)\b/g;
@@ -50,11 +58,9 @@ const handlers = {
 		$(".form-submit").click(function (e) {
 			e.preventDefault();
 
-			let $form = $(this).closest("form");
-			let formType =
-				$form[0].dataset.name.charAt(0).toUpperCase() +
-				$form[0].dataset.name.slice(1);
-			let $statusDiv = $form.closest(".form-content").find(".status-message");
+			let $form = $(this).closest("form") as JQuery<HTMLFormElement>;
+			if (!$form[0].dataset.name) return;
+			let formType = $form[0].dataset.name as FormName;
 
 			$(this)
 				.closest(".form-content")
@@ -65,8 +71,8 @@ const handlers = {
 
 			let validation;
 
-			if (formType === "Client") validation = forms.validateClientForm();
-			if (formType === "Job") validation = forms.validateJobForm();
+			if (formType === "client") validation = forms.validateClientForm();
+			if (formType === "job") validation = forms.validateJobForm();
 
 			// check default validity. If fails, report validity
 			if ($form[0].checkValidity()) {
@@ -107,6 +113,54 @@ const handlers = {
 
 	handlerFormTypeSelect: function () {
 		$(".form-type-select").change(function (e) {
+			let toggleRecordSelectVisibility = function (bool: boolean) {
+				if (bool) {
+					$formRecordSelect.removeClass("d-none");
+				} else {
+					$formRecordSelect.addClass("d-none");
+				}
+			};
+
+			function toggleFormVisibility(bool: boolean) {
+				if (bool) {
+					$form.removeClass("d-none");
+					$recordView.addClass("d-none");
+				} else {
+					$form.addClass("d-none");
+					$recordView.removeClass("d-none");
+				}
+			}
+
+			function toggleReadOnly(bool: boolean) {
+				$formInputs.attr("readonly", `${bool}`);
+				let readOnlyFieldName =
+					dim === "client"
+						? "clientDetails-accountName"
+						: "jobDetails-billingAddress";
+				$form.find("#" + readOnlyFieldName).attr("readonly", "true");
+			}
+
+			function revealPopUp() {
+				revealStatusMessage(
+					dim,
+					"info",
+					false,
+					"Select a " + dim + " to " + formType.toLowerCase()
+				);
+			}
+
+			function toggleDeleteButton(bool: boolean) {
+				let el = $formBody.find(".delete-btn").closest("fieldset");
+				if (bool) {
+					el.removeClass("d-none");
+					el.addClass("d-flex");
+				} else {
+					el.addClass("d-none");
+					el.removeClass("d-flex");
+				}
+			}
+
+			// @ts-ignore
 			let formType = this.value;
 			let $formBody = $(this).closest(".card").find(".form-body");
 			let $form = $formBody.find("form");
@@ -138,14 +192,17 @@ const handlers = {
 				if (dim === "job") $("#jobDetails-billingAddress").val("");
 
 				// Remove info popup
-				$("#" + dim + "DetailsForm")
-					.closest(".form-content")
-					.find(".status-message")
-					.alert("close");
+				(
+					$("#" + dim + "DetailsForm")
+						.closest(".form-content")
+						.find(".status-message") as any
+				).alert("close");
 
 				// ensure accountType field is required
 				if (dim === "client") {
-					let $accTypeField = $("#clientDetails-accountType");
+					let $accTypeField = $(
+						"#clientDetails-accountType"
+					) as JQuery<HTMLSelectElement>;
 					$accTypeField[0].required = true;
 					$accTypeField.closest(".col-6").find("label").text("Account Type *");
 				}
@@ -176,11 +233,13 @@ const handlers = {
 				toggleReadOnly(false);
 
 				// set accountName as readonly=true
-				$('input[name="accountName"]').attr("readonly", true);
+				$('input[name="accountName"]').attr("readonly", "true");
 
 				// if dim === 'client' set accountType to non-required
 				if (dim === "client") {
-					let $accTypeField = $("#clientDetails-accountType");
+					let $accTypeField = $(
+						"#clientDetails-accountType"
+					) as JQuery<HTMLSelectElement>;
 					$accTypeField[0].required = false;
 					$accTypeField.closest(".col-6").find("label").text("Account Type");
 				}
@@ -197,53 +256,6 @@ const handlers = {
 				// reveal delete button
 				toggleDeleteButton(true);
 			}
-
-			function toggleRecordSelectVisibility(bool) {
-				if (bool) {
-					$formRecordSelect.removeClass("d-none");
-				} else {
-					$formRecordSelect.addClass("d-none");
-				}
-			}
-
-			function toggleFormVisibility(bool) {
-				if (bool) {
-					$form.removeClass("d-none");
-					$recordView.addClass("d-none");
-				} else {
-					$form.addClass("d-none");
-					$recordView.removeClass("d-none");
-				}
-			}
-
-			function toggleReadOnly(bool) {
-				$formInputs.attr("readonly", bool);
-				let readOnlyFieldName =
-					dim === "client"
-						? "clientDetails-accountName"
-						: "jobDetails-billingAddress";
-				$form.find("#" + readOnlyFieldName).attr("readonly", true);
-			}
-
-			function revealPopUp() {
-				revealStatusMessage(
-					dim,
-					"info",
-					false,
-					"Select a " + dim + " to " + formType.toLowerCase()
-				);
-			}
-
-			function toggleDeleteButton(bool) {
-				let el = $formBody.find(".delete-btn").closest("fieldset");
-				if (bool) {
-					el.removeClass("d-none");
-					el.addClass("d-flex");
-				} else {
-					el.addClass("d-none");
-					el.removeClass("d-flex");
-				}
-			}
 		});
 	},
 
@@ -251,23 +263,38 @@ const handlers = {
 		$(".form-record-select-div")
 			.find("input")
 			.change(function (e) {
-				let $contentEl = $(this).closest(".form-content");
-				let $defaultBody = $contentEl.find(".default-form-body");
-				let $viewBody = $contentEl.find(".form-view-body");
-				let dim = $contentEl.find("form").attr("data-name");
-				let str = $(this).val();
-				let id = document.appData[dim + "Detail"].find(
-					(obj) => str === obj.concat
-				)[dim + "Id"];
-				let formAction = $contentEl.find(".form-type-select").val();
+				const $contentEl = $(this).closest(
+					".form-content"
+				) as JQuery<HTMLDivElement>;
+				const $defaultBody = $contentEl.find(".default-form-body");
+				const $viewBody = $contentEl.find(".form-view-body");
+				const dim = $contentEl.find("form").attr("data-name");
+				const str = $(this).val();
+				const formDetailArray: ClientDetailShort[] | JobDetailShort[] =
+					dim === "client"
+						? (document as ExtendedDocument).appData.clientDetail
+						: (document as ExtendedDocument).appData.jobDetail;
+				if (!formDetailArray) return;
+				const currentRecord = formDetailArray.find(
+					(record) => record.concat === str
+				);
+				const id = currentRecord && currentRecord[dim + "Id"];
+				const formAction = $contentEl.find(".form-type-select").val();
 
-				$contentEl.find(".alert").alert("close");
+				($contentEl.find(".alert") as any).alert("close");
 
 				initSpinner();
 
 				axios
-					.get("/" + document.appData.businessName + "/" + dim + "s/" + id)
-					.then((result) => {
+					.get(
+						"/" +
+							(document as ExtendedDocument).appData.businessName +
+							"/" +
+							dim +
+							"s/" +
+							id
+					)
+					.then((result: AxiosResponse<any, any>) => {
 						console.log(`handleRecordSelectChange handler axios result`);
 						const { data } = result;
 						console.log(data);
@@ -286,7 +313,7 @@ const handlers = {
 									.format("D/M/YYYY");
 							}
 							$bodyEl.find('[name="' + key + '"]').val(data[key]);
-							$contentEl.find(".status-message .alert").alert("close");
+							($contentEl.find(".status-message .alert") as any).alert("close");
 						});
 
 						// set job address fields from document.appData.jobDetails
@@ -308,7 +335,7 @@ const handlers = {
 
 	handleDeleteBtnClick: function () {
 		$(".delete-btn").click(function (e) {
-			$("#deleteConfirmModal").modal({
+			($("#deleteConfirmModal") as any).modal({
 				backdrop: true,
 			});
 		});
@@ -328,7 +355,12 @@ const handlers = {
 
 			axios
 				.delete(
-					"/" + document.appData.businessName + "/" + formType + "s/" + id
+					"/" +
+						(document as ExtendedDocument).appData.businessName +
+						"/" +
+						formType +
+						"s/" +
+						id
 				)
 				.then((result) => {
 					// implement success message and clear fields

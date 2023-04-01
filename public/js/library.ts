@@ -1,10 +1,13 @@
-export const appendOptionNode = (parent, value) => {
+import axios from "axios";
+import { AccountName, Dimension, ExtendedDocument } from "./types/types";
+
+export const appendOptionNode = (parent: HTMLElement, value: string) => {
 	let option = document.createElement("option");
 	option.setAttribute("value", value);
 	return parent.appendChild(option);
 };
 
-export const capitaliseWords = (str) => {
+export const capitaliseWords = (str: string) => {
 	if (!str) return;
 	let wordsArr = str.split(" ");
 	for (let i = 0; i < wordsArr.length; i++) {
@@ -15,21 +18,20 @@ export const capitaliseWords = (str) => {
 };
 
 export const initialiseAppData = async () => {
+	const eDoc = document as ExtendedDocument;
 	let resultArr;
 	try {
 		// console.log(document.appData.businessName);
 		resultArr = await Promise.all([
 			// this retrieves the data required to construct the forms
-			axios.get("/" + document.appData.businessName + "/?data=true"),
+			axios.get("/" + eDoc.appData.businessName + "/?data=true"),
 			// this retrieves client client data
 			axios.get(
-				"/" +
-					document.appData.businessName +
-					"/clients?requestType=detailsArray"
+				"/" + eDoc.appData.businessName + "/clients?requestType=detailsArray"
 			),
 			// this retrieves job data
 			axios.get(
-				"/" + document.appData.businessName + "/jobs?requestType=detailsArray"
+				"/" + eDoc.appData.businessName + "/jobs?requestType=detailsArray"
 			),
 		]);
 	} catch (err) {
@@ -40,10 +42,10 @@ export const initialiseAppData = async () => {
 
 	const { formOptions, organisationId } = resultArr[0].data;
 
-	document.appData.formOptions = formOptions;
-	document.appData.organisationId = organisationId;
-	document.appData.clientDetail = resultArr[1].data;
-	document.appData.jobDetail = resultArr[2].data;
+	eDoc.appData.formOptions = formOptions;
+	eDoc.appData.organisationId = organisationId;
+	eDoc.appData.clientDetail = resultArr[1].data;
+	eDoc.appData.jobDetail = resultArr[2].data;
 
 	return true;
 };
@@ -56,12 +58,12 @@ export const getAccountNameValue = () => {
 	const secondaryLastEl = $("#clientDetails-secondaryContactLastName");
 	const businessNameEl = $("#clientDetails-businessName");
 
-	let accountTypeVal = capitaliseWords(accountTypeEl.val()),
-		businessNameVal = capitaliseWords(businessNameEl.val()),
-		mainFirstVal = capitaliseWords(mainFirstEl.val()),
-		mainLastVal = capitaliseWords(mainLastEl.val()),
-		secondaryFirstVal = capitaliseWords(secondaryFirstEl.val()),
-		secondaryLastVal = capitaliseWords(secondaryLastEl.val());
+	let accountTypeVal = capitaliseWords((accountTypeEl as any).val()),
+		businessNameVal = capitaliseWords((businessNameEl as any).val()),
+		mainFirstVal = capitaliseWords((mainFirstEl as any).val()),
+		mainLastVal = capitaliseWords((mainLastEl as any).val()),
+		secondaryFirstVal = capitaliseWords((secondaryFirstEl as any).val()),
+		secondaryLastVal = capitaliseWords((secondaryLastEl as any).val());
 
 	if (accountTypeVal === "Business") return businessNameVal;
 	if (accountTypeVal === "Individual") return mainLastVal + ", " + mainFirstVal;
@@ -82,20 +84,21 @@ export const getAccountNameValue = () => {
 	}
 };
 
-export const getClientObj = (accountName) => {
-	if (!document.appData.clientDetail)
+export const getClientObj = (accountName: AccountName) => {
+	const eDoc = document as ExtendedDocument;
+	if (!eDoc.appData.clientDetail)
 		return console.error("Cannot retrieve client data, please reload page");
 
-	let clientObj = document.appData.clientDetail.find((obj) => {
+	let clientObj = eDoc.appData.clientDetail.find((obj) => {
 		return obj.accountName === accountName;
 	});
 
-	if (clientObj === -1) clientObj = "No such account name";
+	if (!clientObj) return;
 
 	return clientObj;
 };
 
-export const googleDateNumberToGBFormat = (GS_date_num) => {
+export const googleDateNumberToGBFormat = (GS_date_num: number) => {
 	let GS_earliest_date = new Date(1899, 11, 30),
 		//GS_earliest_date gives negative time since it is before 1/1/1970
 		GS_date_in_ms = GS_date_num * 24 * 60 * 60 * 1000;
@@ -104,7 +107,7 @@ export const googleDateNumberToGBFormat = (GS_date_num) => {
 	);
 };
 
-export const nzdCurrencyFormat = (num) => {
+export const nzdCurrencyFormat = (num: number) => {
 	let nzdFormat = new Intl.NumberFormat("en-NZ", {
 		style: "currency",
 		currency: "NZD",
@@ -142,6 +145,7 @@ export const initSpinner = () => {
 	loadingOverlay.addClass("submit-loader");
 	let target = $("#loadingMessage");
 	target.empty();
+	// @ts-ignore
 	let spinner = new Spinner(opts).spin(target[0]);
 
 	loadingOverlay.removeClass("d-none");
@@ -153,17 +157,20 @@ export const endSpinner = () => {
 	$("#loadingOverlay").addClass("d-none");
 };
 
-export const removeClassesByRegexp = ($element, regexp) => {
+export const removeClassesByRegexp = (
+	$element: JQuery<HTMLElement>,
+	regexp: RegExp
+) => {
 	return $element.removeClass(function (index, className) {
 		return (className.match(regexp) || []).join(" ");
 	});
 };
 
 export const revealStatusMessage = (
-	dimension,
-	alertType,
-	alertTitle,
-	alertText
+	dimension: Dimension,
+	alertType: string,
+	alertTitle: string,
+	alertText: string
 ) => {
 	console.log("revealStatusMessage dimension");
 	console.log(dimension);
@@ -190,19 +197,23 @@ export const revealStatusMessage = (
 };
 
 export const setCreatedDate = () => {
-	let now = new Date();
-	now = now.toLocaleString("en-GB").replace(/,/g, "");
+	const now = new Date(Date.now());
+	const nowStr = now.toLocaleString("en-GB").replace(/,/g, "");
 
-	$('input[name="createdDateTimeNZT"]').val(now);
+	$('input[name="createdDateTimeNZT"]').val(nowStr);
 };
 
-export const setJobAddressFields = (accountNameVal) => {
-	let clientObj = getClientObj(accountNameVal);
+export const setJobAddressFields = (accountNameVal: AccountName) => {
+	const clientObj = getClientObj(accountNameVal);
 	console.log(clientObj);
-	let streetAddress = clientObj.billingAddressStreet;
-	let suburb = clientObj.billingAddressSuburb;
+	if (!clientObj) return console.error("No client object found");
+	const streetAddress = clientObj.billingAddressStreet;
+	const suburb = clientObj.billingAddressSuburb;
 
-	if (!streetAddress || streetAddress.length < 1) {
+	if (
+		!streetAddress ||
+		(Array.isArray(streetAddress) && streetAddress.length < 1)
+	) {
 		return $("#jobDetails-billingAddress").html(
 			"No address in database." + "\n" + "Please update client record."
 		);

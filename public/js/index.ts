@@ -2,19 +2,29 @@ import { initialiseAppData } from "./library.js";
 import handlers from "./handlers.js";
 import forms from "./forms.js";
 
-$(document).ready(function () {
+import {
+	AppData,
+	Dimension,
+	ExtendedDocument,
+	OrgShortName,
+} from "./types/types.js";
+
+$(function () {
 	function init() {
 		// remove body d-none once loaded static content (ensures loader is uninterrupted)
-		document.querySelector("body").classList.remove("d-none");
+		document.querySelector("body")?.classList.remove("d-none");
 
+		// set re-typed document
+		const eDoc = document as ExtendedDocument;
 		// get orgName name from views
-		const orgName = document.getElementById("businessName").innerText;
+		const orgName = document.getElementById("businessName")
+			?.innerText as OrgShortName;
 
-		console.log(document.appData);
+		console.log(eDoc.appData);
 
-		document.appData = {
+		eDoc.appData = {
 			businessName: orgName,
-		};
+		} as AppData;
 
 		initialiseAppData()
 			.then((result) => {
@@ -35,13 +45,9 @@ $(document).ready(function () {
 		function buildForms() {
 			// form construction
 			console.log("formOptions");
-			console.log(document.appData.formOptions);
-			forms.constructForm(
-				orgName,
-				"clientDetails",
-				document.appData.formOptions
-			);
-			forms.constructForm(orgName, "jobDetails", document.appData.formOptions);
+			console.log(eDoc.appData.formOptions);
+			forms.constructForms(orgName, "client", eDoc.appData.formOptions);
+			forms.constructForms(orgName, "job", eDoc.appData.formOptions);
 			forms.setClientDetails();
 			forms.setJobDetails();
 			forms.setViewKeys();
@@ -104,15 +110,15 @@ $(document).ready(function () {
 			applyTestData("client", clientData);
 			applyTestData("job", jobData);
 
-			function applyTestData(dim, data) {
+			function applyTestData(dim: Dimension, data: { [key: string]: string }) {
 				for (let key in data) {
-					let el = document.getElementById(dim + "Details-" + key);
+					let el = document.getElementById(dim + "Details-" + key) as
+						| HTMLInputElement
+						| HTMLSelectElement;
 
 					el.value = data[key];
 				}
 			}
-
-			applyTestData();
 		}
 	}
 
