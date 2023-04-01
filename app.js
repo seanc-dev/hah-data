@@ -13,7 +13,6 @@ import jobsRoutes from "./routes/jobs.js";
 
 const __filename = fileURLToPath(import.meta.url);
 
-// 👇️ "/home/john/Desktop/javascript"
 const __dirname = path.dirname(__filename);
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
