@@ -7,13 +7,14 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import indexRoutes from "./routes/index.js";
-import clientsRoutes from "./routes/clients.js";
-import jobsRoutes from "./routes/jobs.js";
+import indexRoutes from "../routes/index.js";
+import clientsRoutes from "../routes/clients.js";
+import jobsRoutes from "../routes/jobs.js";
 
-const __filename = fileURLToPath(import.meta.url);
+// const __filename = fileURLToPath(import.meta.url);
+// console.log(__filename);
 
-const __dirname = path.dirname(__filename);
+// const __dirname = path.dirname(__filename);
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 	dotenv.config();
@@ -25,7 +26,8 @@ console.log("App variables initialised");
 
 // config
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(__dirname + "/public/"));
+// app.use(express.static(__dirname + "/public/"));
+app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.text());
@@ -63,6 +65,6 @@ process.on("unhandledRejection", (err) => {
 	process.exit(1);
 });
 
-app.listen(process.env.PORT, process.env.IP, () =>
+app.listen(Number(process.env.PORT), process.env.IP || "", () =>
 	console.log("hah-data running on port " + process.env.PORT)
 );

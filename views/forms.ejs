@@ -21,7 +21,7 @@
 				<h2>Loading...</h2>
 			</div>
 		</div>
-		<script src="/js/loading-overlay.js"></script>
+		<script type="module" src="/js/loading-overlay.js"></script>
 
 		<div id="businessName" class="d-none"><%= businessName %></div>
 
@@ -301,7 +301,6 @@
 		<script src="/js/moment.js" type="text/javascript" charset="utf-8"></script>
 		<script
 			src="/js/moment-timezone-with-data-10-year-range.js"
-			type="text/javascript"
 			charset="utf-8"
 			async
 			defer
@@ -309,7 +308,6 @@
 		<script
 			type="module"
 			src="/js/forms.js"
-			type="text/javascript"
 			charset="utf-8"
 			async
 			defer
@@ -317,18 +315,10 @@
 		<script
 			type="module"
 			src="/js/handlers.js"
-			type="text/javascript"
 			charset="utf-8"
 			async
 			defer
 		></script>
-		<script
-			type="module"
-			src="/js/index.js"
-			type="text/javascript"
-			charset="utf-8"
-			async
-			defer
-		></script>
+		<script type="module" src="/index.js" charset="utf-8" async defer></script>
 	</body>
 </html>
