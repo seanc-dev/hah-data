@@ -17,7 +17,6 @@ export const capitaliseWords = (str) => {
 export const initialiseAppData = async () => {
 	let resultArr;
 	try {
-		// console.log(document.appData.businessName);
 		resultArr = await Promise.all([
 			// this retrieves the data required to construct the forms
 			axios.get("/" + document.appData.businessName + "/?data=true"),
@@ -38,12 +37,16 @@ export const initialiseAppData = async () => {
 		return err;
 	}
 
-	const { formOptions, organisationId } = resultArr[0].data;
+	const { formOptions, organisationId, staffNames } = resultArr[0].data;
 
-	document.appData.formOptions = formOptions;
-	document.appData.organisationId = organisationId;
-	document.appData.clientDetail = resultArr[1].data;
-	document.appData.jobDetail = resultArr[2].data;
+	document.appData = {
+		...document.appData,
+		formOptions,
+		staffNames,
+		organisationId,
+		clientDetail: resultArr[1].data,
+		jobDetail: resultArr[2].data,
+	};
 
 	return true;
 };
@@ -213,4 +216,79 @@ export const setJobAddressFields = (accountNameVal) => {
 	$("#jobDetails-workLocationSuburb").val(suburb);
 
 	$("#jobDetails-clientId").val(clientObj.clientId);
+};
+
+export const getStaffFormDetails = () => {
+	const staffFormSections = [
+		{
+			sectionTitle: "Staff Member Details",
+			rows: [
+				[
+					{
+						label: "Staff Member Name",
+						name: "staffMemberName",
+						type: "input",
+						properties: {
+							isRequired: true,
+						},
+					},
+					{
+						label: "Currently Employed",
+						name: "currentlyEmployed",
+						type: "checkbox",
+						properties: {
+							isRequired: true,
+						},
+					},
+				],
+				[
+					{
+						label: "Start Date",
+						name: "staffMemberStartDateUTC",
+						type: "input",
+						subType: "date",
+						properties: {
+							isRequired: true,
+						},
+					},
+					{
+						label: "End Date",
+						name: "staffMemberEndDateUTC",
+						type: "input",
+						subType: "date",
+						properties: {},
+					},
+				],
+			],
+		},
+		{
+			sectionTitle: "Remuneration Details",
+			rows: [
+				[
+					{
+						label: "Hourly Rate",
+						name: "hourlyRate",
+						type: "input",
+						subType: "number",
+						properties: {
+							isRequired: true,
+						},
+					},
+					{
+						label: "Effective Date",
+						name: "hourlyRateEffectiveDateUTC",
+						type: "input",
+						subType: "date",
+						properties: {
+							isRequired: true,
+						},
+					},
+				],
+			],
+		},
+	];
+	return {
+		restfulName: "staff",
+		sections: staffFormSections,
+	};
 };
