@@ -14,7 +14,7 @@ export default {
 			);
 			return result.rows.map((row) => row.staffmembername);
 		} catch (err) {
-			throw err;
+			console.error(err);
 		}
 	},
 
@@ -26,7 +26,7 @@ export default {
 			ratesResult = await pool.query(getStaffRatesByJobId(staffNames), [jobId]);
 			return ratesResult.rows[0];
 		} catch (err) {
-			throw err;
+			console.error(err);
 		}
 	},
 
