@@ -2,7 +2,7 @@ import { initialiseAppData } from "./library.js";
 import handlers from "./handlers.js";
 import forms from "./forms.js";
 
-$(document).ready(function () {
+$(function () {
 	function init() {
 		// remove body d-none once loaded static content (ensures loader is uninterrupted)
 		document.querySelector("body").classList.remove("d-none");
@@ -15,6 +15,9 @@ $(document).ready(function () {
 		document.appData = {
 			businessName: orgName,
 		};
+
+		console.log("public/index.js document.appData.businessName");
+		console.log(document.appData.businessName);
 
 		initialiseAppData()
 			.then((result) => {
@@ -33,15 +36,10 @@ $(document).ready(function () {
 			});
 
 		function buildForms() {
+			const { formOptions } = document.appData;
 			// form construction
-			console.log("formOptions");
-			console.log(document.appData.formOptions);
-			forms.constructForm(
-				orgName,
-				"clientDetails",
-				document.appData.formOptions
-			);
-			forms.constructForm(orgName, "jobDetails", document.appData.formOptions);
+			forms.constructForm(orgName, "clientDetails", formOptions);
+			forms.constructForm(orgName, "jobDetails", formOptions);
 			forms.setClientDetails();
 			forms.setJobDetails();
 			forms.setViewKeys();
