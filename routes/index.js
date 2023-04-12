@@ -1,8 +1,8 @@
 import express from "express";
 
 import getData from "./services/getData.js";
-import { getNewFormObject } from "../lib/library.js";
 import formOptions from "../lib/form-options.js";
+import { getNewFormObject } from "../lib/library.js";
 
 const router = express.Router({
 	mergeParams: true,
@@ -41,6 +41,7 @@ router.get("/:orgShortName", function (req, res) {
 						businessNameDisplay:
 							orgShortName[0].toUpperCase() + orgShortName.slice(1),
 						organisationId,
+						staffNames,
 					};
 					res.send(data);
 				})
