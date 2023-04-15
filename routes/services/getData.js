@@ -1,4 +1,3 @@
-import { getObjectFromKey } from "../../lib/library.js";
 import territoryQueries from "./queries/territories.js";
 import clientQueries from "./queries/client.js";
 import staffQueries from "./queries/staff.js";
@@ -38,19 +37,9 @@ export default {
 		queries
 			.getColumnHeaders(dim.toLowerCase(), orgShortName)
 			.then((fieldNames) => {
-				let obj = {
-					fieldLabels: fieldNames.map((columnName) =>
-						getObjectFromKey(
-							orgShortName,
-							dim,
-							"fieldName",
-							columnName,
-							"sheetHeaderName"
-						)
-					),
+				res.json({
 					fieldNames,
-				};
-				res.json(obj);
+				});
 			})
 			.catch((err) => {
 				console.error(err);

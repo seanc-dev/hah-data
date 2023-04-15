@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import indexRoutes from "./routes/index.js";
 import clientsRoutes from "./routes/clients.js";
 import jobsRoutes from "./routes/jobs.js";
+import staffRoutes from "./routes/staff.js";
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -56,6 +57,7 @@ console.log("App config intitialised");
 app.use("/", indexRoutes);
 app.use("/:orgId/clients", clientsRoutes);
 app.use("/:orgId/jobs", jobsRoutes);
+app.use("/:orgId/staff", staffRoutes);
 
 console.log("App routes initialised");
 

@@ -116,7 +116,7 @@ export default {
 				),
 			};
 		} catch (err) {
-			throw err;
+			console.error(err);
 		} finally {
 			client.release();
 		}
@@ -152,6 +152,10 @@ export default {
 		getData.crud(new Client(orgId, id, body), "edit");
 	},
 	deleteClientById: async (req, res) => {
+		return null;
+		// returning null because below code is incomplete = it deletes a job record but not a client record
+		// better solution is to set db to cascade deletes (pretty sure already exists) then just delete client record
+		// eslint-disable-next-line no-unreachable
 		const { id } = req.params;
 		const client = await pool.connect();
 		try {
@@ -161,7 +165,7 @@ export default {
 				[id]
 			);
 			await client.query("delete from job where id = $1", [id]);
-			await client.query("commit");
+			const result = await client.query("commit");
 			res.json(result.rows[0]);
 			console.log(`Job record with id ${id} successfully deleted`);
 		} catch (err) {

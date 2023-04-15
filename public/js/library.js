@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export const appendOptionNode = (parent, value) => {
 	let option = document.createElement("option");
 	option.setAttribute("value", value);
@@ -30,6 +31,10 @@ export const initialiseAppData = async () => {
 			axios.get(
 				"/" + document.appData.businessName + "/jobs?requestType=detailsArray"
 			),
+			// this retrieves staff data
+			axios.get(
+				"/" + document.appData.businessName + "/staff?requestType=detailsArray"
+			),
 		]);
 	} catch (err) {
 		console.log("initialiseAppData error");
@@ -37,15 +42,21 @@ export const initialiseAppData = async () => {
 		return err;
 	}
 
-	const { formOptions, organisationId, staffNames } = resultArr[0].data;
+	console.log("initialiseAppData resultArr");
+	console.log(resultArr);
+
+	const { formOptions, organisationId } = resultArr[0].data;
 
 	document.appData = {
 		...document.appData,
-		formOptions,
-		staffNames,
+		formOptions: {
+			...formOptions,
+			staffDetails: getStaffFormDetails(),
+		},
 		organisationId,
 		clientDetail: resultArr[1].data,
 		jobDetail: resultArr[2].data,
+		staffDetail: resultArr[3].data,
 	};
 
 	return true;
@@ -218,8 +229,9 @@ export const setJobAddressFields = (accountNameVal) => {
 	$("#jobDetails-clientId").val(clientObj.clientId);
 };
 
-export const getStaffFormDetails = () => {
-	const staffFormSections = [
+export const getStaffFormDetails = () => ({
+	restfulName: "staff",
+	sections: [
 		{
 			sectionTitle: "Staff Member Details",
 			rows: [
@@ -275,7 +287,7 @@ export const getStaffFormDetails = () => {
 						},
 					},
 					{
-						label: "Effective Date",
+						label: "Hourly Rate Effective Date",
 						name: "hourlyRateEffectiveDateUTC",
 						type: "input",
 						subType: "date",
@@ -284,11 +296,18 @@ export const getStaffFormDetails = () => {
 						},
 					},
 				],
+				[
+					{
+						// label: "Staff ID",
+						name: "id",
+						type: "input",
+						properties: {
+							readOnly: true,
+						},
+						classes: ["d-none"],
+					},
+				],
 			],
 		},
-	];
-	return {
-		restfulName: "staff",
-		sections: staffFormSections,
-	};
-};
+	],
+});

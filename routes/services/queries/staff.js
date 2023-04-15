@@ -3,6 +3,35 @@ import staffQueries from "./queryBuilders/staff.js";
 
 const { pool } = dbConfig;
 const { getStaffRatesByJobId } = staffQueries;
+const staffDetailsQuery = `select s.id, s.staffmembername, staffmemberstartdateutc, s.currentlyemployed, srh.hourlyrate, srh.hourlyrateeffectivedateutc from (select staffid, max(hourlyrateeffectivedateutc) as maxratedate from staff_rate_history group by staffid) mr inner join staff_rate_history srh on srh.staffid = mr.staffid and srh.hourlyrateeffectivedateutc = mr.maxratedate inner join staff s on srh.staffid = s.id inner join organisation o on s.organisationid = o.id where o.shortname = $1`;
+
+const mapStaffDetails = (rows) =>
+	rows.reduce(
+		(
+			acc,
+			{
+				id,
+				staffmembername,
+				staffmemberstartdateutc,
+				currentlyemployed,
+				hourlyrate,
+				hourlyrateeffectivedateutc,
+			}
+		) => {
+			return [
+				...acc,
+				{
+					id,
+					staffMemberName: staffmembername,
+					staffMemberStartDateUTC: staffmemberstartdateutc,
+					currentlyEmployed: currentlyemployed,
+					hourlyRate: hourlyrate,
+					hourlyRateEffectiveDateUTC: hourlyrateeffectivedateutc,
+				},
+			];
+		},
+		[]
+	);
 
 export default {
 	getStaffNames: async function (orgShortName, client) {
@@ -13,6 +42,34 @@ export default {
 				[orgShortName]
 			);
 			return result.rows.map((row) => row.staffmembername);
+		} catch (err) {
+			console.error(err);
+		}
+	},
+
+	getStaffDetails: async function (req, res) {
+		try {
+			const client = await pool.connect();
+			const staffResult = await client.query(staffDetailsQuery, [
+				req.params.orgId,
+			]);
+			const staffDetails = mapStaffDetails(staffResult.rows);
+			res.json(staffDetails);
+		} catch (err) {
+			console.log("error in getStaffDetails query");
+			console.error(err);
+		}
+	},
+
+	getStaffMemberById: async function (id, orgShortName) {
+		try {
+			const client = await pool.connect();
+			const staffResult = await client.query(
+				`${staffDetailsQuery} and s.id = $2`,
+				[orgShortName, id]
+			);
+			const staffDetails = mapStaffDetails(staffResult.rows);
+			return staffDetails[0];
 		} catch (err) {
 			console.error(err);
 		}

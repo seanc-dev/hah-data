@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {
 	initSpinner,
 	endSpinner,
@@ -6,6 +7,45 @@ import {
 	appendOptionNode,
 	revealStatusMessage,
 } from "./library.js";
+
+const setEntitySelect = (dim, details, textArr, keyArr) => {
+	if (!["client", "job", "staff"].includes(dim))
+		console.error("invalid dim in setEntitySelect function: ", dim);
+	if (!details)
+		console.error("invalid details in setEntitySelect function: ", details);
+	if (!Array.isArray(textArr) || !Array.isArray(keyArr))
+		console.error(
+			"invalid textArr or keyArr in setEntitySelect function: ",
+			textArr,
+			keyArr
+		);
+	// set options in client select drop-down //
+	// find field and empty
+	const $dataList = $(`#${dim}DetailsList`);
+	$dataList.empty();
+
+	// create datalist options
+	for (let i = 0; i < details.length; i++) {
+		// create concat string
+		const concat = textArr[0]
+			? textArr.reduce((acc, curr, idx) => {
+					return (acc +=
+						textArr[idx] +
+						": " +
+						details[i][keyArr[idx]] +
+						(idx !== textArr.length - 1 ? ", " : ""));
+			  }, "")
+			: details[i][keyArr[0]];
+
+		document.appData[`${dim}Detail`][i].concat = concat;
+
+		// create new option node, append to record select datalist, and set data-key as clientId
+		appendOptionNode($dataList[0], concat).setAttribute(
+			"data-key",
+			details[i][`${dim}Id`]
+		);
+	}
+};
 
 const forms = {
 	constructForm: (orgName, formName, data) => {
@@ -74,6 +114,7 @@ const forms = {
 					name,
 					label,
 					type: fieldType,
+					subType,
 					classes,
 					values,
 					properties: { isRequired, readOnly, excludeOnSubmit },
@@ -85,12 +126,14 @@ const forms = {
 				innerEl.classList.add("col-6");
 
 				// create label
-				let labelEl = document.createElement("label"),
-					labelText = isRequired ? label + " *" : label,
-					labelTextNode = document.createTextNode(labelText);
-				labelEl.appendChild(labelTextNode);
-				labelEl.setAttribute("for", uniqueName);
-				innerEl.appendChild(labelEl);
+				if (label) {
+					let labelEl = document.createElement("label"),
+						labelText = isRequired ? label + " *" : label,
+						labelTextNode = document.createTextNode(labelText);
+					labelEl.appendChild(labelTextNode);
+					labelEl.setAttribute("for", uniqueName);
+					innerEl.appendChild(labelEl);
+				}
 
 				// create input and add relevant classes and attributes
 				let type =
@@ -102,8 +145,10 @@ const forms = {
 				inputEl.classList.add("form-control");
 				inputEl.setAttribute("id", uniqueName);
 				if (!excludeOnSubmit) inputEl.setAttribute("name", name);
-				if (type === "input") inputEl.setAttribute("type", fieldType);
-				if (fieldType === "number") inputEl.setAttribute("step", "0.01");
+				if (type === "input")
+					inputEl.setAttribute("type", subType ?? fieldType);
+				if (fieldType === "number" || subType === "number")
+					inputEl.setAttribute("step", "0.01");
 				if (isRequired) inputEl.required = true;
 				if (readOnly) inputEl.setAttribute("readonly", true);
 
@@ -166,16 +211,12 @@ const forms = {
 
 			return col;
 		};
-
-		if (formName === "staff") {
-			// constructStaffForm(data["staff"]);
-		} else {
-			constructClientOrJobForm(orgName, formName, data[formName]);
-		}
+		constructClientOrJobForm(orgName, formName, data);
 	},
 
 	initAutocomplete: function () {
 		function initAddy(fields) {
+			// eslint-disable-next-line no-undef
 			let addyComplete = new AddyComplete(
 				document.getElementById(fields.searchField)
 			);
@@ -210,10 +251,11 @@ const forms = {
 	},
 
 	retrieveClientAddress: function (accountName) {
-		let clientObj = document.appData.clientDetail.find((val) => {
+		const clientObj = document.appData.clientDetail.find((val) => {
 			return val.accountName === accountName;
 		});
 
+		// eslint-disable-next-line no-undef
 		return axios.get(
 			"/" +
 				document.appData.businessName +
@@ -223,16 +265,19 @@ const forms = {
 	},
 
 	setViewKeys: function () {
-		doWork("client");
-		doWork("job");
+		doWork("clients");
+		doWork("jobs");
+		doWork("staff");
 
 		async function doWork(dim) {
 			// retrieve keys for dimension's db record
 			let result;
 			try {
 				result = await axios.get(
-					"/" + document.appData.businessName + "/" + dim + "s?requestType=keys"
+					"/" + document.appData.businessName + "/" + dim + "?requestType=keys"
 				);
+				console.log("setViewKeys for ", dim, " result: ");
+				console.log(result);
 			} catch (err) {
 				console.error(
 					"Error in setViewKeys doWork async step for " + dim + " dimension"
@@ -240,43 +285,62 @@ const forms = {
 				console.error(err);
 			}
 
-			console.log(`view fieldset ${dim} axios result`);
-			console.log(result);
+			// find view fieldset element
+			const $viewFieldset = $("#" + dim + "ViewFormBody fieldset");
 
-			// define vars
-			let $viewFieldset = $("#" + dim + "ViewFormBody fieldset");
-			let fieldLabels = result.data.fieldLabels;
-			let fieldNames = result.data.fieldNames;
+			// enumerate dim to formOptions key
+			const formOptionsKey =
+				dim[0] === "c"
+					? "clientDetails"
+					: dim[0] === "j"
+					? "jobDetails"
+					: "staffDetails";
 
-			// loop through keys and create element tree, then apply key to first el
-			for (let i = 0; i < fieldLabels.length; i++) {
-				// create row
-				let row = createEl("div", ["row"]);
-				$viewFieldset[0].appendChild(row);
+			// build array of name and labels for each field from formOptions data
+			// filtered by the keys sent from db
+			// this ensures that the keys displayed are the same as those in the database
+			const fieldData = result.data.fieldNames.map((name) => ({
+				name,
+				label: document.appData.formOptions[formOptionsKey].sections
+					.find((section) =>
+						section.rows.some((row) => row.some((field) => field.name === name))
+					)
+					?.rows.find((row) => row.some((field) => field.name === name))
+					.find((field) => field.name === name).label,
+			}));
 
-				// create column to hold field label
-				let col = createEl("div", ["col-3", "form-view-text-sm"]);
-				col.appendChild(
-					document.createTextNode(capitaliseWords(fieldLabels[i]) + ":")
-				);
-				row.appendChild(col);
-
-				// create column to hold value
-				let col2 = createEl("div", ["col-9", "form-view-text-lg"]);
-				row.appendChild(col2);
-				let input = createEl("input", ["form-control"]);
-				input.setAttribute("type", "text");
-				input.setAttribute("name", fieldNames[i]);
-				input.setAttribute("readonly", true);
-				col2.appendChild(input);
-			}
-
-			function createEl(elType, classes) {
-				let el = document.createElement(elType);
+			// helper function to create elements with correct classes
+			const createEl = (elType, classes) => {
+				const el = document.createElement(elType);
 				for (let i = 0; i < classes.length; i++) {
 					el.classList.add(classes[i]);
 				}
 				return el;
+			};
+
+			// loop through keys and create element tree, then apply key to first el
+			for (let i = 0; i < fieldData.length; i++) {
+				const { name, label } = fieldData[i];
+
+				// if no label, skip
+				if (!label) continue;
+				// create row
+				const row = createEl("div", ["row"]);
+				$viewFieldset[0].appendChild(row);
+
+				// create column to hold field label
+				const col = createEl("div", ["col-3", "form-view-text-sm"]);
+				col.appendChild(document.createTextNode(capitaliseWords(label) + ":"));
+				row.appendChild(col);
+
+				// create column to hold value
+				const col2 = createEl("div", ["col-9", "form-view-text-lg"]);
+				row.appendChild(col2);
+				const input = createEl("input", ["form-control"]);
+				input.setAttribute("type", "text");
+				input.setAttribute("name", name);
+				input.setAttribute("readonly", true);
+				col2.appendChild(input);
 			}
 		}
 	},
@@ -298,64 +362,44 @@ const forms = {
 			);
 		}
 
-		// set options in client select drop-down //
-		// find field and empty
-		let $clientDetailsDatalist = $("#clientDetailsList");
-		$clientDetailsDatalist.empty();
-
-		// create datalist options
-		for (let i = 0; i < clientDetail.length; i++) {
-			let concat =
-				"Account: " +
-				clientDetail[i].accountName +
-				", Billing Address: " +
-				clientDetail[i].billingAddressStreet +
-				", " +
-				clientDetail[i].billingAddressSuburb;
-
-			document.appData.clientDetail[i].concat = concat;
-
-			// create new option node, append to record select datalist, and set data-key as clientId
-			appendOptionNode($clientDetailsDatalist[0], concat).setAttribute(
-				"data-key",
-				clientDetail[i].clientId
-			);
-		}
+		// set values in client select drop-down
+		setEntitySelect(
+			"client",
+			clientDetail,
+			["Account", "Billing Address", ""],
+			["accountName", "billingAddressStreet", "billingAddressSuburb"]
+		);
 	},
 
 	setJobDetails: function () {
-		let jobDetail = document.appData.jobDetail;
-
-		// find field and empty
-		let $jobDetailDatalist = $("#jobDetailsList");
-		$jobDetailDatalist.empty();
-
-		// create datalist options from
-		for (let i = 0; i < jobDetail.length; i++) {
-			let formattedDate = moment(jobDetail[i].dateInvoiceSent)
-				.tz("Pacific/Auckland")
-				.format("D/M/YYYY");
-			document.appData.jobDetail[i].dateInvoiceSent = formattedDate;
-
-			let concat =
-				"Account: " +
-				jobDetail[i].accountName +
-				", Date Invoice Sent: " +
-				formattedDate +
-				", Amount Invoiced: " +
-				nzdCurrencyFormat(jobDetail[i].amountInvoiced);
-
-			document.appData.jobDetail[i].concat = concat;
-
-			// create new option node, append to record select datalist, and set data-key as jobId
-			appendOptionNode($jobDetailDatalist[0], concat).setAttribute(
-				"data-key",
-				jobDetail[i].jobId
-			);
-		}
+		setEntitySelect(
+			"job",
+			document.appData.jobDetail.map((job) => {
+				const { accountName, dateInvoiceSent, amountInvoiced } = job;
+				return {
+					...job,
+					accountName,
+					dateInvoiceSent: moment(dateInvoiceSent)
+						.tz("Pacific/Auckland")
+						.format("D/M/YYYY"),
+					amountInvoiced: nzdCurrencyFormat(amountInvoiced),
+				};
+			}),
+			["Account", "Date Invoice Sent", "Amount Invoiced"],
+			["accountName", "dateInvoiceSent", "amountInvoiced"]
+		);
 	},
 
-	submitFormFlow: async function (form, formName, statusDiv) {
+	setStaffDetails: function () {
+		setEntitySelect(
+			"staff",
+			document.appData.staffDetail,
+			[],
+			["staffMemberName"]
+		);
+	},
+
+	submitFormFlow: async function (form, formName) {
 		initSpinner();
 
 		const formAction = form
@@ -404,7 +448,7 @@ const forms = {
 					newId
 				);
 
-			function appendNewObj(dim, arr, id) {
+			const appendNewObj = (dim, arr, id) => {
 				let obj = {};
 				// build object of values (id and arr vals)
 				// add dimension id from returned id value
@@ -427,7 +471,7 @@ const forms = {
 						document.getElementById("accountNameList"),
 						obj.accountName
 					);
-			}
+			};
 		} else if (formAction === "edit") {
 			try {
 				await axios.put(
@@ -458,7 +502,7 @@ const forms = {
 					"amountInvoiced",
 				]);
 
-			function updateObj(searchKey, updateDim, arr) {
+			const updateObj = (searchKey, updateDim, arr) => {
 				// this function updates the data objects held in arrays in document.appData[* + Details]
 
 				// 1. find objects in relevant appData array with search key
@@ -476,7 +520,7 @@ const forms = {
 				});
 
 				return objArr;
-			}
+			};
 		}
 
 		function registerSubmitError(err) {

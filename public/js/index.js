@@ -2,6 +2,7 @@ import { initialiseAppData } from "./library.js";
 import handlers from "./handlers.js";
 import forms from "./forms.js";
 
+// eslint-disable-next-line no-undef
 $(function () {
 	function init() {
 		// remove body d-none once loaded static content (ensures loader is uninterrupted)
@@ -20,7 +21,7 @@ $(function () {
 		console.log(document.appData.businessName);
 
 		initialiseAppData()
-			.then((result) => {
+			.then(() => {
 				// build forms
 				buildForms();
 
@@ -38,10 +39,16 @@ $(function () {
 		function buildForms() {
 			const { formOptions } = document.appData;
 			// form construction
-			forms.constructForm(orgName, "clientDetails", formOptions);
-			forms.constructForm(orgName, "jobDetails", formOptions);
+			forms.constructForm(
+				orgName,
+				"clientDetails",
+				formOptions["clientDetails"]
+			);
+			forms.constructForm(orgName, "jobDetails", formOptions["jobDetails"]);
+			forms.constructForm(orgName, "staffDetails", formOptions["staffDetails"]);
 			forms.setClientDetails();
 			forms.setJobDetails();
+			forms.setStaffDetails();
 			forms.setViewKeys();
 			forms.initAutocomplete();
 
