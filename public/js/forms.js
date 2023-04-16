@@ -4,8 +4,9 @@ import {
 	initSpinner,
 	endSpinner,
 	capitaliseWords,
-	nzdCurrencyFormat,
 	appendOptionNode,
+	nzdCurrencyFormat,
+	getFormRestfulName,
 	revealStatusMessage,
 } from "./library.js";
 
@@ -424,12 +425,11 @@ const forms = {
 
 		if (formAction === "new") {
 			try {
-				let result = await axios.post(
+				const result = await axios.post(
 					"/" +
 						document.appData.businessName +
 						"/" +
-						form[0].dataset.name +
-						"s",
+						getFormRestfulName(form[0].dataset.name),
 					formData
 				);
 				newId = result.data.id;
@@ -554,74 +554,6 @@ const forms = {
 		if (formName === "Job") form.find("#jobDetails-billingAddress").val("");
 
 		endSpinner();
-	},
-
-	validateClientForm: function () {
-		// check if account name entered matches one from list
-		let $clientDetailsForm = $("#clientDetailsForm"),
-			optionsNodeList = $("#jobDetailsForm")
-				.find("#accountNameList")
-				.children(),
-			accountName = $clientDetailsForm.find("#clientDetails-accountName").val(),
-			accountNameVals = [];
-
-		for (let i = 0; i < optionsNodeList.length; i++) {
-			accountNameVals.push($(optionsNodeList[i]).val());
-		}
-
-		if (accountNameVals.includes(accountName))
-			return (
-				"Account " +
-				accountName +
-				" already exists in database. Please submit jobs under existing client record."
-			);
-
-		// if all validation passed, return true
-		return true;
-	},
-
-	validateJobForm: function () {
-		// check if account name entered matches one from list
-		let $jobDetailsForm = $("#jobDetailsForm"),
-			accountName = $jobDetailsForm.find("#jobDetails-accountName").val(),
-			accountNameVals = [];
-
-		for (let i = 0; i < document.appData.clientDetail.length; i++) {
-			accountNameVals.push(document.appData.clientDetail[i].accountName);
-		}
-		if (!accountNameVals.includes(accountName))
-			return "Please ensure Account Name is a valid option from the drop-down list. It must have already been created using the Client Details form.";
-
-		// check if dates entered
-		let $dateFields = $jobDetailsForm.find('input[type="date"]'),
-			cd = new Date(),
-			tenYearsBack = new Date(
-				cd.getFullYear() - 10,
-				cd.getMonth(),
-				cd.getDate()
-			);
-
-		for (let i = 0; i < $dateFields.length; i++) {
-			let dateVal = new Date($($dateFields[i]).val());
-
-			if (
-				dateVal !== "Invalid Date" &&
-				(dateVal > cd || dateVal < tenYearsBack)
-			)
-				return "Please ensure all entered dates are in the past within the last 10 years.";
-		}
-
-		// check to ensure at least 1 hour of work has been entered
-		let sum = 0;
-		$jobDetailsForm
-			.find(".staff-hours")
-			.each((i, field) => (sum += $(field).val()));
-
-		if (sum == 0)
-			return "Please ensure the total of hours entered for this job is greater than zero.";
-
-		// if all validation passed, return true
-		return true;
 	},
 };
 

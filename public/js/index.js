@@ -11,14 +11,9 @@ $(function () {
 		// get orgName name from views
 		const orgName = document.getElementById("businessName").innerText;
 
-		console.log(document.appData);
-
 		document.appData = {
 			businessName: orgName,
 		};
-
-		console.log("public/index.js document.appData.businessName");
-		console.log(document.appData.businessName);
 
 		initialiseAppData()
 			.then(() => {
@@ -58,6 +53,7 @@ $(function () {
 			handlers.handleRecordSelectChange();
 			handlers.handleInputFocus();
 			handlers.handleAccountNameBlur();
+			handlers.handleStaffStartDateBlur();
 			handlers.handleFormSubmit();
 			handlers.handleDeleteBtnClick();
 			handlers.handleDeleteBtnConfirm();

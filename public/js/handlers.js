@@ -1,16 +1,19 @@
 /* eslint-disable no-undef */
 import forms from "./forms.js";
 import {
-	initSpinner,
 	endSpinner,
+	initSpinner,
 	setCreatedDate,
+	getFormRestfulName,
 	getAccountNameValue,
-	setJobAddressFields,
 	revealStatusMessage,
+	setJobAddressFields,
 } from "./library.js";
-
-const getRestfulName = (formType) =>
-	`${formType.toLowerCase()}${formType.toLowerCase() === "staff" ? "" : "s"}`;
+import {
+	validateJobForm,
+	validateStaffForm,
+	validateClientForm,
+} from "./validation.js";
 
 const handlers = {
 	handleAccountNameBlur: function () {
@@ -69,8 +72,9 @@ const handlers = {
 
 			let validation;
 
-			if (formType === "Client") validation = forms.validateClientForm();
-			if (formType === "Job") validation = forms.validateJobForm();
+			if (formType === "Client") validation = validateClientForm();
+			if (formType === "Job") validation = validateJobForm();
+			if (formType === "Staff") validation = validateStaffForm();
 
 			// check default validity. If fails, report validity
 			if ($form[0].checkValidity()) {
@@ -261,33 +265,35 @@ const handlers = {
 				const $viewBody = $contentEl.find(".form-view-body");
 				const dim = $contentEl.find("form").attr("data-name");
 				const str = $(this).val();
-				const id = document.appData[dim + "Detail"].find(
+				const detailsObj = document.appData[dim + "Detail"].find(
 					(obj) => str === obj.concat
-				)[dim + "Id"];
+				);
+				const id = detailsObj["id"] ?? detailsObj[dim + "Id"];
 				const formAction = $contentEl.find(".form-type-select").val();
 
 				$contentEl.find(".alert").alert("close");
 
 				initSpinner();
 
+				const url =
+					"/" +
+					document.appData.businessName +
+					"/" +
+					getFormRestfulName(dim) +
+					"/" +
+					id;
+				console.log("url: ", url);
+
 				axios
-					.get(
-						"/" +
-							document.appData.businessName +
-							"/" +
-							getRestfulName(dim) +
-							"/" +
-							id
-					)
+					.get(url)
 					.then((result) => {
-						console.log(`handleRecordSelectChange handler axios result`);
 						const { data } = result;
-						console.log(data);
 
 						const $bodyEl = formAction === "Edit" ? $defaultBody : $viewBody;
 
 						// loop through returned properties and apply as values to relevant cells
 						const keys = Object.keys(data);
+						console.log("view form value setting for ", dim);
 						keys.forEach((key) => {
 							if (
 								moment(data[key], "YYYY-MM-DDTHH:mm:ss.SSSSZ", true).isValid()
@@ -295,15 +301,23 @@ const handlers = {
 								data[key] = moment
 									.utc(data[key])
 									.tz("Pacific/Auckland")
-									.format("D/M/YYYY");
+									.format("yyyy-MM-DD");
 							}
-							$bodyEl.find('[name="' + key + '"]').val(data[key]);
+
+							const el = $bodyEl.find('[name="' + key + '"]');
+							if (el[0] && el[0].type === "checkbox") {
+								if (data[key]) {
+									el.attr("unchecked", false);
+									el.attr("checked", true);
+								} else {
+									el.attr("checked", false);
+									el.attr("unchecked", true);
+								}
+							} else {
+								el.val(data[key]);
+							}
 							$contentEl.find(".status-message .alert").alert("close");
 						});
-
-						// set job address fields from document.appData.jobDetails
-						// if (dim === "job")
-						//   lib.setJobAddressFields($("#jobDetails-accountName").val());
 					})
 					.catch((err) => {
 						console.error(err);
@@ -372,6 +386,18 @@ const handlers = {
 			e.preventDefault();
 
 			this.classList.add("d-none");
+		});
+	},
+
+	handleStaffStartDateBlur: function () {
+		$("#staffDetails-staffMemberStartDateUTC").on("blur", function () {
+			const $this = $(this);
+			const $rateEffectiveDate = $this
+				.closest("#staffDetailsForm")
+				.find("#staffDetails-hourlyRateEffectiveDateUTC");
+			const startDate = $this.val();
+			if (!startDate) return;
+			if (!$rateEffectiveDate.val()) $rateEffectiveDate.val(startDate);
 		});
 	},
 };

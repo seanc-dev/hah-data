@@ -16,14 +16,19 @@ router.get("/", (req, res) => {
 	}
 });
 
-// // create route
-// router.post("/", queries.createStaffMember);
+// create route
+router.post("/", queries.createStaffMember);
 
 // show
-router.get("/:id", queries.getStaffMemberById);
+router.get("/:id", (req, res) => {
+	const { orgId, id } = req.params;
+	queries.getStaffMemberById(id, orgId).then((result) => {
+		res.json(result);
+	});
+});
 
-// // update
-// router.put("/:id", queries.updateStaffMemberById);
+// update
+router.put("/:id", queries.updateStaffMemberById);
 
 // // destroy
 // router.delete("/:id", queries.deleteStaffMemberById);

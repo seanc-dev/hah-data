@@ -311,3 +311,6 @@ export const getStaffFormDetails = () => ({
 		},
 	],
 });
+
+export const getFormRestfulName = (formType) =>
+	`${formType.toLowerCase()}${formType.toLowerCase() === "staff" ? "" : "s"}`;
