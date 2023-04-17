@@ -7,12 +7,15 @@ const { pool } = dbConfig;
 const { getStaffRatesByJobId } = staffQueries;
 const staffDetailsQuery = `select s.id, s.staffmembername, staffmemberstartdateutc, s.currentlyemployed, srh.hourlyrate, srh.hourlyrateeffectivedateutc from (select staffid, max(hourlyrateeffectivedateutc) as maxratedate from staff_rate_history group by staffid) mr inner join staff_rate_history srh on srh.staffid = mr.staffid and srh.hourlyrateeffectivedateutc = mr.maxratedate inner join staff s on srh.staffid = s.id inner join organisation o on s.organisationid = o.id where o.shortname = $1`;
 
-const rateHistoryInsert = async (
+const rateHistoryInsertAndUpdate = async (
 	xClient,
 	{ staffId, hourlyRate, hourlyRateEffectiveDateUTC }
 ) => {
 	const client = (await xClient) || pool.connect();
 	const insertStaffRateHistoryQuery = `insert into staff_rate_history (staffid, hourlyrate, hourlyrateeffectivedateutc) values ($1, $2, $3) returning id`;
+
+	// insert new record into rate history
+	console.log("inserting staff rate history record");
 	const {
 		rows: [{ id: rateHistoryId }],
 	} = await client.query(insertStaffRateHistoryQuery, [
@@ -20,6 +23,11 @@ const rateHistoryInsert = async (
 		hourlyRate,
 		hourlyRateEffectiveDateUTC,
 	]);
+
+	// update existing record expiry date in rate history
+	console.log("updating previous rate expiry date");
+	const updateStaffRateHistoryQuery = `update staff_rate_history srh set hourlyrateexpirydateutc = med.maxeffectivedate from (select max(hourlyrateeffectivedateutc) as maxeffectivedate, staffid from staff_rate_history where staffid = $1 and hourlyrateexpirydateutc is null group by staffid) med where srh.staffid = $1 and srh.staffid = med.staffid and srh.hourlyrateeffectivedateutc != med.maxeffectivedate and hourlyrateexpirydateutc is null;`;
+	await client.query(updateStaffRateHistoryQuery, [staffId]);
 	return rateHistoryId;
 };
 
@@ -95,6 +103,7 @@ export default {
 	},
 
 	createStaffMember: async function (req, res) {
+		console.log("running createStaffMember query");
 		const client = await pool.connect();
 		const {
 			body,
@@ -103,6 +112,7 @@ export default {
 		try {
 			// create new staff member
 			client.query("BEGIN");
+			console.log("getting org id from short name: ", orgId);
 			const numericalOrgId = await getOrgIdFromShortName(orgId, client);
 			console.log(body);
 			const {
@@ -114,6 +124,7 @@ export default {
 				hourlyRateEffectiveDateUTC,
 			} = prepareDataForDbInsert(body);
 			const insertStaffQuery = `insert into staff (staffmembername, staffmemberstartdateutc, staffmemberenddateutc, currentlyemployed, organisationid) values ($1, $2, $3, $4, $5) returning id`;
+			console.log("inserting staff member: ", staffMemberName);
 			const insertStaffResult = await client.query(insertStaffQuery, [
 				staffMemberName,
 				staffMemberStartDateUTC,
@@ -123,28 +134,22 @@ export default {
 			]);
 			// return new staff member id
 			const staffId = insertStaffResult.rows[0].id;
-			// create new staff rate history entry
-			const rateHistoryId = await rateHistoryInsert(client, {
+			// create new staff rate history entry and update previous rate expiry date
+			await rateHistoryInsertAndUpdate(client, {
 				staffId,
 				hourlyRate,
 				hourlyRateEffectiveDateUTC,
 			});
 
-			// update previous rate expiry date
-			const updateStaffRateHistoryQuery = `update staff_rate_history srh set hourlyrateexpirydateutc = med.maxeffectivedate from (select max(hourlyrateeffectivedateutc) as maxeffectivedate, staffid from staff_rate_history where staffid = $1 and hourlyrateexpirydateutc is null group by staffid) med where srh.staffid = $1 and srh.staffid = med.staffid and srh.hourlyrateeffectivedateutc != med.maxeffectivedate and hourlyrateexpirydateutc is null;`;
-			await client.query(updateStaffRateHistoryQuery, [
-				hourlyRateEffectiveDateUTC,
-				staffId,
-				rateHistoryId,
-			]);
-
 			// commit transaction
+			console.log("committing transaction");
 			client.query("COMMIT");
 
 			// send response with new staff member details
 			res.json(staffId);
 		} catch (err) {
 			// rollback transaction
+			console.log("rolling back transaction");
 			client.query("ROLLBACK");
 			console.error(err);
 			res.status(500).send(err);
@@ -156,7 +161,8 @@ export default {
 	updateStaffMemberById: async function (req, res) {
 		const client = await pool.connect();
 		try {
-			const { orgId, id } = req.params;
+			// destructure params and body
+			const { id } = req.params;
 			const {
 				staffMemberName,
 				staffMemberStartDateUTC,
@@ -165,8 +171,10 @@ export default {
 				hourlyRate,
 				hourlyRateEffectiveDateUTC,
 			} = prepareDataForDbInsert(req.body);
-			const updateStaffQuery = `update staff set staffmembername = $1, staffmemberstartdateutc = $2, staffmemberenddateutc = $3, currentlyemployed = $4 where id = $5 returning id`;
 			client.query("begin");
+
+			// update staff member
+			const updateStaffQuery = `update staff set staffmembername = $1, staffmemberstartdateutc = $2, staffmemberenddateutc = $3, currentlyemployed = $4 where id = $5 returning id`;
 			const updateStaffResult = await client.query(updateStaffQuery, [
 				staffMemberName,
 				staffMemberStartDateUTC,
@@ -174,25 +182,34 @@ export default {
 				currentlyEmployed === 0 ? 0 : 1,
 				id,
 			]);
-			// return new staff member id
+
+			// update staff rate history
 			const staffId = updateStaffResult.rows[0].id;
-			// update staff rate history entry
-			if (hourlyRate && hourlyRateEffectiveDateUTC)
-				rateHistoryInsert(client, {
+			const {
+				rows: [{ hourlRate: currentRate }],
+			} = await pool.query(
+				`select * from staff_rate_history where staffid = $1 and hourlyrateexpirydateutc is null`,
+				[staffId]
+			);
+			if (currentRate !== hourlyRate)
+				rateHistoryInsertAndUpdate(client, {
 					staffId,
 					hourlyRate,
 					hourlyRateEffectiveDateUTC,
 				});
+
+			// commit transaction
 			client.query("commit");
-			// return staff member details
-			const staffDetails = await this.getStaffMemberById(staffId, orgId);
+
 			// send response with staff member details
-			res.json(staffDetails);
+			res.json(staffId);
 		} catch (err) {
+			// rollback, log, and send error
 			client.query("rollback");
 			console.error(err);
 			res.status(500).send(err);
 		} finally {
+			// release db connection
 			client.release();
 		}
 	},
@@ -219,12 +236,13 @@ export default {
 	},
 
 	insertStaffJobHours: async (staffNames, staffIdArray, id, body, client) => {
-		if (!client) client = pool;
+		if (!client) client = pool.connect();
 
 		let jobHoursQueryStr =
 			"insert into staff_job_hours (jobid, staffid, hoursworked) values ";
 		const parametersArray = [];
 
+		// loop through staff names and create query string and parameter array
 		staffNames.forEach((name, idx) => {
 			const idxMultiple = idx * 3;
 			const staffObj = staffIdArray.find(
@@ -247,5 +265,24 @@ export default {
 		} catch (err) {
 			console.error(err);
 		}
+	},
+
+	updateStaffJobHours: async (jobId, body, client) => {
+		if (!client) client = pool.connect();
+		// select all staff_job_hours records for this job
+		const { rows: jobHoursRows } = await client.query(
+			"select * from staff_job_hours where jobid = $1",
+			[jobId]
+		);
+		console.log("updateStaffJobHours jobHoursRows");
+		console.log(jobHoursRows);
+		// const hoursWorked = body[`hoursWorked${name}`];
+
+		// // loop through staff ids and find which have had changes to hours worked for this job
+		// const changedHoursIds = staffIDArr.reduce((acc, id) => {
+		// 	if (jobHoursRows)
+
+		// // loop through ids with changed hours to update relevant staff_job_hours records for this job
+		// `update staff_job_hours set hoursworked = $1 where jobId = $2 and staffid = $3`
 	},
 };

@@ -60,6 +60,7 @@ export const validateJobForm = function () {
 
 export const validateStaffForm = function () {
 	const $form = $("#staffDetailsForm");
+	const isEdit = $("#staffFormTypeSelect").val().toLowerCase() === "edit";
 	const name = $form.find("#staffDetails-staffMemberName").val();
 	const startDate = $form.find("#staffDetails-staffMemberStartDateUTC").val();
 	const endDate = $form.find("#staffDetails-staffMemberEndDateUTC").val();
@@ -71,7 +72,7 @@ export const validateStaffForm = function () {
 
 	// staff member name is unique
 	for (let i = 0; i < document.appData.staffDetail.length; i++) {
-		if (document.appData.staffDetail[i].staffMemberName === name) {
+		if (!isEdit && document.appData.staffDetail[i].staffMemberName === name) {
 			return "Staff member name already exists in database. Please enter a unique name.";
 		}
 	}

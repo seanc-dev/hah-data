@@ -248,9 +248,7 @@ export const getStaffFormDetails = () => ({
 						label: "Currently Employed",
 						name: "currentlyEmployed",
 						type: "checkbox",
-						properties: {
-							isRequired: true,
-						},
+						properties: {},
 					},
 				],
 				[

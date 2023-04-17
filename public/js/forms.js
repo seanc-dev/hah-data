@@ -278,8 +278,6 @@ const forms = {
 				result = await axios.get(
 					"/" + document.appData.businessName + "/" + dim + "?requestType=keys"
 				);
-				console.log("setViewKeys for ", dim, " result: ");
-				console.log(result);
 			} catch (err) {
 				console.error(
 					"Error in setViewKeys doWork async step for " + dim + " dimension"
@@ -301,6 +299,8 @@ const forms = {
 			// build array of name and labels for each field from formOptions data
 			// filtered by the keys sent from db
 			// this ensures that the keys displayed are the same as those in the database
+			console.log(dim);
+			console.log(result.data.fieldNames);
 			const fieldData = result.data.fieldNames.map((name) => ({
 				name,
 				label: document.appData.formOptions[formOptionsKey].sections
@@ -412,7 +412,6 @@ const forms = {
 
 		// pull out and transform form data
 		const formData = form.serializeArray().reduce(function (obj, val) {
-			if (val.name === "dateInvoiceSent") console.log(moment(val.value));
 			if (moment(val.value, "YYYY-MM-DD", true).isValid()) {
 				val.value = moment(val.value).format("YYYY-MM-DDTHH:mm:ss.SSSSZ");
 			}
@@ -448,6 +447,8 @@ const forms = {
 					["clientId", "accountName", "dateInvoiceSent", "amountInvoiced"],
 					newId
 				);
+			if (formName === "Staff")
+				appendNewObj("staff", ["staffMemberName"], newId);
 
 			const appendNewObj = (dim, arr, id) => {
 				let obj = {};
@@ -474,34 +475,22 @@ const forms = {
 					);
 			};
 		} else if (formAction === "edit") {
+			const url =
+				"/" +
+				document.appData.businessName +
+				"/" +
+				getFormRestfulName(form[0].dataset.name) +
+				"/" +
+				formData[
+					formName.toLowerCase() === "staff"
+						? "id"
+						: formName.toLowerCase() + "Id"
+				];
 			try {
-				await axios.put(
-					"/" +
-						document.appData.businessName +
-						"/" +
-						form[0].dataset.name +
-						"s/" +
-						formData[formName.toLowerCase() + "Id"],
-					formData
-				);
+				await axios.put(url, formData);
 			} catch (err) {
 				registerSubmitError(err);
 			}
-
-			if (formName === "Client") {
-				updateObj("clientId", "client", [
-					"accountName",
-					"billingAddressStreet",
-					"billingAddressSuburb",
-				]);
-				updateObj("clientId", "job", ["accountName"]);
-			}
-			if (formName === "Job")
-				updateObj("jobId", "job", [
-					"accountName",
-					"dateInvoiceSent",
-					"amountInvoiced",
-				]);
 
 			const updateObj = (searchKey, updateDim, arr) => {
 				// this function updates the data objects held in arrays in document.appData[* + Details]
@@ -522,6 +511,21 @@ const forms = {
 
 				return objArr;
 			};
+
+			if (formName === "Client") {
+				updateObj("clientId", "client", [
+					"accountName",
+					"billingAddressStreet",
+					"billingAddressSuburb",
+				]);
+				updateObj("clientId", "job", ["accountName"]);
+			}
+			if (formName === "Job")
+				updateObj("jobId", "job", [
+					"accountName",
+					"dateInvoiceSent",
+					"amountInvoiced",
+				]);
 		}
 
 		function registerSubmitError(err) {
