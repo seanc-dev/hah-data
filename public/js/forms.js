@@ -420,6 +420,14 @@ const forms = {
 			return obj;
 		}, {});
 
+		const formCheckboxSet = $('input[type="checkbox"]');
+		if (!!formCheckboxSet[0]) {
+			formCheckboxSet.each(function () {
+				if (!this.checked) formData[this.name] = false;
+				if (this.checked) formData[this.name] = true;
+			});
+		}
+
 		let newId;
 
 		if (formAction === "new") {

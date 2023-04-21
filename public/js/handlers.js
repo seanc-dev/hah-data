@@ -193,7 +193,11 @@ const handlers = {
 				toggleReadOnly(false);
 
 				// set accountName as readonly=true
-				$('input[name="accountName"]').attr("readonly", true);
+				if (dim != "staff") {
+					$('input[name="accountName"]').attr("readonly", true);
+				} else {
+					$('input[name="staffMemberName"]').attr("readonly", true);
+				}
 
 				// if dim === 'client' set accountType to non-required
 				if (dim === "client") {
@@ -304,14 +308,14 @@ const handlers = {
 									.format("yyyy-MM-DD");
 							}
 
+							console.log("setting value for ", key, " to ", data[key]);
+
 							const el = $bodyEl.find('[name="' + key + '"]');
 							if (el[0] && el[0].type === "checkbox") {
-								if (data[key]) {
-									el.attr("unchecked", false);
+								if (!!Number(data[key])) {
 									el.attr("checked", true);
 								} else {
 									el.attr("checked", false);
-									el.attr("unchecked", true);
 								}
 							} else {
 								el.val(data[key]);

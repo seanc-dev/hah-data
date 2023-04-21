@@ -160,6 +160,7 @@ export default {
 
 	updateStaffMemberById: async function (req, res) {
 		const client = await pool.connect();
+		console.log(req.body);
 		try {
 			// destructure params and body
 			const { id } = req.params;
@@ -175,28 +176,44 @@ export default {
 
 			// update staff member
 			const updateStaffQuery = `update staff set staffmembername = $1, staffmemberstartdateutc = $2, staffmemberenddateutc = $3, currentlyemployed = $4 where id = $5 returning id`;
-			const updateStaffResult = await client.query(updateStaffQuery, [
+			const updateStaffParams = [
 				staffMemberName,
 				staffMemberStartDateUTC,
 				staffMemberEndDateUTC,
 				currentlyEmployed === 0 ? 0 : 1,
 				id,
-			]);
+			];
+			console.log("updateStaffParams");
+			console.log(updateStaffParams);
+			const updateStaffResult = await client.query(
+				updateStaffQuery,
+				updateStaffParams
+			);
 
 			// update staff rate history
 			const staffId = updateStaffResult.rows[0].id;
 			const {
-				rows: [{ hourlRate: currentRate }],
+				rows: [{ hourlyRate: currentRate }],
 			} = await pool.query(
 				`select * from staff_rate_history where staffid = $1 and hourlyrateexpirydateutc is null`,
 				[staffId]
 			);
-			if (currentRate !== hourlyRate)
-				rateHistoryInsertAndUpdate(client, {
-					staffId,
-					hourlyRate,
-					hourlyRateEffectiveDateUTC,
-				});
+
+			console.log(
+				"current rate: ",
+				currentRate,
+				"new rate: ",
+				hourlyRate,
+				"staff id: ",
+				staffId
+			);
+			if (currentRate && currentRate !== hourlyRate)
+				console.log("rates are different");
+			// rateHistoryInsertAndUpdate(client, {
+			// 	staffId,
+			// 	hourlyRate,
+			// 	hourlyRateEffectiveDateUTC,
+			// });
 
 			// commit transaction
 			client.query("commit");
