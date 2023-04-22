@@ -153,7 +153,9 @@ const handlers = {
 
 				// hide hourly rate effective date field if staff new
 				if (dim === "staff")
-					$('input[name="hourlyRateEffectiveDateUTC"]').addClass("d-none");
+					$('input[name="hourlyRateEffectiveDateUTC"]')
+						.closest("div")
+						.addClass("d-none");
 
 				// if dim === 'job', clear billingAddress textarea
 				if (dim === "job") $("#jobDetails-billingAddress").val("");
@@ -204,7 +206,9 @@ const handlers = {
 
 					// hide hourly rate effective date field if staff new
 					if (dim === "staff")
-						$('input[name="hourlyRateEffectiveDateUTC"]').removeClass("d-none");
+						$('input[name="hourlyRateEffectiveDateUTC"]')
+							.closest("div")
+							.removeClass("d-none");
 				}
 
 				// if dim === 'client' set accountType to non-required

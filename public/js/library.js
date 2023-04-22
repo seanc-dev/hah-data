@@ -292,7 +292,7 @@ export const getStaffFormDetails = () => ({
 						properties: {
 							isRequired: true,
 						},
-						hideOnFormType: "new",
+						classes: ["d-none"],
 					},
 				],
 				[

@@ -70,6 +70,20 @@ export const validateStaffForm = function () {
 		.find("#staffDetails-hourlyRateEffectiveDateUTC")
 		.val();
 
+	console.log("validation values");
+	console.log(
+		"name: ",
+		name,
+		"startDate: ",
+		startDate,
+		"endDate: ",
+		endDate,
+		"currentlyEmployed: ",
+		currentlyEmployed,
+		"hourlyRateEffectiveDate: ",
+		hourlyRateEffectiveDate
+	);
+
 	// staff member name is unique
 	for (let i = 0; i < document.appData.staffDetail.length; i++) {
 		if (!isEdit && document.appData.staffDetail[i].staffMemberName === name) {

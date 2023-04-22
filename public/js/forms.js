@@ -143,7 +143,13 @@ const forms = {
 							? fieldType
 							: "input",
 					inputEl = document.createElement(type);
-				if (classes && classes.length > 0) addClasses(inputEl, classes);
+				if (classes && classes.length > 0) {
+					const hasDNone = classes.includes("d-none");
+					const classesToAdd = hasDNone
+						? classes.toSpliced(classes.indexOf("d-none)"), 1)
+						: classes;
+					addClasses(inputEl, classesToAdd);
+				}
 				inputEl.classList.add("form-control");
 				inputEl.setAttribute("id", uniqueName);
 				if (!excludeOnSubmit) inputEl.setAttribute("name", name);
@@ -163,7 +169,8 @@ const forms = {
 				if (fieldType === "datalist") {
 					innerEl.appendChild(constructDataList(rowFieldData[k]));
 				}
-				if (fieldType === "hidden") innerEl.classList.add("d-none");
+				if (fieldType === "hidden" || (classes && classes.includes("d-none")))
+					innerEl.classList.add("d-none");
 
 				containerEl.appendChild(innerEl);
 			}
@@ -299,8 +306,6 @@ const forms = {
 			// build array of name and labels for each field from formOptions data
 			// filtered by the keys sent from db
 			// this ensures that the keys displayed are the same as those in the database
-			console.log(dim);
-			console.log(result.data.fieldNames);
 			const fieldData = result.data.fieldNames.map((name) => ({
 				name,
 				label: document.appData.formOptions[formOptionsKey].sections
