@@ -144,17 +144,21 @@ const handlers = {
 				// toggle record select
 				toggleRecordSelectVisibility(false);
 
-				// Ensure form is visible and data view is not
+				// ensure form is visible and data view is not
 				toggleFormVisibility(true);
 
-				// Clear all other fields, set as non-read-only
+				// clear all other fields, set as non-read-only
 				$form[0].reset();
 				toggleReadOnly(false);
 
-				// If dim === 'job', clear billingAddress textarea
+				// hide hourly rate effective date field if staff new
+				if (dim === "staff")
+					$('input[name="hourlyRateEffectiveDateUTC"]').addClass("d-none");
+
+				// if dim === 'job', clear billingAddress textarea
 				if (dim === "job") $("#jobDetails-billingAddress").val("");
 
-				// Remove info popup
+				// remove info popup
 				$("#" + dim + "DetailsForm")
 					.closest(".form-content")
 					.find(".status-message")
@@ -167,28 +171,28 @@ const handlers = {
 					$accTypeField.closest(".col-6").find("label").text("Account Type *");
 				}
 			} else if (formType === "View") {
-				// Ensure record select is visible
+				// ensure record select is visible
 				toggleRecordSelectVisibility(true);
 
-				// Ensure form not visible and data view is
+				// ensure form not visible and data view is
 				toggleFormVisibility(false);
 
-				// Pop up info alert to populate record select field which disappears upon selection
+				// Ppp up info alert to populate record select field which disappears upon selection
 				revealPopUp();
 
 				// toggle delete button
 				toggleDeleteButton(false);
 			} else if (formType === "Edit") {
-				// Ensure record select is visible
+				// ensure record select is visible
 				toggleRecordSelectVisibility(true);
 
-				// Ensure form is visible and data view is not
+				// ensure form is visible and data view is not
 				toggleFormVisibility(true);
 
-				// Pop up info alert to populate record select field which disappears upon selection
+				// pop up info alert to populate record select field which disappears upon selection
 				revealPopUp();
 
-				// Clear all other fields, set as non-read-only
+				// clear all other fields, set as non-read-only
 				$form[0].reset();
 				toggleReadOnly(false);
 
@@ -197,6 +201,10 @@ const handlers = {
 					$('input[name="accountName"]').attr("readonly", true);
 				} else {
 					$('input[name="staffMemberName"]').attr("readonly", true);
+
+					// hide hourly rate effective date field if staff new
+					if (dim === "staff")
+						$('input[name="hourlyRateEffectiveDateUTC"]').removeClass("d-none");
 				}
 
 				// if dim === 'client' set accountType to non-required
@@ -206,10 +214,10 @@ const handlers = {
 					$accTypeField.closest(".col-6").find("label").text("Account Type");
 				}
 			} else if (formType === "Delete") {
-				// Ensure record select is visible
+				// ensure record select is visible
 				toggleRecordSelectVisibility(true);
 
-				// Ensure form not visible and data view is
+				// ensure form not visible and data view is
 				toggleFormVisibility(false);
 
 				// Pop up info alert to populate record select field which disappears upon selection
@@ -297,7 +305,6 @@ const handlers = {
 
 						// loop through returned properties and apply as values to relevant cells
 						const keys = Object.keys(data);
-						console.log("view form value setting for ", dim);
 						keys.forEach((key) => {
 							if (
 								moment(data[key], "YYYY-MM-DDTHH:mm:ss.SSSSZ", true).isValid()
@@ -307,8 +314,6 @@ const handlers = {
 									.tz("Pacific/Auckland")
 									.format("yyyy-MM-DD");
 							}
-
-							console.log("setting value for ", key, " to ", data[key]);
 
 							const el = $bodyEl.find('[name="' + key + '"]');
 							if (el[0] && el[0].type === "checkbox") {

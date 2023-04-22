@@ -428,6 +428,31 @@ const forms = {
 			});
 		}
 
+		const appendNewObj = (dim, arr, id) => {
+			let obj = {};
+			// build object of values (id and arr vals)
+			// add dimension id from returned id value
+			obj[dim + "Id"] = id;
+			// loop through array of field names, update values, add them to object
+			for (let i = 0; i < arr.length; i++) {
+				let val = form.find("#" + dim + "Details-" + arr[i]).val();
+				if (isFinite(val)) val = Number(val);
+				if (arr[i] === "dateInvoiceSent") {
+					val = moment(val).format("D/M/YYYY");
+				}
+				obj[arr[i]] = val;
+			}
+			// push into relevant appData array
+			document.appData[dim + "Detail"].push(obj);
+
+			// if new client created, append new option node to datalist for job details account name field
+			if (dim === "client")
+				appendOptionNode(
+					document.getElementById("accountNameList"),
+					obj.accountName
+				);
+		};
+
 		let newId;
 
 		if (formAction === "new") {
@@ -457,31 +482,6 @@ const forms = {
 				);
 			if (formName === "Staff")
 				appendNewObj("staff", ["staffMemberName"], newId);
-
-			const appendNewObj = (dim, arr, id) => {
-				let obj = {};
-				// build object of values (id and arr vals)
-				// add dimension id from returned id value
-				obj[dim + "Id"] = id;
-				// loop through array of field names, update values, add them to object
-				for (let i = 0; i < arr.length; i++) {
-					let val = form.find("#" + dim + "Details-" + arr[i]).val();
-					if (isFinite(val)) val = Number(val);
-					if (arr[i] === "dateInvoiceSent") {
-						val = moment(val).format("D/M/YYYY");
-					}
-					obj[arr[i]] = val;
-				}
-				// push into relevant appData array
-				document.appData[dim + "Detail"].push(obj);
-
-				// if new client created, append new option node to datalist for job details account name field
-				if (dim === "client")
-					appendOptionNode(
-						document.getElementById("accountNameList"),
-						obj.accountName
-					);
-			};
 		} else if (formAction === "edit") {
 			const url =
 				"/" +
