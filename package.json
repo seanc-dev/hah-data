@@ -39,13 +39,13 @@
 		"node-forge": ">=0.10.0",
 		"node-geocoder": "^3.23.0",
 		"node-postgres": "^0.6.0",
-		"nodemon": "^2.0.21",
 		"pg": "^8.2.1",
 		"spin.js": "^4.0.0"
 	},
 	"devDependencies": {
 		"eslint": "^8.34.0",
-		"lodash": ">=4.17.21"
+		"lodash": ">=4.17.21",
+		"nodemon": "^2.0.21"
 	},
 	"type": "module"
 }
