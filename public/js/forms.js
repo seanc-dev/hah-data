@@ -566,12 +566,13 @@ const forms = {
 		// trigger success alert
 		let v = formAction === "new" ? "created" : "updated",
 			message =
-				formData.accountName +
-				" " +
-				formName.toLowerCase() +
-				" record successfully " +
-				v +
-				".";
+				formData.accountName ??
+				formData.staffMemberName +
+					" " +
+					formName.toLowerCase() +
+					" record successfully " +
+					v +
+					".";
 		revealStatusMessage(form.attr("data-name"), "success", "Success", message);
 
 		// clear form
