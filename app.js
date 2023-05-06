@@ -2,12 +2,23 @@
 //         methodOverride  = require("method-override"),
 //         LocalStrategy   = require("passport-local"),
 
-const bodyParser = require("body-parser"),
-  express = require("express");
+import bodyParser from "body-parser";
+import express from "express";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import indexRoutes from "./routes/index.js";
+import clientsRoutes from "./routes/clients.js";
+import jobsRoutes from "./routes/jobs.js";
+import staffRoutes from "./routes/staff.js";
+
+const __filename = fileURLToPath(import.meta.url);
+
+// 👇️ "/home/john/Desktop/javascript"
+const __dirname = path.dirname(__filename);
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-  const dotenv = require("dotenv");
-  dotenv.config();
+	dotenv.config();
 }
 
 const app = express();
@@ -43,17 +54,18 @@ console.log("App config intitialised");
 // });
 
 // ROUTES //
-app.use("/", require("./routes/index"));
-app.use("/:orgId/clients", require("./routes/clients"));
-app.use("/:orgId/jobs", require("./routes/jobs"));
+app.use("/", indexRoutes);
+app.use("/:orgId/clients", clientsRoutes);
+app.use("/:orgId/jobs", jobsRoutes);
+app.use("/:orgId/staff", staffRoutes);
 
 console.log("App routes initialised");
 
 process.on("unhandledRejection", (err) => {
-  console.error(err);
-  process.exit(1);
+	console.error(err);
+	process.exit(1);
 });
 
 app.listen(process.env.PORT, process.env.IP, () =>
-  console.log("hah-data running on port " + process.env.PORT)
+	console.log("hah-data running on port " + process.env.PORT)
 );

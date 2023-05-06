@@ -1,4 +1,8 @@
-const express = require("express");
+import express from "express";
+
+import getData from "./services/getData.js";
+import queries from "./services/queries/job.js";
+
 const router = express.Router({
 	mergeParams: true,
 });
@@ -30,4 +34,4 @@ router.put("/:id", queries.updateJobById);
 // destroy
 router.delete("/:id", queries.deleteJobById);
 
-module.exports = router;
+export default router;

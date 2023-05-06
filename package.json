@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"engines": {
-		"node": "10.14.1",
+		"node": "16.15.0",
 		"npm": "6.9.0"
 	},
 	"main": "app.js",
@@ -13,7 +13,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"preinstall": "node preinstall.js",
-		"start": "node app.js"
+		"start": "nodemon app.js"
 	},
 	"repository": {
 		"type": "git",
@@ -38,10 +38,13 @@
 		"node-forge": ">=0.10.0",
 		"node-geocoder": "^3.23.0",
 		"node-postgres": "^0.6.0",
+		"nodemon": "^2.0.21",
 		"pg": "^8.2.1",
 		"spin.js": "^4.0.0"
 	},
 	"devDependencies": {
+		"eslint": "^8.34.0",
 		"lodash": ">=4.17.21"
-	}
+	},
+	"type": "module"
 }
