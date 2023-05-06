@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from "fs";
 
 console.log(process.env.GOOGLE_CONFIG);
 fs.writeFileSync(
