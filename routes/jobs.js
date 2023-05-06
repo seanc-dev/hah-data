@@ -7,9 +7,6 @@ const router = express.Router({
 	mergeParams: true,
 });
 
-const getData = require("./services/getData.js");
-const queries = require("./services/queries/job");
-
 // index route
 router.get("/", (req, res) => {
 	if (req.query.requestType === "detailsArray") {
