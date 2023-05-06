@@ -1,218 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<!-- <base href="/"> -->
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		/>
+		<link rel="stylesheet" href="/css/styles.css" />
+		<link rel="stylesheet" href="/css/loading-overlay.css" />
+		<!-- <link rel="stylesheet" href="public/stylesheets/styles.css"> -->
+		<title>Hire a Hubby <%= businessNameDisplay %> Form Central</title>
+	</head>
 
-<head>
-    <!-- <base href="/"> -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/loading-overlay.css">
-    <!-- <link rel="stylesheet" href="public/stylesheets/styles.css"> -->
-    <title>Hire a Hubby <%= businessNameDisplay %> Form Central</title>
-</head>
+	<body class="d-none">
+		<div id="loadingOverlay">
+			<div id="loadingMessage">
+				<h2>Loading...</h2>
+			</div>
+		</div>
+		<script src="/js/loading-overlay.js"></script>
 
-<body class="d-none">
+		<div id="businessName" class="d-none"><%= businessName %></div>
 
-    <div id="loadingOverlay">
-        <div id="loadingMessage">
-            <h2>Loading...</h2>
-        </div>
-    </div>
-    </div>
-    <script src="/js/loading-overlay.js"></script>
+		<div class="container my-3">
+			<div class="jumbotron">
+				<h1 class="display-4 text-center">
+					Hire a Hubby <%= businessNameDisplay %> Forms
+				</h1>
+			</div>
+			<!-- tab row -->
+			<section class="" id="appBody">
+				<div id="tabRow" class="row text-center justify-content-center">
+					<div class="col-4 tab-col">
+						<div class="card tab-card active-tab" data-tab-id="clientDetails">
+							<div class="card-body">
+								<!-- <i class="fas fa-user-circle"></i> -->
+								<i class="fas fa-portrait"></i>
+								<h4><span>Client Details</span></h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-4 tab-col">
+						<div class="card tab-card" data-tab-id="jobDetails">
+							<div class="card-body">
+								<i class="fas fa-search-plus"></i>
+								<h4><span>Job Details</span></h4>
+							</div>
+						</div>
+					</div>
+					<div class="col-4 tab-col">
+						<div class="card tab-card" data-tab-id="staffDetails">
+							<div class="card-body">
+								<i class="fas fa-search-plus"></i>
+								<h4><span>Staff Details</span></h4>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="contentBody">
+					<div id="clientDetails" class="form-content row">
+						<div class="col-12 px-0">
+							<div class="card">
+								<div class="card-body pb-0">
+									<div class="row">
+										<div class="col-3">
+											<label
+												id="form-type-select-label"
+												class="pr-2 input-label-large"
+												for="clientFormTypeSelect"
+												>Form Type:</label
+											>
+											<select
+												class="form-control form-type-select"
+												name="form-type-select"
+												id="clientFormTypeSelect"
+												required
+											>
+												<option value="New">New</option>
+												<option value="View">View</option>
+												<option value="Edit">Edit</option>
+												<!-- <option value="Delete">Delete </option> -->
+											</select>
+										</div>
+										<div class="col-9 form-record-select-div d-none">
+											<label
+												id="clientDetailsDatalistLabel"
+												class="pr-2 input-label-large"
+												for="clientDetailsDatalist"
+												>Client:</label
+											>
+											<input
+												type="datalist"
+												class="form-control mb-0"
+												name="clientDetailsDatalist"
+												id="clientDetailsDatalist"
+												list="clientDetailsList"
+												required
+											/>
+											<datalist id="clientDetailsList"> </datalist>
+										</div>
+									</div>
+									<div class="status-message alert py-1 px-3 mt-4 mb-0 d-none">
+										<span></span>
+										<button
+											type="button"
+											class="close"
+											data-dismiss="alert"
+											aria-label="Close"
+										>
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body form-body">
+									<div class="default-form-body">
+										<form
+											id="clientDetailsForm"
+											data-name="client"
+											class=""
+											action=""
+											method="get"
+											accept-charset="utf-8"
+										></form>
+									</div>
+									<div id="clientsViewFormBody" class="form-view-body d-none">
+										<fieldset class="form-group">
+											<legend>Client Record</legend>
+										</fieldset>
+										<fieldset class="border-0 d-flex delete-btn-fieldset">
+											<div class="row justify-content-end">
+												<div class="col-2 p-0 pl-3">
+													<button
+														class="btn d-inline btn-block btn-danger delete-btn"
+														type="submit"
+													>
+														Delete
+													</button>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="jobDetails" class="form-content row d-none">
+						<div class="col-12 px-0">
+							<div class="card">
+								<div class="card-body pb-0">
+									<div class="row">
+										<div class="col-3">
+											<label
+												id="form-type-select-label"
+												class="pr-2 input-label-large"
+												for="jobFormTypeSelect"
+												>Form Type:</label
+											>
+											<select
+												class="form-type-select form-control"
+												name="form-type-select"
+												id="jobFormTypeSelect"
+												required
+											>
+												<option value="New">New</option>
+												<option value="View">View</option>
+												<option value="Edit">Edit</option>
+												<!-- <option value="Delete">Delete </option> -->
+											</select>
+										</div>
+										<div class="col-9 form-record-select-div d-none">
+											<label
+												id="jobDetailsDatalistLabel"
+												class="pr-2 input-label-large"
+												for="jobDetailsDatalist"
+												>Job:</label
+											>
+											<input
+												type="datalist"
+												class="form-control mb-0"
+												name="jobDetailsDatalist"
+												id="jobDetailsDatalist"
+												list="jobDetailsList"
+												required
+											/>
+											<datalist id="jobDetailsList"></datalist>
+										</div>
+									</div>
 
-    <div id="businessName" class="d-none"><%= businessName %></div>
+									<div class="status-message alert py-1 px-3 mt-4 mb-0 d-none">
+										<span></span>
+										<button
+											type="button"
+											class="close"
+											data-dismiss="alert"
+											aria-label="Close"
+										>
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body form-body">
+									<div class="default-form-body">
+										<form
+											id="jobDetailsForm"
+											data-name="job"
+											class=""
+											action=""
+											method="get"
+											accept-charset="utf-8"
+										></form>
+									</div>
+									<div id="jobsViewFormBody" class="form-view-body d-none">
+										<fieldset class="form-group">
+											<legend>Job Record</legend>
+										</fieldset>
+										<fieldset class="border-0 d-flex delete-btn-fieldset">
+											<div class="row justify-content-end">
+												<div class="col-2 p-0 pl-3">
+													<button
+														class="btn d-inline btn-block btn-danger delete-btn"
+														type="submit"
+													>
+														Delete
+													</button>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="staffDetails" class="form-content row d-none">
+						<div class="col-12 px-0">
+							<div class="card">
+								<div class="card-body pb-0">
+									<div class="row">
+										<div class="col-3">
+											<label
+												id="form-type-select-label"
+												class="pr-2 input-label-large"
+												for="staffFormTypeSelect"
+												>Form Type:</label
+											>
+											<select
+												class="form-type-select form-control"
+												name="form-type-select"
+												id="staffFormTypeSelect"
+												required
+											>
+												<option value="New">New</option>
+												<option value="View">View</option>
+												<option value="Edit">Edit</option>
+												<!-- <option value="Delete">Delete </option> -->
+											</select>
+										</div>
+										<div class="col-9 form-record-select-div d-none">
+											<label
+												id="staffDetailsDatalistLabel"
+												class="pr-2 input-label-large"
+												for="staffDetailsDatalist"
+												>Staff:</label
+											>
+											<input
+												type="datalist"
+												class="form-control mb-0"
+												name="staffDetailsDatalist"
+												id="staffDetailsDatalist"
+												list="staffDetailsList"
+												required
+											/>
+											<datalist id="staffDetailsList"></datalist>
+										</div>
+									</div>
 
-    <div class="container my-3">
-        <div class="jumbotron">
-            <h1 class="display-4 text-center">
-                Hire a Hubby <%= businessNameDisplay %> Forms
-            </h1>
-        </div>
-        <!-- tab row -->
-        <section class="" id="appBody">
-            <div id="tabRow" class="row text-center justify-content-center">
-                <div class="col-6 tab-col">
-                    <div class="card tab-card active-tab" data-tab-id="clientDetails">
-                        <div class="card-body">
-                            <!-- <i class="fas fa-user-circle"></i> -->
-                            <i class="fas fa-portrait"></i>
-                            <h4><span>Client Details</span></h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 tab-col">
-                    <div class="card tab-card" data-tab-id="jobDetails">
-                        <div class="card-body">
-                            <i class="fas fa-search-plus"></i>
-                            <h4><span>Job Details</span></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="contentBody">
-                <div id="clientDetails" class="form-content row">
-                    <div class="col-12 px-0">
-                        <div class="card">
-                            <div class="card-body pb-0">
-                                <div class="row">
-                                    <div class="col-3">
-                                        <label id="form-type-select-label" class="pr-2 input-label-large"
-                                            for="clientFormTypeSelect">Form
-                                            Type:</label>
-                                        <select class="form-control form-type-select" name="form-type-select"
-                                            id="clientFormTypeSelect" required>
-                                            <option value="New">New </option>
-                                            <option value="View">View </option>
-                                            <option value="Edit">Edit </option>
-                                            <!-- <option value="Delete">Delete </option> -->
-                                        </select>
-                                    </div>
-                                    <div class="col-9 form-record-select-div d-none">
-                                        <label id="clientDetailsDatalistLabel" class="pr-2 input-label-large"
-                                            for="clientDetailsDatalist">Client:</label>
-                                        <input type="datalist" class="form-control mb-0" name="clientDetailsDatalist"
-                                            id="clientDetailsDatalist" list="clientDetailsList" required>
-                                        </input>
-                                        <datalist id="clientDetailsList">
+									<div class="status-message alert py-1 px-3 mt-4 mb-0 d-none">
+										<span></span>
+										<button
+											type="button"
+											class="close"
+											data-dismiss="alert"
+											aria-label="Close"
+										>
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+								</div>
+								<div class="card-body form-body">
+									<div class="default-form-body">
+										<form
+											id="staffDetailsForm"
+											data-name="staff"
+											class=""
+											action=""
+											method="get"
+											accept-charset="utf-8"
+										></form>
+									</div>
+									<div id="staffViewFormBody" class="form-view-body d-none">
+										<fieldset class="form-group">
+											<legend>Staff Record</legend>
+										</fieldset>
+										<fieldset class="border-0 d-flex delete-btn-fieldset">
+											<div class="row justify-content-end">
+												<div class="col-2 p-0 pl-3">
+													<button
+														class="btn d-inline btn-block btn-danger delete-btn"
+														type="submit"
+													>
+														Delete
+													</button>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 
-                                        </datalist>
-                                    </div>
-                                </div>
-                                <div class="status-message alert py-1 px-3 mt-4 mb-0 d-none">
-                                    <span></span>
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body form-body">
-                                <div class="default-form-body">
-                                    <form id="clientDetailsForm" data-name="client" class="" action="" method="get"
-                                        accept-charset="utf-8">
+			<div
+				class="modal fade"
+				id="deleteConfirmModal"
+				data-backdrop="static"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="staticBackdropLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="staticBackdropLabel">
+								Are you sure?
+							</h5>
+							<button
+								type="button"
+								class="close"
+								data-dismiss="modal"
+								aria-label="Close"
+							>
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<span></span>
+							This data will be permanently deleted. This cannot be undone.
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-secondary"
+								data-dismiss="modal"
+							>
+								Cancel
+							</button>
+							<button type="button" class="btn btn-danger delete-confirm-btn">
+								DELETE
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                                    </form>
-                                </div>
-                                <div id="clientViewFormBody" class="form-view-body d-none">
-                                    <fieldset class="form-group">
-                                        <legend>Client Record</legend>
-                                    </fieldset>
-                                    <fieldset class="border-0 d-flex delete-btn-fieldset">
-                                        <div class="row justify-content-end">
-                                            <div class="col-2 p-0 pl-3"><button
-                                                    class="btn d-inline btn-block btn-danger delete-btn"
-                                                    type="submit">Delete</button></div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="jobDetails" class="form-content row d-none">
-                    <div class="col-12 px-0">
-                        <div class="card">
-                            <div class="card-body pb-0">
-                                <div class="row">
-                                    <div class="col-3">
-                                        <label id="form-type-select-label" class="pr-2 input-label-large"
-                                            for="jobFormTypeSelect">Form
-                                            Type:</label>
-                                        <select class="form-type-select form-control" name="form-type-select"
-                                            id="jobFormTypeSelect" required>
-                                            <option value="New">New </option>
-                                            <option value="View">View </option>
-                                            <option value="Edit">Edit </option>
-                                            <!-- <option value="Delete">Delete </option> -->
-                                        </select>
-                                    </div>
-                                    <div class="col-9 form-record-select-div d-none">
-                                        <label id="jobDetailsDatalistLabel" class="pr-2 input-label-large"
-                                            for="jobDetailsDatalist">Job:</label>
-                                        <input type="datalist" class="form-control mb-0" name="jobDetailsDatalist"
-                                            id="jobDetailsDatalist" list="jobDetailsList" required>
-                                        </input>
-                                        <datalist id="jobDetailsList"></datalist>
-                                    </div>
-                                </div>
-
-                                <div class="status-message alert py-1 px-3 mt-4 mb-0 d-none">
-                                    <span></span>
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body form-body">
-                                <div class="default-form-body">
-                                    <form id="jobDetailsForm" data-name="job" class="" action="" method="get"
-                                        accept-charset="utf-8">
-
-                                    </form>
-                                </div>
-                                <div id="jobViewFormBody" class="form-view-body d-none">
-                                    <fieldset class="form-group">
-                                        <legend>Job Record</legend>
-                                    </fieldset>
-                                    <fieldset class="border-0 d-flex delete-btn-fieldset">
-                                        <div class="row justify-content-end">
-                                            <div class="col-2 p-0 pl-3">
-                                                <button class="btn d-inline btn-block btn-danger delete-btn"
-                                                    type="submit">Delete</button>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="modal fade" id="deleteConfirmModal" data-backdrop="static" tabindex="-1" role="dialog"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Are you sure?</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <span></span>
-                        This data will be permanently deleted. This cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger delete-confirm-btn">DELETE</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
-    <script
-        src='https://www.addy.co.nz/scripts/addy.js?loadcss=true&enableLocation=false&key=13ecb92d1b934e1db5328eebdc715e6e'
-        type='text/javascript' async=true></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
-        integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"
-        integrity="sha256-PieqE0QdEDMppwXrTzSZQr6tWFX3W5KkyRVyF1zN3eg=" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" type="text/javascript"
-        charset="utf-8" async defer></script>
-    <script src="/js/moment.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/js/moment-timezone-with-data-10-year-range.js" type="text/javascript" charset="utf-8" async defer>
-    </script>
-    <script type="module" src="/js/forms.js" type="text/javascript" charset="utf-8" async defer></script>
-    <script type="module" src="/js/handlers.js" type="text/javascript" charset="utf-8" async defer></script>
-    <script type="module" src="/js/index.js" type="text/javascript" charset="utf-8" async defer></script>
-</body>
-
+		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+		<script
+			src="https://www.addy.co.nz/scripts/addy.js?loadcss=true&enableLocation=false&key=13ecb92d1b934e1db5328eebdc715e6e"
+			type="text/javascript"
+			async="true"
+		></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
+			integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs="
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"
+			integrity="sha256-PieqE0QdEDMppwXrTzSZQr6tWFX3W5KkyRVyF1zN3eg="
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+			type="text/javascript"
+			charset="utf-8"
+			async
+			defer
+		></script>
+		<script src="/js/moment.js" type="text/javascript" charset="utf-8"></script>
+		<script
+			src="/js/moment-timezone-with-data-10-year-range.js"
+			type="text/javascript"
+			charset="utf-8"
+			async
+			defer
+		></script>
+		<script
+			type="module"
+			src="/js/forms.js"
+			type="text/javascript"
+			charset="utf-8"
+			async
+			defer
+		></script>
+		<script
+			type="module"
+			src="/js/handlers.js"
+			type="text/javascript"
+			charset="utf-8"
+			async
+			defer
+		></script>
+		<script
+			type="module"
+			src="/js/index.js"
+			type="text/javascript"
+			charset="utf-8"
+			async
+			defer
+		></script>
+	</body>
 </html>

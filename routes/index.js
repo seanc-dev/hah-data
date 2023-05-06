@@ -1,6 +1,8 @@
 import express from "express";
+
 import getData from "./services/getData.js";
 import formOptions from "../lib/form-options.js";
+import { getNewFormObject } from "../lib/library.js";
 
 const router = express.Router({
 	mergeParams: true,
@@ -19,21 +21,21 @@ router.get("/:orgShortName", function (req, res) {
 		} else {
 			getData
 				.getOrgDetailsByShortName(orgShortName)
-				.then(({ organisationId, staffNames, territories }) => {
+				.then(({ organisationId, staffNames }) => {
 					const data = {
 						formOptions: {
-							...formOptions[orgShortName],
-							clientDetails: {
-								...formOptions[orgShortName].clientDetails,
-								fields: {
-									...formOptions[orgShortName].clientDetails.fields,
-									cd_territory: {
-										...formOptions[orgShortName].clientDetails.fields
-											.cd_territory,
-										values: ["", ...territories],
-									},
-								},
-							},
+							...getNewFormObject(formOptions[orgShortName], staffNames),
+							// clientDetails: {
+							// 	...formOptions[orgShortName].clientDetails,
+							// 	fields: {
+							// 		...formOptions[orgShortName].clientDetails.fields,
+							// 		cd_territory: {
+							// 			...formOptions[orgShortName].clientDetails.fields
+							// 				.cd_territory,
+							// 			values: ["", ...territories],
+							// 		},
+							// 	},
+							// },
 						},
 						businessName: orgShortName,
 						businessNameDisplay:

@@ -1,6 +1,6 @@
 export default {
 	getJobById: (staffNames, client) => {
-		let staffNamesTrim = staffNames.map((name) => name.replace(" ", ""));
+		let staffNamesTrim = staffNames.map((name) => name.replaceAll(" ", ""));
 		let queryStr = "with ";
 
 		staffNamesTrim.forEach((name, idx) => {

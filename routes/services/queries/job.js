@@ -1,7 +1,11 @@
 import queryBuilders from "./queryBuilders/job.js";
 import staffQueries from "./staff.js";
-import Job from "../../../lib/classes/job.js";
-import lib from "./../../../lib/library.js";
+import {
+	getStaffNamesFromJobPost,
+	prepareDataForDbInsert,
+	getObjectFromKey,
+} from "./../../../lib/library.js";
+// import getData from "../getData.js";
 
 import dbConfig from "./../../../lib/db_config.js";
 
@@ -11,9 +15,9 @@ export default {
 	createJob: async (req, res) => {
 		// replace empty strings with string null values for insert
 		const { orgId } = req.params;
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
 		// extract staffNames from body for staff_job_hours insert
-		const staffNames = lib.getStaffNamesFromJobPost(body);
+		const staffNames = getStaffNamesFromJobPost(body);
 		// create id var outside of block
 		let id;
 		// connect node-postgres client
@@ -66,8 +70,8 @@ export default {
 		}
 		// Fire off async insert into google sheets for job record - must do this here as we require (and don't
 		// return) the id for the newly created record
-		const getData = require("../getData");
-		getData.crud(new Job(orgId, id, body), "new");
+
+		// getData.crud(new Job(orgId, id, body), "new");
 	},
 
 	deleteJobById: async (req, res) => {
@@ -78,7 +82,7 @@ export default {
 			await client.query("delete from staff_job_hours where jobid = $1", [id]);
 			await client.query("delete from job where id = $1", [id]);
 			await client.query("commit");
-			res.json(result.rows[0]);
+			res.json(`Job record with id ${id} successfully deleted`);
 			console.log(`Job record with id ${id} successfully deleted`);
 		} catch (err) {
 			client.query("rollback");
@@ -124,9 +128,17 @@ export default {
 			const jobObj = jobResult.rows[0];
 			const mappedJobObj = {};
 			const keys = Object.keys(jobObj);
+			const hoursWorkedFields = staffNames.map(
+				(name) => `hoursWorked${name.replaceAll(" ", "")}`
+			);
+			const hourlyRateFields = staffNames.map(
+				(name) => `hourlyRate${name.replaceAll(" ", "")}`
+			);
 			keys.forEach((key) => {
 				mappedJobObj[
-					lib.getObjectFromKey(orgId, "job", "dbHeader", key, "fieldName")
+					hoursWorkedFields.find((field) => field.toLowerCase() === key) ??
+						hourlyRateFields.find((field) => field.toLowerCase() === key) ??
+						getObjectFromKey(orgId, "job", "dbHeader", key, "fieldName")
 				] = jobObj[key];
 			});
 			return mappedJobObj;
@@ -137,33 +149,51 @@ export default {
 	},
 
 	updateJobById: async (req, res) => {
-		const { orgId, id } = req.params;
+		const { id } = req.params;
 		// create id outside of block
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
+		const {
+			workLocationStreetAddress,
+			workLocationSuburb,
+			primaryJobType,
+			secondaryJobType,
+			indoorsOutdoors,
+			dateJobEnquiryutc,
+			dateJobQuoted,
+			dateWorkCommenced,
+			dateInvoiceSent,
+			amountInvoiced,
+			costMaterials,
+			costSubcontractor,
+			costTipFees,
+			costOther,
+			workSatisfaction,
+		} = body;
 		const client = await pool.connect();
 		try {
 			await client.query("begin");
-			const result = await client.query(
+			await client.query(
 				"update job as j set worklocationstreetaddress = $2, worklocationsuburb = $3, primaryjobtype = $4, secondaryjobtype = $5, indoorsoutdoors = $6, datejobenquiryutc = $7, datejobquotedutc = $8, dateworkcommencedutc = $9, dateinvoicesentutc = $10, amountinvoiced = $11, costmaterials = $12, costsubcontractor = $13, costtipfees = $14, costother = $15, worksatisfaction = $16 where j.id = $1 returning id",
 				[
 					id,
-					body["workLocationStreetAddress"],
-					body["workLocationSuburb"],
-					body["primaryJobType"],
-					body["secondaryJobType"],
-					body["indoorsOutdoors"],
-					body["dateJobEnquiryutc"],
-					body["dateJobQuoted"],
-					body["dateWorkCommenced"],
-					body["dateInvoiceSent"],
-					body["amountInvoiced"],
-					body["costMaterials"],
-					body["costSubcontractor"],
-					body["costTipFees"],
-					body["costOther"],
-					body["workSatisfaction"],
+					workLocationStreetAddress,
+					workLocationSuburb,
+					primaryJobType,
+					secondaryJobType,
+					indoorsOutdoors,
+					dateJobEnquiryutc,
+					dateJobQuoted,
+					dateWorkCommenced,
+					dateInvoiceSent,
+					amountInvoiced,
+					costMaterials,
+					costSubcontractor,
+					costTipFees,
+					costOther,
+					workSatisfaction,
 				]
 			);
+			await staffQueries.updateStaffJobHours(id, body, client);
 			await client.query("commit");
 			res.json({ id });
 		} catch (err) {
@@ -173,9 +203,7 @@ export default {
 		} finally {
 			client.release();
 		}
-		// Fire off async insert into google sheets for job record - must do this here as we require (and don't
-		// return) the id for the newly created record
-		const getData = require("../getData");
-		getData.crud(new Job(orgId, id, body), "edit");
+		// Fire off async insert into google sheets for job record - must do this here as we require (and don't return) the id for the newly created record
+		// getData.crud(new Job(orgId, id, body), "edit");
 	},
 };

@@ -1,6 +1,14 @@
 import clientQueries from "./queryBuilders/client.js";
-import lib from "./../../../lib/library.js";
+import Client from "../../../lib/classes/client.js";
 import staffQueries from "./staff.js";
+import {
+	getMaxDateFromArrayOfObjects,
+	prepareDataForDbInsert,
+	sumKeyInObjectsArray,
+	getObjectFromKey,
+} from "./../../../lib/library.js";
+import getData from "../getData.js";
+import queries from "./index.js";
 
 import dbConfig from "./../../../lib/db_config.js";
 
@@ -10,12 +18,11 @@ export default {
 	createClient: async (req, res) => {
 		const { orgId } = req.params;
 		let id;
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
 		if (body.mainContactFirstName.toLowerCase() === "test") body.test = 1;
 		const pgClient = await pool.connect();
 		try {
 			await pgClient.query("begin");
-			const queries = require("./index");
 			const orgIdResult = await queries.getOrgId(orgId, pgClient);
 			const result = await pgClient.query(
 				"insert into client (organisationid, accountname, maincontactfirstname, maincontactlastname, maincontactemail, maincontactmobile, maincontactlandline, businessname, billingaddressstreet, billingaddresssuburb, territory, customerdemographic, estimatedcustomerincome, acquisitionchannel, test) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) returning id",
@@ -47,8 +54,6 @@ export default {
 		} finally {
 			pgClient.release();
 		}
-		const Client = require("../../../lib/classes/client");
-		const getData = require("../getData");
 		getData.crud(new Client(orgId, id, body), "new");
 	},
 	getClientDetails: async (req, res) => {
@@ -77,10 +82,8 @@ export default {
 		try {
 			const staffNames = await staffQueries.getStaffNames(orgId, client);
 			// pull detail of all jobs for client
-			const jobDetails = await client.query(
-				clientQueries.getJobsByClientIdQuery(staffNames),
-				[id]
-			);
+			const queryString = clientQueries.getJobsByClientIdQuery(staffNames);
+			const jobDetails = await client.query(queryString, [id]);
 			// pull client details
 			const clientResult = await client.query(
 				"select * from client where id = $1",
@@ -92,31 +95,26 @@ export default {
 			Object.keys(clientObj).forEach((key) => {
 				if (key !== "organisationid")
 					mappedClientObj[
-						lib.getObjectFromKey(orgId, "client", "dbHeader", key, "fieldName")
+						getObjectFromKey(orgId, "client", "dbHeader", key, "fieldName")
 					] = clientObj[key];
 			});
+			getObjectFromKey, sumKeyInObjectsArray;
 			// concat job details to client
 			const jobDetailsData = jobDetails.rows;
 			clientDetailsObject = {
 				...mappedClientObj,
 				countJobs: jobDetailsData.length,
-				sumJobValue: lib.sumKeyInObjectsArray(jobDetailsData, "amountinvoiced"),
-				sumJobCost: lib.sumKeyInObjectsArray(jobDetailsData, "totaljobcost"),
-				sumJobGrossProfit: lib.sumKeyInObjectsArray(
-					jobDetailsData,
-					"grossprofit"
-				),
-				sumJobHours: lib.sumKeyInObjectsArray(
-					jobDetailsData,
-					"totalhoursworked"
-				),
-				mostRecentJobInvoicedDate: lib.getMaxDateFromArrayOfObjects(
+				sumJobValue: sumKeyInObjectsArray(jobDetailsData, "amountinvoiced"),
+				sumJobCost: sumKeyInObjectsArray(jobDetailsData, "totaljobcost"),
+				sumJobGrossProfit: sumKeyInObjectsArray(jobDetailsData, "grossprofit"),
+				sumJobHours: sumKeyInObjectsArray(jobDetailsData, "totalhoursworked"),
+				mostRecentJobInvoicedDate: getMaxDateFromArrayOfObjects(
 					jobDetailsData,
 					"dateinvoicesentutc"
 				),
 			};
 		} catch (err) {
-			throw err;
+			console.error(err);
 		} finally {
 			client.release();
 		}
@@ -124,7 +122,7 @@ export default {
 	},
 	updateClientById: (req, res) => {
 		const { id, orgId } = req.params;
-		const body = lib.prepareDataForDbInsert(req.body);
+		const body = prepareDataForDbInsert(req.body);
 		try {
 			pool.query(
 				"update client set maincontactfirstname = $1, maincontactlastname = $2, maincontactemail = $3, maincontactmobile = $4, maincontactlandline = $5, businessname = $6, billingaddressstreet = $7, billingaddresssuburb = $8, territory = $9, customerdemographic = $10, estimatedcustomerincome = $11, acquisitionchannel = $12 where id = $13",
@@ -149,11 +147,13 @@ export default {
 			console.error(err);
 			res.status(500).send(err);
 		}
-		const Client = require("../../../lib/classes/client");
-		const getData = require("../getData");
 		getData.crud(new Client(orgId, id, body), "edit");
 	},
 	deleteClientById: async (req, res) => {
+		return null;
+		// returning null because below code is incomplete = it deletes a job record but not a client record
+		// better solution is to set db to cascade deletes (pretty sure already exists) then just delete client record
+		// eslint-disable-next-line no-unreachable
 		const { id } = req.params;
 		const client = await pool.connect();
 		try {
@@ -163,7 +163,7 @@ export default {
 				[id]
 			);
 			await client.query("delete from job where id = $1", [id]);
-			await client.query("commit");
+			const result = await client.query("commit");
 			res.json(result.rows[0]);
 			console.log(`Job record with id ${id} successfully deleted`);
 		} catch (err) {

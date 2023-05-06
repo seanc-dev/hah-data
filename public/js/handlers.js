@@ -1,358 +1,418 @@
+/* eslint-disable no-undef */
 import forms from "./forms.js";
-import lib from "./library.js";
+import {
+	endSpinner,
+	initSpinner,
+	setCreatedDate,
+	getFormRestfulName,
+	getAccountNameValue,
+	revealStatusMessage,
+	setJobAddressFields,
+} from "./library.js";
+import {
+	validateJobForm,
+	validateStaffForm,
+	validateClientForm,
+} from "./validation.js";
 
 const handlers = {
-  handleAccountNameBlur: function () {
-    let accountNameField = $("#jobDetails-accountName");
+	handleAccountNameBlur: function () {
+		const accountNameField = $("#jobDetails-accountName");
 
-    accountNameField.blur(function (e) {
-      lib.setJobAddressFields(accountNameField.val());
-    });
-  },
+		accountNameField.on("blur", function () {
+			setJobAddressFields(accountNameField.val());
+		});
+	},
 
-  handleAccountTypeInput: function () {
-    $("#clientDetailsForm")
-      .find(".account-name")
-      .on("input", function (e) {
-        if (
-          $(this)
-            .closest(".form-content")
-            .find(".form-type-select")
-            .val()
-            .toLowerCase() === "new"
-        ) {
-          let value = lib.getAccountNameValue(),
-            reg = /\b(\w*undefined\w*)\b/g;
-          if (value === undefined || value.search(reg) > -1) value = "";
-          $("#clientDetails-accountName").val(value);
-        }
-      });
-  },
+	handleAccountTypeInput: function () {
+		$("#clientDetailsForm")
+			.find(".account-name")
+			.on("input", function () {
+				if (
+					$(this)
+						.closest(".form-content")
+						.find(".form-type-select")
+						.val()
+						.toLowerCase() === "new"
+				) {
+					let value = getAccountNameValue(),
+						reg = /\b(\w*undefined\w*)\b/g;
+					if (value === undefined || value.search(reg) > -1) value = "";
+					$("#clientDetails-accountName").val(value);
+				}
+			});
+	},
 
-  handleInputFocus: function () {
-    let inputs = $(".form-control");
-    inputs.focus(function () {
-      $(this).closest("div").find("label").addClass("active");
-    });
-    inputs.blur(function () {
-      $(this).closest("div").find("label").removeClass("active");
-    });
-  },
+	handleInputFocus: function () {
+		const inputs = $(".form-control");
+		inputs.on("focus", function () {
+			$(this).closest("div").find("label").addClass("active");
+		});
+		inputs.on("blur", function () {
+			$(this).closest("div").find("label").removeClass("active");
+		});
+	},
 
-  handleFormSubmit: function () {
-    $(".form-submit").click(function (e) {
-      e.preventDefault();
+	handleFormSubmit: function () {
+		$(".form-submit").on("click", function (e) {
+			e.preventDefault();
 
-      let $form = $(this).closest("form");
-      let formType =
-        $form[0].dataset.name.charAt(0).toUpperCase() +
-        $form[0].dataset.name.slice(1);
-      let $statusDiv = $form.closest(".form-content").find(".status-message");
+			const $form = $(this).closest("form");
+			const formType =
+				$form[0].dataset.name.charAt(0).toUpperCase() +
+				$form[0].dataset.name.slice(1);
+			const $statusDiv = $form.closest(".form-content").find(".status-message");
 
-      $(this)
-        .closest(".form-content")
-        .find(".form-record-select-div input")
-        .val("");
+			$(this)
+				.closest(".form-content")
+				.find(".form-record-select-div input")
+				.val("");
 
-      lib.setCreatedDate();
+			setCreatedDate();
 
-      let validation;
+			let validation;
 
-      if (formType === "Client") validation = forms.validateClientForm();
-      if (formType === "Job") validation = forms.validateJobForm();
+			if (formType === "Client") validation = validateClientForm();
+			if (formType === "Job") validation = validateJobForm();
+			if (formType === "Staff") validation = validateStaffForm();
 
-      // check default validity. If fails, report validity
-      if ($form[0].checkValidity()) {
-        // check custom validation. if successful, submit and append client details to array. If unsuccessful, report in error message
-        if (validation === true) {
-          forms.submitFormFlow($form, formType, $statusDiv);
-        } else {
-          // else, fail validation and present custom error message
-          lib.revealStatusMessage(
-            formType.toLowerCase(),
-            "danger",
-            "Error",
-            validation
-          );
-        }
-      } else {
-        $form[0].reportValidity();
-      }
-    });
-  },
+			// check default validity. If fails, report validity
+			if ($form[0].checkValidity()) {
+				// check custom validation. if successful, submit and append client details to array. If unsuccessful, report in error message
+				if (validation === true) {
+					forms.submitFormFlow($form, formType, $statusDiv);
+				} else {
+					// else, fail validation and present custom error message
+					revealStatusMessage(
+						formType.toLowerCase(),
+						"danger",
+						"Error",
+						validation
+					);
+				}
+			} else {
+				$form[0].reportValidity();
+			}
+		});
+	},
 
-  handleFormTabClick: function () {
-    let formTabArr = $(".tab-card");
-    formTabArr.on("click", function () {
-      // set clicked tab active and all others inactive
-      formTabArr.each(function (i, element) {
-        element.classList.remove("active-tab");
-      });
-      this.classList.add("active-tab");
+	handleFormTabClick: function () {
+		const formTabArr = $(".tab-card");
+		formTabArr.on("click", function () {
+			// set clicked tab active and all others inactive
+			formTabArr.each(function (i, element) {
+				element.classList.remove("active-tab");
+			});
+			this.classList.add("active-tab");
 
-      // toggle form content
-      $(".form-content").addClass("d-none");
+			// toggle form content
+			$(".form-content").addClass("d-none");
 
-      let clickedTabName = $(this).attr("data-tab-id");
-      $("#" + clickedTabName).removeClass("d-none");
-    });
-  },
+			const clickedTabName = $(this).attr("data-tab-id");
+			$("#" + clickedTabName).removeClass("d-none");
+		});
+	},
 
-  handlerFormTypeSelect: function () {
-    $(".form-type-select").change(function (e) {
-      let formType = this.value;
-      let $formBody = $(this).closest(".card").find(".form-body");
-      let $form = $formBody.find("form");
-      let $recordView = $formBody.find(".form-view-body");
-      let $formRecordSelect = $(this)
-        .closest(".row")
-        .find(".form-record-select-div");
-      let $formInputs = $form.find("input, select");
-      let dim = $form.attr("data-name");
-      toggleRecordSelectVisibility = toggleRecordSelectVisibility.bind(this);
+	handlerFormTypeSelect: function () {
+		$(".form-type-select").on("change", function () {
+			const formType = this.value;
+			const $formBody = $(this).closest(".card").find(".form-body");
+			const $form = $formBody.find("form");
+			const $recordView = $formBody.find(".form-view-body");
+			const $formRecordSelect = $(this)
+				.closest(".row")
+				.find(".form-record-select-div");
+			const $formInputs = $form.find("input, select");
+			const dim = $form.attr("data-name");
 
-      $formRecordSelect.find("input").val("");
-      $.each($formBody.find(".form-control"), function (i, el) {
-        $(el).val("");
-      });
+			let toggleRecordSelectVisibility = function (bool) {
+				if (bool) {
+					$formRecordSelect.removeClass("d-none");
+				} else {
+					$formRecordSelect.addClass("d-none");
+				}
+			};
 
-      if (formType === "New") {
-        // toggle record select
-        toggleRecordSelectVisibility(false);
+			toggleRecordSelectVisibility = toggleRecordSelectVisibility.bind(this);
 
-        // Ensure form is visible and data view is not
-        toggleFormVisibility(true);
+			$formRecordSelect.find("input").val("");
+			$.each($formBody.find(".form-control"), function (i, el) {
+				$(el).val("");
+			});
 
-        // Clear all other fields, set as non-read-only
-        $form[0].reset();
-        toggleReadOnly(false);
+			if (formType === "New") {
+				// toggle record select
+				toggleRecordSelectVisibility(false);
 
-        // If dim === 'job', clear billingAddress textarea
-        if (dim === "job") $("#jobDetails-billingAddress").val("");
+				// ensure form is visible and data view is not
+				toggleFormVisibility(true);
 
-        // Remove info popup
-        $("#" + dim + "DetailsForm")
-          .closest(".form-content")
-          .find(".status-message")
-          .alert("close");
+				// clear all other fields, set as non-read-only
+				$form[0].reset();
+				toggleReadOnly(false);
 
-        // ensure accountType field is required
-        if (dim === "client") {
-          let $accTypeField = $("#clientDetails-accountType");
-          $accTypeField[0].required = true;
-          $accTypeField.closest(".col-6").find("label").text("Account Type *");
-        }
-      } else if (formType === "View") {
-        // Ensure record select is visible
-        toggleRecordSelectVisibility(true);
+				// hide hourly rate effective date field if staff new
+				if (dim === "staff")
+					$('input[name="hourlyRateEffectiveDateUTC"]')
+						.closest("div")
+						.addClass("d-none");
 
-        // Ensure form not visible and data view is
-        toggleFormVisibility(false);
+				// if dim === 'job', clear billingAddress textarea
+				if (dim === "job") $("#jobDetails-billingAddress").val("");
 
-        // Pop up info alert to populate record select field which disappears upon selection
-        revealPopUp();
+				// remove info popup
+				$("#" + dim + "DetailsForm")
+					.closest(".form-content")
+					.find(".status-message")
+					.alert("close");
 
-        // toggle delete button
-        toggleDeleteButton(false);
-      } else if (formType === "Edit") {
-        // Ensure record select is visible
-        toggleRecordSelectVisibility(true);
+				// ensure accountType field is required
+				if (dim === "client") {
+					const $accTypeField = $("#clientDetails-accountType");
+					$accTypeField[0].required = true;
+					$accTypeField.closest(".col-6").find("label").text("Account Type *");
+				}
+			} else if (formType === "View") {
+				// ensure record select is visible
+				toggleRecordSelectVisibility(true);
 
-        // Ensure form is visible and data view is not
-        toggleFormVisibility(true);
+				// ensure form not visible and data view is
+				toggleFormVisibility(false);
 
-        // Pop up info alert to populate record select field which disappears upon selection
-        revealPopUp();
+				// Ppp up info alert to populate record select field which disappears upon selection
+				revealPopUp();
 
-        // Clear all other fields, set as non-read-only
-        $form[0].reset();
-        toggleReadOnly(false);
+				// toggle delete button
+				toggleDeleteButton(false);
+			} else if (formType === "Edit") {
+				// ensure record select is visible
+				toggleRecordSelectVisibility(true);
 
-        // set accountName as readonly=true
-        $('input[name="accountName"]').attr("readonly", true);
+				// ensure form is visible and data view is not
+				toggleFormVisibility(true);
 
-        // if dim === 'client' set accountType to non-required
-        if (dim === "client") {
-          let $accTypeField = $("#clientDetails-accountType");
-          $accTypeField[0].required = false;
-          $accTypeField.closest(".col-6").find("label").text("Account Type");
-        }
-      } else if (formType === "Delete") {
-        // Ensure record select is visible
-        toggleRecordSelectVisibility(true);
+				// pop up info alert to populate record select field which disappears upon selection
+				revealPopUp();
 
-        // Ensure form not visible and data view is
-        toggleFormVisibility(false);
+				// clear all other fields, set as non-read-only
+				$form[0].reset();
+				toggleReadOnly(false);
 
-        // Pop up info alert to populate record select field which disappears upon selection
-        revealPopUp();
+				// set accountName as readonly=true
+				if (dim != "staff") {
+					$('input[name="accountName"]').attr("readonly", true);
+				} else {
+					$('input[name="staffMemberName"]').attr("readonly", true);
 
-        // reveal delete button
-        toggleDeleteButton(true);
-      }
+					// hide hourly rate effective date field if staff new
+					if (dim === "staff")
+						$('input[name="hourlyRateEffectiveDateUTC"]')
+							.closest("div")
+							.removeClass("d-none");
+				}
 
-      function toggleRecordSelectVisibility(bool) {
-        if (bool) {
-          $formRecordSelect.removeClass("d-none");
-        } else {
-          $formRecordSelect.addClass("d-none");
-        }
-      }
+				// if dim === 'client' set accountType to non-required
+				if (dim === "client") {
+					const $accTypeField = $("#clientDetails-accountType");
+					$accTypeField[0].required = false;
+					$accTypeField.closest(".col-6").find("label").text("Account Type");
+				}
+			} else if (formType === "Delete") {
+				// ensure record select is visible
+				toggleRecordSelectVisibility(true);
 
-      function toggleFormVisibility(bool) {
-        if (bool) {
-          $form.removeClass("d-none");
-          $recordView.addClass("d-none");
-        } else {
-          $form.addClass("d-none");
-          $recordView.removeClass("d-none");
-        }
-      }
+				// ensure form not visible and data view is
+				toggleFormVisibility(false);
 
-      function toggleReadOnly(bool) {
-        $formInputs.attr("readonly", bool);
-        let readOnlyFieldName =
-          dim === "client"
-            ? "clientDetails-accountName"
-            : "jobDetails-billingAddress";
-        $form.find("#" + readOnlyFieldName).attr("readonly", true);
-      }
+				// Pop up info alert to populate record select field which disappears upon selection
+				revealPopUp();
 
-      function revealPopUp() {
-        lib.revealStatusMessage(
-          dim,
-          "info",
-          false,
-          "Select a " + dim + " to " + formType.toLowerCase()
-        );
-      }
+				// reveal delete button
+				toggleDeleteButton(true);
+			}
 
-      function toggleDeleteButton(bool) {
-        let el = $formBody.find(".delete-btn").closest("fieldset");
-        if (bool) {
-          el.removeClass("d-none");
-          el.addClass("d-flex");
-        } else {
-          el.addClass("d-none");
-          el.removeClass("d-flex");
-        }
-      }
-    });
-  },
+			function toggleFormVisibility(bool) {
+				if (bool) {
+					$form.removeClass("d-none");
+					$recordView.addClass("d-none");
+				} else {
+					$form.addClass("d-none");
+					$recordView.removeClass("d-none");
+				}
+			}
 
-  handleRecordSelectChange: function () {
-    $(".form-record-select-div")
-      .find("input")
-      .change(function (e) {
-        let $contentEl = $(this).closest(".form-content");
-        let $defaultBody = $contentEl.find(".default-form-body");
-        let $viewBody = $contentEl.find(".form-view-body");
-        let dim = $contentEl.find("form").attr("data-name");
-        let str = $(this).val();
-        let id = document.appData[dim + "Detail"].find(
-          (obj) => str === obj.concat
-        )[dim + "Id"];
-        let formAction = $contentEl.find(".form-type-select").val();
+			function toggleReadOnly(bool) {
+				$formInputs.attr("readonly", bool);
+				const readOnlyFieldName =
+					dim === "client"
+						? "clientDetails-accountName"
+						: "jobDetails-billingAddress";
+				$form.find("#" + readOnlyFieldName).attr("readonly", true);
+			}
 
-        $contentEl.find(".alert").alert("close");
+			function revealPopUp() {
+				revealStatusMessage(
+					dim,
+					"info",
+					false,
+					"Select a " + dim + " to " + formType.toLowerCase()
+				);
+			}
 
-        lib.initSpinner();
+			function toggleDeleteButton(bool) {
+				const el = $formBody.find(".delete-btn").closest("fieldset");
+				if (bool) {
+					el.removeClass("d-none");
+					el.addClass("d-flex");
+				} else {
+					el.addClass("d-none");
+					el.removeClass("d-flex");
+				}
+			}
+		});
+	},
 
-        axios
-          .get("/" + document.appData.businessName + "/" + dim + "s/" + id)
-          .then((result) => {
-            console.log(`handleRecordSelectChange handler axios result`);
-            const { data } = result;
-            console.log(data);
+	handleRecordSelectChange: function () {
+		$(".form-record-select-div")
+			.find("input")
+			.on("change", function () {
+				const $contentEl = $(this).closest(".form-content");
+				const $defaultBody = $contentEl.find(".default-form-body");
+				const $viewBody = $contentEl.find(".form-view-body");
+				const dim = $contentEl.find("form").attr("data-name");
+				const str = $(this).val();
+				const detailsObj = document.appData[dim + "Detail"].find(
+					(obj) => str === obj.concat
+				);
+				const id = detailsObj["id"] ?? detailsObj[dim + "Id"];
+				const formAction = $contentEl.find(".form-type-select").val();
 
-            let $bodyEl = formAction === "Edit" ? $defaultBody : $viewBody;
+				$contentEl.find(".alert").alert("close");
 
-            // loop through returned properties and apply as values to relevant cells
-            let keys = Object.keys(data);
-            keys.forEach((key) => {
-              if (
-                moment(data[key], "YYYY-MM-DDTHH:mm:ss.SSSSZ", true).isValid()
-              ) {
-                data[key] = moment
-                  .utc(data[key])
-                  .tz("Pacific/Auckland")
-                  .format("D/M/YYYY");
-              }
-              $bodyEl.find('[name="' + key + '"]').val(data[key]);
-              $contentEl.find(".status-message .alert").alert("close");
-            });
+				initSpinner();
 
-            // set job address fields from document.appData.jobDetails
-            // if (dim === "job")
-            //   lib.setJobAddressFields($("#jobDetails-accountName").val());
-          })
-          .catch((err) => {
-            console.error(err);
-            lib.revealStatusMessage(
-              dim,
-              "danger",
-              "Error",
-              "Failed to retrieve client details from Database. Please refresh page."
-            );
-          })
-          .then(lib.endSpinner);
-      });
-  },
+				const url =
+					"/" +
+					document.appData.businessName +
+					"/" +
+					getFormRestfulName(dim) +
+					"/" +
+					id;
+				console.log("url: ", url);
 
-  handleDeleteBtnClick: function () {
-    $(".delete-btn").click(function (e) {
-      $("#deleteConfirmModal").modal({
-        backdrop: true,
-      });
-    });
-  },
+				axios
+					.get(url)
+					.then((result) => {
+						const { data } = result;
 
-  handleDeleteBtnConfirm: function () {
-    $(".delete-confirm-btn").click(function (e) {
-      // initiate loading spinner
-      lib.initSpinner();
-      let $viewBody = $(this).closest(".form-content").find(".form-view-body");
-      let formType = $(this)
-        .closest(".form-content")
-        .find("form")
-        .attr("data-name");
-      let accountName = $viewBody.find('input[name="accountName"]').val();
-      let id = $viewBody.find('input[name="' + formType + 'Id"]').val();
+						const $bodyEl = formAction === "Edit" ? $defaultBody : $viewBody;
 
-      axios
-        .delete(
-          "/" + document.appData.businessName + "/" + formType + "s/" + id
-        )
-        .then((result) => {
-          // implement success message and clear fields
-          lib.revealStatusMessage(
-            formType,
-            "success",
-            "Success",
-            "Deleted " + formType + " record for " + accountName
-          );
-          $viewBody.find("input").empty();
-        })
-        .catch((err) => {
-          console.error(err);
-          lib.revealStatusMessage(
-            formType,
-            "error",
-            "Error",
-            "Failed to delete record"
-          );
-        })
-        .then(lib.endSpinner);
-    });
-  },
+						// loop through returned properties and apply as values to relevant cells
+						const keys = Object.keys(data);
+						keys.forEach((key) => {
+							if (
+								moment(data[key], "YYYY-MM-DDTHH:mm:ss.SSSSZ", true).isValid()
+							) {
+								data[key] = moment
+									.utc(data[key])
+									.tz("Pacific/Auckland")
+									.format("yyyy-MM-DD");
+							}
 
-  handleAlertHide: function () {
-    $(".alert").on("close.bs.alert", function (e) {
-      e.preventDefault();
+							const el = $bodyEl.find('[name="' + key + '"]');
+							if (el[0] && el[0].type === "checkbox") {
+								if (!!Number(data[key])) {
+									el.attr("checked", true);
+								} else {
+									el.attr("checked", false);
+								}
+							} else {
+								el.val(data[key]);
+							}
+							$contentEl.find(".status-message .alert").alert("close");
+						});
+					})
+					.catch((err) => {
+						console.error(err);
+						revealStatusMessage(
+							dim,
+							"danger",
+							"Error",
+							"Failed to retrieve client details from Database. Please refresh page."
+						);
+					})
+					.then(endSpinner);
+			});
+	},
 
-      this.classList.add("d-none");
-    });
-  },
+	handleDeleteBtnClick: function () {
+		$(".delete-btn").on("click", function () {
+			$("#deleteConfirmModal").modal({
+				backdrop: true,
+			});
+		});
+	},
+
+	handleDeleteBtnConfirm: function () {
+		$(".delete-confirm-btn").on("click", function () {
+			// initiate loading spinner
+			initSpinner();
+			const $viewBody = $(this)
+				.closest(".form-content")
+				.find(".form-view-body");
+			const formType = $(this)
+				.closest(".form-content")
+				.find("form")
+				.attr("data-name");
+			const accountName = $viewBody.find('input[name="accountName"]').val();
+			const id = $viewBody.find('input[name="' + formType + 'Id"]').val();
+
+			axios
+				.delete(
+					"/" + document.appData.businessName + "/" + formType + "s/" + id
+				)
+				.then(() => {
+					// implement success message and clear fields
+					revealStatusMessage(
+						formType,
+						"success",
+						"Success",
+						"Deleted " + formType + " record for " + accountName
+					);
+					$viewBody.find("input").empty();
+				})
+				.catch((err) => {
+					console.error(err);
+					revealStatusMessage(
+						formType,
+						"error",
+						"Error",
+						"Failed to delete record"
+					);
+				})
+				.then(endSpinner);
+		});
+	},
+
+	handleAlertHide: function () {
+		$(".alert").on("close.bs.alert", function (e) {
+			e.preventDefault();
+
+			this.classList.add("d-none");
+		});
+	},
+
+	handleStaffStartDateBlur: function () {
+		$("#staffDetails-staffMemberStartDateUTC").on("blur", function () {
+			const $this = $(this);
+			const $rateEffectiveDate = $this
+				.closest("#staffDetailsForm")
+				.find("#staffDetails-hourlyRateEffectiveDateUTC");
+			const startDate = $this.val();
+			if (!startDate) return;
+			if (!$rateEffectiveDate.val()) $rateEffectiveDate.val(startDate);
+		});
+	},
 };
 
 export default handlers;

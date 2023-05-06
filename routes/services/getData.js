@@ -1,9 +1,8 @@
-import lib from "../../lib/library.js";
-import queries from "./queries/index.js";
-import jobQueries from "./queries/job.js";
-import staffQueries from "./queries/staff.js";
-import clientQueries from "./queries/client.js";
 import territoryQueries from "./queries/territories.js";
+import clientQueries from "./queries/client.js";
+import staffQueries from "./queries/staff.js";
+import jobQueries from "./queries/job.js";
+import queries from "./queries/index.js";
 
 const { getTerritories } = territoryQueries;
 
@@ -38,21 +37,12 @@ export default {
 		queries
 			.getColumnHeaders(dim.toLowerCase(), orgShortName)
 			.then((fieldNames) => {
-				let obj = {
-					fieldLabels: fieldNames.map((columnName) =>
-						lib.getObjectFromKey(
-							orgShortName,
-							dim,
-							"fieldName",
-							columnName,
-							"sheetHeaderName"
-						)
-					),
+				res.json({
 					fieldNames,
-				};
-				res.json(obj);
+				});
 			})
 			.catch((err) => {
+				console.log("Error in getData.getKeysFromDb: ", dim.toLowerCase());
 				console.error(err);
 				res.status(500).send(err);
 			});

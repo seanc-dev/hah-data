@@ -1,113 +1,121 @@
-import forms from "./forms.js";
+import { initialiseAppData } from "./library.js";
 import handlers from "./handlers.js";
-import lib from "./library.js";
+import forms from "./forms.js";
 
-$(document).ready(function () {
-  function init() {
-    // remove body d-none once loaded static content (ensures loader is uninterrupted)
-    document.querySelector("body").classList.remove("d-none");
+// eslint-disable-next-line no-undef
+$(function () {
+	function init() {
+		// remove body d-none once loaded static content (ensures loader is uninterrupted)
+		document.querySelector("body").classList.remove("d-none");
 
-    document.appData = {
-      businessName: document.getElementById("businessName").innerText,
-    };
+		// get orgName name from views
+		const orgName = document.getElementById("businessName").innerText;
 
-    lib
-      .initialiseAppData()
-      .then((result) => {
-        // build forms
-        buildForms();
+		document.appData = {
+			businessName: orgName,
+		};
 
-        // kill loader
-        let event = new CustomEvent("appready");
-        document.dispatchEvent(event);
-        console.log("App ready!");
-      })
-      .catch((err) => {
-        alert("There was an error loading the forms. Please refresh the page.");
-        console.error("Error in lib.initialiseAppData in index.init");
-        console.error(err);
-      });
+		initialiseAppData()
+			.then(() => {
+				// build forms
+				buildForms();
 
-    function buildForms() {
-      // form construction
-      forms.constructForm("clientDetails");
-      forms.constructForm("jobDetails");
-      forms.setClientDetails();
-      forms.setJobDetails();
-      forms.setViewKeys();
-      forms.initAutocomplete();
+				// kill loader
+				let event = new CustomEvent("appready");
+				document.dispatchEvent(event);
+				console.log("App ready!");
+			})
+			.catch((err) => {
+				alert("There was an error loading the forms. Please refresh the page.");
+				console.error("Error in lib.initialiseAppData in index.init");
+				console.error(err);
+			});
 
-      // event handlers
-      handlers.handleFormTabClick();
-      handlers.handlerFormTypeSelect();
-      handlers.handleRecordSelectChange();
-      handlers.handleInputFocus();
-      handlers.handleAccountNameBlur();
-      handlers.handleFormSubmit();
-      handlers.handleDeleteBtnClick();
-      handlers.handleDeleteBtnConfirm();
-      handlers.handleAccountTypeInput();
-      handlers.handleAlertHide();
+		function buildForms() {
+			const { formOptions } = document.appData;
+			// form construction
+			forms.constructForm(
+				orgName,
+				"clientDetails",
+				formOptions["clientDetails"]
+			);
+			forms.constructForm(orgName, "jobDetails", formOptions["jobDetails"]);
+			forms.constructForm(orgName, "staffDetails", formOptions["staffDetails"]);
+			forms.setClientDetails();
+			forms.setJobDetails();
+			forms.setStaffDetails();
+			forms.setViewKeys();
+			forms.initAutocomplete();
 
-      // let clientData = {
-      //     accountType: 'Business',
-      //     accountName: 'Test Test Test Ltd.',
-      //     businessName: 'Test Test Test Ltd.',
-      //     mainContactFirstName: 'Coley',
-      //     mainContactLastName: 'Coley',
-      //     mainContactLandline: '',
-      //     mainContactMobile: '+64273493710',
-      //     mainContactEmail: 'seanco.dev@gmail.com',
-      //     billingAddressStreet: '11 Island View Terrace',
-      //     billingAddressSuburb: 'Cockle Bay',
-      //     billingAddressCity: 'Auckland',
-      //     billingAddressPostcode: '2014',
-      //     territory: 'South Wellington',
-      //     customerDemographic: 'Baby Boomer (50-65 ish)',
-      //     estimatedCustomerIncome: 'Pension',
-      //     acquisitionChannel: 'Word of Mouth',
-      // }
+			// event handlers
+			handlers.handleFormTabClick();
+			handlers.handlerFormTypeSelect();
+			handlers.handleRecordSelectChange();
+			handlers.handleInputFocus();
+			handlers.handleAccountNameBlur();
+			handlers.handleStaffStartDateBlur();
+			handlers.handleFormSubmit();
+			handlers.handleDeleteBtnClick();
+			handlers.handleDeleteBtnConfirm();
+			handlers.handleAccountTypeInput();
+			handlers.handleAlertHide();
 
-      // let jobData = { accountName: 'Davia, Ido',
-      // workLocationStreetAddress: '56 Kiwi Crescent',
-      // workLocationSuburb: 'Tawa',
-      // workLocationCity: '',
-      // workLocationPostcode: '',
-      // primaryJobType: 'Maintenance',
-      // secondaryJobType: '',
-      // indoorsOutdoors: 'Indoors',
-      // createdDateTimeNZT: '17/12/2019 22:12:43',
-      // dateJobEnquiry: '',
-      // dateJobQuoted: '',
-      // dateWorkCommenced: '',
-      // dateInvoiceSent: '2019-12-03',
-      // amountInvoiced: '2',
-      // costMaterials: '',
-      // costSubcontractor: '',
-      // costTipFees: '',
-      // costOther: '',
-      // hoursWorkedDave: '',
-      // workSatisfaction: '5',
-      // clientId: '10' }
+			let clientData = {
+				accountType: "Business",
+				accountName: "Test Test Test Ltd.",
+				businessName: "Test Test Test Ltd.",
+				mainContactFirstName: "Coley",
+				mainContactLastName: "Coley",
+				mainContactLandline: "",
+				mainContactMobile: "+64273493710",
+				mainContactEmail: "seanco.dev@gmail.com",
+				billingAddressStreet: "11 Island View Terrace",
+				billingAddressSuburb: "Cockle Bay",
+				billingAddressCity: "Auckland",
+				billingAddressPostcode: "2014",
+				territory: "Raumati",
+				customerDemographic: "Baby Boomer (50-65 ish)",
+				estimatedCustomerIncome: "Pension",
+				acquisitionChannel: "WOM Client",
+			};
 
-      // applyTestData('client', clientData);
-      // applyTestData('job', jobData);
+			let jobData = {
+				accountName: "Davia, Ido",
+				workLocationStreetAddress: "56 Kiwi Crescent",
+				workLocationSuburb: "Tawa",
+				workLocationCity: "",
+				workLocationPostcode: "",
+				primaryJobType: "Maintenance",
+				secondaryJobType: "",
+				indoorsOutdoors: "Indoors",
+				dateJobEnquiry: "",
+				dateJobQuoted: "",
+				dateWorkCommenced: "",
+				dateInvoiceSent: "2019-12-03",
+				amountInvoiced: "2",
+				costMaterials: "",
+				costSubcontractor: "",
+				costTipFees: "",
+				costOther: "",
+				hoursWorkedDave: "",
+				workSatisfaction: "5",
+				clientId: "10",
+			};
 
-      // function applyTestData(dim, data){
+			applyTestData("client", clientData);
+			applyTestData("job", jobData);
 
-      //     for (let key in data) {
+			function applyTestData(dim, data) {
+				for (let key in data) {
+					let el = document.getElementById(dim + "Details-" + key);
 
-      //         let el = document.getElementById(dim + 'Details-' + key);
+					el.value = data[key];
+				}
+			}
 
-      //         el.value = data[key];
+			applyTestData();
+		}
+	}
 
-      //     }
-
-      // }
-
-      // applyTestData();
-    }
-  }
-
-  init();
+	init();
 });
