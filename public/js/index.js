@@ -60,60 +60,60 @@ $(function () {
 			handlers.handleAccountTypeInput();
 			handlers.handleAlertHide();
 
-			let clientData = {
-				accountType: "Business",
-				accountName: "Test Test Test Ltd.",
-				businessName: "Test Test Test Ltd.",
-				mainContactFirstName: "Coley",
-				mainContactLastName: "Coley",
-				mainContactLandline: "",
-				mainContactMobile: "+64273493710",
-				mainContactEmail: "seanco.dev@gmail.com",
-				billingAddressStreet: "11 Island View Terrace",
-				billingAddressSuburb: "Cockle Bay",
-				billingAddressCity: "Auckland",
-				billingAddressPostcode: "2014",
-				territory: "Raumati",
-				customerDemographic: "Baby Boomer (50-65 ish)",
-				estimatedCustomerIncome: "Pension",
-				acquisitionChannel: "WOM Client",
-			};
+			// let clientData = {
+			// 	accountType: "Business",
+			// 	accountName: "Test Test Test Ltd.",
+			// 	businessName: "Test Test Test Ltd.",
+			// 	mainContactFirstName: "Coley",
+			// 	mainContactLastName: "Coley",
+			// 	mainContactLandline: "",
+			// 	mainContactMobile: "+64273493710",
+			// 	mainContactEmail: "seanco.dev@gmail.com",
+			// 	billingAddressStreet: "11 Island View Terrace",
+			// 	billingAddressSuburb: "Cockle Bay",
+			// 	billingAddressCity: "Auckland",
+			// 	billingAddressPostcode: "2014",
+			// 	territory: "Raumati",
+			// 	customerDemographic: "Baby Boomer (50-65 ish)",
+			// 	estimatedCustomerIncome: "Pension",
+			// 	acquisitionChannel: "WOM Client",
+			// };
 
-			let jobData = {
-				accountName: "Davia, Ido",
-				workLocationStreetAddress: "56 Kiwi Crescent",
-				workLocationSuburb: "Tawa",
-				workLocationCity: "",
-				workLocationPostcode: "",
-				primaryJobType: "Maintenance",
-				secondaryJobType: "",
-				indoorsOutdoors: "Indoors",
-				dateJobEnquiry: "",
-				dateJobQuoted: "",
-				dateWorkCommenced: "",
-				dateInvoiceSent: "2019-12-03",
-				amountInvoiced: "2",
-				costMaterials: "",
-				costSubcontractor: "",
-				costTipFees: "",
-				costOther: "",
-				hoursWorkedDave: "",
-				workSatisfaction: "5",
-				clientId: "10",
-			};
+			// let jobData = {
+			// 	accountName: "Davia, Ido",
+			// 	workLocationStreetAddress: "56 Kiwi Crescent",
+			// 	workLocationSuburb: "Tawa",
+			// 	workLocationCity: "",
+			// 	workLocationPostcode: "",
+			// 	primaryJobType: "Maintenance",
+			// 	secondaryJobType: "",
+			// 	indoorsOutdoors: "Indoors",
+			// 	dateJobEnquiry: "",
+			// 	dateJobQuoted: "",
+			// 	dateWorkCommenced: "",
+			// 	dateInvoiceSent: "2019-12-03",
+			// 	amountInvoiced: "2",
+			// 	costMaterials: "",
+			// 	costSubcontractor: "",
+			// 	costTipFees: "",
+			// 	costOther: "",
+			// 	hoursWorkedDave: "",
+			// 	workSatisfaction: "5",
+			// 	clientId: "10",
+			// };
 
-			applyTestData("client", clientData);
-			applyTestData("job", jobData);
+			// applyTestData("client", clientData);
+			// applyTestData("job", jobData);
 
-			function applyTestData(dim, data) {
-				for (let key in data) {
-					let el = document.getElementById(dim + "Details-" + key);
+			// function applyTestData(dim, data) {
+			// 	for (let key in data) {
+			// 		let el = document.getElementById(dim + "Details-" + key);
 
-					el.value = data[key];
-				}
-			}
+			// 		el.value = data[key];
+			// 	}
+			// }
 
-			applyTestData();
+			// applyTestData();
 		}
 	}
 
