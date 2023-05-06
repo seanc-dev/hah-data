@@ -82,10 +82,8 @@ export default {
 		try {
 			const staffNames = await staffQueries.getStaffNames(orgId, client);
 			// pull detail of all jobs for client
-			const jobDetails = await client.query(
-				clientQueries.getJobsByClientIdQuery(staffNames),
-				[id]
-			);
+			const queryString = clientQueries.getJobsByClientIdQuery(staffNames);
+			const jobDetails = await client.query(queryString, [id]);
 			// pull client details
 			const clientResult = await client.query(
 				"select * from client where id = $1",

@@ -281,10 +281,10 @@ const forms = {
 		async function doWork(dim) {
 			// retrieve keys for dimension's db record
 			let result;
+			const url =
+				"/" + document.appData.businessName + "/" + dim + "?requestType=keys";
 			try {
-				result = await axios.get(
-					"/" + document.appData.businessName + "/" + dim + "?requestType=keys"
-				);
+				result = await axios.get(url);
 			} catch (err) {
 				console.error(
 					"Error in setViewKeys doWork async step for " + dim + " dimension"
@@ -538,6 +538,14 @@ const forms = {
 					"accountName",
 					"dateInvoiceSent",
 					"amountInvoiced",
+				]);
+			if (formName === "Staff")
+				updateObj("id", "staff", [
+					"staffMemberName",
+					"staffMemberStartDateUTC",
+					"currentlyEmployed",
+					"hourlyRate",
+					"hourlyRateEffectiveDateUTC",
 				]);
 		}
 

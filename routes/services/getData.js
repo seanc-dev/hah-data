@@ -42,6 +42,7 @@ export default {
 				});
 			})
 			.catch((err) => {
+				console.log("Error in getData.getKeysFromDb: ", dim.toLowerCase());
 				console.error(err);
 				res.status(500).send(err);
 			});

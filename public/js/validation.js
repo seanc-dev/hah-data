@@ -1,4 +1,9 @@
 /* eslint-disable no-undef */
+
+const isDate = function (date) {
+	return date instanceof Date && !isNaN(date);
+};
+
 export const validateClientForm = function () {
 	// check if account name entered matches one from list
 	let $clientDetailsForm = $("#clientDetailsForm"),
@@ -62,13 +67,17 @@ export const validateStaffForm = function () {
 	const $form = $("#staffDetailsForm");
 	const isEdit = $("#staffFormTypeSelect").val().toLowerCase() === "edit";
 	const name = $form.find("#staffDetails-staffMemberName").val();
-	const startDate = $form.find("#staffDetails-staffMemberStartDateUTC").val();
-	const endDate = $form.find("#staffDetails-staffMemberEndDateUTC").val();
+	const startDate = new Date(
+		$form.find("#staffDetails-staffMemberStartDateUTC").val()
+	);
+	const endDate = new Date(
+		$form.find("#staffDetails-staffMemberEndDateUTC").val()
+	);
 	const currentlyEmployed = $form.find("#staffDetails-currentlyEmployed")[0]
 		.checked;
-	const hourlyRateEffectiveDate = $form
-		.find("#staffDetails-hourlyRateEffectiveDateUTC")
-		.val();
+	const hourlyRateEffectiveDate = new Date(
+		$form.find("#staffDetails-hourlyRateEffectiveDateUTC").val()
+	);
 
 	console.log("validation values");
 	console.log(
@@ -81,46 +90,54 @@ export const validateStaffForm = function () {
 		"currentlyEmployed: ",
 		currentlyEmployed,
 		"hourlyRateEffectiveDate: ",
-		hourlyRateEffectiveDate
+		hourlyRateEffectiveDate,
+		"isEdit: ",
+		isEdit
 	);
 
+	const staffDetail = document.appData.staffDetail;
+
 	// staff member name is unique
-	for (let i = 0; i < document.appData.staffDetail.length; i++) {
-		if (!isEdit && document.appData.staffDetail[i].staffMemberName === name) {
+	for (let i = 0; i < staffDetail.length; i++) {
+		if (!isEdit && staffDetail[i].staffMemberName === name) {
 			return "Staff member name already exists in database. Please enter a unique name.";
 		}
 	}
 
-	// if start date is in the future, currently employed must be 0
-	if (startDate > new Date() && currentlyEmployed === 1) {
-		return "Start date cannot be in the future if staff member is currently employed.";
+	// if start date is in the future, currently employed must be false
+	if (startDate > Date.now() && currentlyEmployed) {
+		return "Staff member cannot be currently employed while start date is in the future";
 	}
 
-	// if end date is in the future, currently employed must be 1
-	if (endDate > new Date() && currentlyEmployed === 0) {
-		return "End date cannot be in the future if staff member is not currently employed.";
-
-		// if end date is not empty, currently employed must be 0
-	} else if (endDate !== "" && currentlyEmployed === 1) {
-		return "End date cannot be entered if staff member is currently employed.";
-	}
-
-	// if currently employed = 1 end date must be empty
-	if (currentlyEmployed === 1 && endDate !== "") {
-		return "End date cannot be entered if staff member is currently employed.";
+	// if end date is in the past, currently employed must be false
+	if (isDate(endDate) && endDate <= Date.now() && currentlyEmployed) {
+		return "Staff member must not be currently employed if end date is in the past.";
 	}
 
 	// start date must be before end date
-	if (endDate && startDate > endDate) {
+	if (isDate(endDate) && startDate > endDate) {
 		return "Start date must be before end date.";
 	}
 
-	// hourly rate effective date must be on or after start date and before end date
+	// hourly rate effective date must be on or after start date
 	if (
-		endDate &&
-		(hourlyRateEffectiveDate < startDate || hourlyRateEffectiveDate >= endDate)
+		isEdit &&
+		isDate(hourlyRateEffectiveDate) &&
+		hourlyRateEffectiveDate < startDate
 	) {
-		return "Hourly rate effective date must be on or after start date and before end date.";
+		return "Hourly rate effective date must be on or after start date";
 	}
+
+	// hourly rate effective date must be before end date
+	if (
+		isEdit &&
+		isDate(hourlyRateEffectiveDate) &&
+		isDate(endDate) &&
+		hourlyRateEffectiveDate >= endDate
+	) {
+		return "Hourly rate effective date must be before end date.";
+	}
+
+	// if all validation passed
 	return true;
 };

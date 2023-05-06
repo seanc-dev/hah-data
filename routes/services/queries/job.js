@@ -16,8 +16,6 @@ export default {
 		// replace empty strings with string null values for insert
 		const { orgId } = req.params;
 		const body = prepareDataForDbInsert(req.body);
-		console.log("jobQueries.createJob req.body");
-		console.log(body);
 		// extract staffNames from body for staff_job_hours insert
 		const staffNames = getStaffNamesFromJobPost(body);
 		// create id var outside of block
@@ -131,10 +129,10 @@ export default {
 			const mappedJobObj = {};
 			const keys = Object.keys(jobObj);
 			const hoursWorkedFields = staffNames.map(
-				(name) => `hoursWorked${name.replace(" ", "")}`
+				(name) => `hoursWorked${name.replaceAll(" ", "")}`
 			);
 			const hourlyRateFields = staffNames.map(
-				(name) => `hourlyRate${name.replace(" ", "")}`
+				(name) => `hourlyRate${name.replaceAll(" ", "")}`
 			);
 			keys.forEach((key) => {
 				mappedJobObj[

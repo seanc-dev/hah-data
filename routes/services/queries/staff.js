@@ -31,6 +31,23 @@ const rateHistoryInsertAndUpdate = async (
 	return rateHistoryId;
 };
 
+const updateCurrentAndFormerRateDates = async (
+	xClient,
+	{ staffId, hourlyRateEffectiveDateUTC }
+) => {
+	const client = (await xClient) || pool.connect();
+	// update effective date of current rate
+	client.query(
+		"UPDATE staff_rate_history srh SET hourlyrateeffectivedateutc = $1 WHERE staffid = $2 AND hourlyrateexpirydateutc IS NULL",
+		[hourlyRateEffectiveDateUTC, staffId]
+	);
+	// update expiry date of former rate
+	client.query(
+		"UPDATE staff_rate_history srh SET hourlyrateexpirydateutc = $1 FROM (SELECT staffid, max(hourlyrateexpirydateutc) AS maxexpdate FROM staff_rate_history WHERE hourlyrateexpirydateutc IS NOT NULL GROUP BY staffid) maxexp WHERE srh.staffid = $2 AND srh.staffid = maxexp.staffid AND maxexp.maxexpdate = srh.hourlyrateexpirydateutc",
+		[hourlyRateEffectiveDateUTC, staffId]
+	);
+};
+
 const mapStaffDetails = (rows) =>
 	rows.reduce(
 		(
@@ -160,7 +177,6 @@ export default {
 
 	updateStaffMemberById: async function (req, res) {
 		const client = await pool.connect();
-		console.log(req.body);
 		try {
 			// destructure params and body
 			const { id } = req.params;
@@ -183,37 +199,45 @@ export default {
 				currentlyEmployed === 0 ? 0 : 1,
 				id,
 			];
-			console.log("updateStaffParams");
-			console.log(updateStaffParams);
 			const updateStaffResult = await client.query(
 				updateStaffQuery,
 				updateStaffParams
 			);
 
-			// update staff rate history
+			// update staff rate history //
+			// get current rate and effective date for staff member
 			const staffId = updateStaffResult.rows[0].id;
 			const {
-				rows: [{ hourlyRate: currentRate }],
-			} = await pool.query(
+				rows: [
+					{
+						hourlyrate: currentRate,
+						hourlyrateeffectivedateutc: currentRateEffectiveDate,
+					},
+				],
+			} = await client.query(
 				`select * from staff_rate_history where staffid = $1 and hourlyrateexpirydateutc is null`,
 				[staffId]
 			);
 
-			console.log(
-				"current rate: ",
-				currentRate,
-				"new rate: ",
-				hourlyRate,
-				"staff id: ",
-				staffId
-			);
-			if (currentRate && currentRate !== hourlyRate)
-				console.log("rates are different");
-			// rateHistoryInsertAndUpdate(client, {
-			// 	staffId,
-			// 	hourlyRate,
-			// 	hourlyRateEffectiveDateUTC,
-			// });
+			// if rate has changed insert new record and update old with expiry date
+			if (currentRate !== hourlyRate)
+				await rateHistoryInsertAndUpdate(client, {
+					staffId,
+					hourlyRate,
+					hourlyRateEffectiveDateUTC,
+				});
+
+			const currentDateStr = new Date(currentRateEffectiveDate).toISOString();
+			const newDateStr = new Date(hourlyRateEffectiveDateUTC).toISOString();
+
+			// if rate has not changed but effective date has, update current and former rate dates only
+			if (currentRate === hourlyRate && currentDateStr !== newDateStr) {
+				console.log("triggered updateCurrentAndFormerRateDates");
+				await updateCurrentAndFormerRateDates(client, {
+					staffId,
+					hourlyRateEffectiveDateUTC,
+				});
+			}
 
 			// commit transaction
 			client.query("commit");
