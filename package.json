@@ -13,7 +13,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"preinstall": "node preinstall.js",
-		"start dev": "nodemon app.js",
+		"dev": "nodemon app.js",
 		"start": "node app.js"
 	},
 	"repository": {
