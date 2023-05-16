@@ -46,7 +46,7 @@
 	"devDependencies": {
 		"eslint": "^8.34.0",
 		"lodash": ">=4.17.21",
-		"nodemon": "^2.0.21"
+		"nodemon": "^2.0.22"
 	},
 	"type": "module"
 }
