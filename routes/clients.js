@@ -9,6 +9,7 @@ const router = express.Router({
 
 // index route
 router.get("/", (req, res) => {
+	console.log('index clients route triggered for ', req.query.requestType)
 	if (req.query.requestType === "detailsArray") {
 		queries.getClientDetails(req, res);
 	} else if (req.query.requestType === "keys") {

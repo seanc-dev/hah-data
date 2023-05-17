@@ -10,6 +10,7 @@ const router = express.Router({
 
 // show form
 router.get("/:orgShortName", function (req, res) {
+	console.log('index show route for ', req.params.orgShortName, ' triggered')
 	let { orgShortName } = req.params;
 	if (orgShortName === "kapiti" || orgShortName === "wellington") {
 		if (!req.query.data) {

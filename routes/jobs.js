@@ -9,6 +9,7 @@ const router = express.Router({
 
 // index route
 router.get("/", (req, res) => {
+	console.log('index route for jobs triggered for ', req.query.requestType)
 	if (req.query.requestType === "detailsArray") {
 		queries.getJobDetails(req, res);
 	} else if (req.query.requestType === "keys") {
